@@ -17,6 +17,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["api/**/*.ts", "lib/**/*.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist", "scripts"]
 }
