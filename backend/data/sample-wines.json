@@ -1,0 +1,72 @@
+[
+  {
+    "producer": "Opus One",
+    "name": "Opus One",
+    "vintage": 2021,
+    "region": "Napa Valley",
+    "sub_region": "Oakville",
+    "country": "USA",
+    "color": "red",
+    "grape_varieties": [
+      { "name": "Cabernet Sauvignon", "percentage": 79 },
+      { "name": "Merlot", "percentage": 7 },
+      { "name": "Cabernet Franc", "percentage": 6 },
+      { "name": "Petit Verdot", "percentage": 6 },
+      { "name": "Malbec", "percentage": 2 }
+    ],
+    "alcohol": 14.5,
+    "score": 98,
+    "tasting_note": "This is intensely structured and refined, with a core of blackcurrant and black cherry that's framed by savory herbs, graphite and a hint of violet. The tannins are fine-grained and the finish is long and persistent.",
+    "reviewer_initials": "JL",
+    "reviewer_name": "James Laube",
+    "review_date": "2024-03-15",
+    "issue_date": "2024-04-30",
+    "drink_window_start": 2027,
+    "drink_window_end": 2055,
+    "release_price": 450
+  },
+  {
+    "producer": "Domaine de la Romanée-Conti",
+    "name": "La Tâche Grand Cru",
+    "vintage": 2021,
+    "region": "Burgundy",
+    "sub_region": "Vosne-Romanée",
+    "appellation": "La Tâche Grand Cru",
+    "country": "France",
+    "color": "red",
+    "grape_varieties": [
+      { "name": "Pinot Noir", "percentage": 100 }
+    ],
+    "alcohol": 13.5,
+    "score": 99,
+    "tasting_note": "Ethereal and transcendent, with an incredible array of red and black fruits, flowers, spices and earth. The texture is silky yet powerful, with remarkable depth and a finish that seems to go on forever.",
+    "reviewer_initials": "BL",
+    "reviewer_name": "Bruce Sanderson",
+    "review_date": "2024-02-20",
+    "drink_window_start": 2028,
+    "drink_window_end": 2060,
+    "release_price": 1200
+  },
+  {
+    "producer": "Penfolds",
+    "name": "Grange",
+    "vintage": 2019,
+    "region": "South Australia",
+    "sub_region": "Multi-Regional Blend",
+    "country": "Australia",
+    "color": "red",
+    "grape_varieties": [
+      { "name": "Shiraz", "percentage": 98 },
+      { "name": "Cabernet Sauvignon", "percentage": 2 }
+    ],
+    "alcohol": 14.5,
+    "score": 97,
+    "tasting_note": "Rich and powerful, with layers of blackberry, plum, dark chocolate, espresso and sweet spices. The tannins are ripe and fine-grained, leading to a long, complex finish.",
+    "reviewer_initials": "MG",
+    "reviewer_name": null,
+    "review_date": "2024-01-10",
+    "drink_window_start": 2025,
+    "drink_window_end": 2050,
+    "release_price": 850
+  }
+]
