@@ -123,22 +123,7 @@ struct ScannerTopBar: View {
             Spacer()
 
             // Center branding
-            VStack(spacing: 2) {
-                Text("WINE LENS")
-                    .font(.system(size: 12, weight: .bold, design: .default))
-                    .tracking(2)
-                    .foregroundColor(Theme.secondaryColor)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.black.opacity(0.5))
-                    .overlay(
-                        Capsule()
-                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
-                    )
-            )
+            WineLensBadge(style: .light)
 
             Spacer()
 

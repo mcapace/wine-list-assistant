@@ -112,16 +112,7 @@ struct SettingsHeader: View {
             Spacer()
 
             // Wine Lens badge
-            Text("WINE LENS")
-                .font(.system(size: 10, weight: .bold))
-                .tracking(1)
-                .foregroundColor(Theme.secondaryColor)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(
-                    Capsule()
-                        .fill(Theme.secondaryColor.opacity(0.15))
-                )
+            WineLensBadge(style: .dark)
         }
         .padding(.bottom, 8)
     }
@@ -448,10 +439,18 @@ struct AboutSection: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Wine Spectator")
                         .font(.system(size: 18, weight: .bold, design: .serif))
-                    Text("WINE LENS")
-                        .font(.system(size: 12, weight: .semibold))
-                        .tracking(2)
-                        .foregroundColor(Theme.secondaryColor)
+
+                    if let _ = UIImage(named: "WineLensText") {
+                        Image("WineLensText")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 14)
+                    } else {
+                        Text("WINE LENS")
+                            .font(.system(size: 12, weight: .semibold))
+                            .tracking(2)
+                            .foregroundColor(Theme.secondaryColor)
+                    }
                 }
             }
 
@@ -516,10 +515,18 @@ struct SignInView: View {
                             VStack(spacing: 4) {
                                 Text("Wine Spectator")
                                     .font(.system(size: 22, weight: .bold, design: .serif))
-                                Text("WINE LENS")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .tracking(3)
-                                    .foregroundColor(Theme.secondaryColor)
+
+                                if let _ = UIImage(named: "WineLensText") {
+                                    Image("WineLensText")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 16)
+                                } else {
+                                    Text("WINE LENS")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .tracking(3)
+                                        .foregroundColor(Theme.secondaryColor)
+                                }
                             }
                         }
                         .padding(.top, 20)

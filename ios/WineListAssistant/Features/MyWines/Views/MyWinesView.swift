@@ -136,16 +136,7 @@ struct MyWinesHeader: View {
             Spacer()
 
             // Wine Lens badge
-            Text("WINE LENS")
-                .font(.system(size: 10, weight: .bold))
-                .tracking(1)
-                .foregroundColor(Theme.secondaryColor)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(
-                    Capsule()
-                        .fill(Theme.secondaryColor.opacity(0.15))
-                )
+            WineLensBadge(style: .dark)
         }
         .padding()
         .background(Color(.systemBackground))

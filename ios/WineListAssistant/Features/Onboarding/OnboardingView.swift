@@ -124,10 +124,18 @@ struct OnboardingPageView: View {
                         Text("Wine Spectator")
                             .font(.system(size: 28, weight: .bold, design: .serif))
                             .foregroundColor(.primary)
-                        Text("WINE LENS")
-                            .font(.system(size: 18, weight: .semibold, design: .default))
-                            .tracking(4)
-                            .foregroundColor(Theme.secondaryColor)
+
+                        if let _ = UIImage(named: "WineLensText") {
+                            Image("WineLensText")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 20)
+                        } else {
+                            Text("WINE LENS")
+                                .font(.system(size: 18, weight: .semibold, design: .default))
+                                .tracking(4)
+                                .foregroundColor(Theme.secondaryColor)
+                        }
                     }
                 }
             } else {
