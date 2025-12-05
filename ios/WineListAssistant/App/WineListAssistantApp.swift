@@ -1,7 +1,8 @@
 import SwiftUI
+import Combine
 
 @main
-struct WineListAssistantApp: App {
+struct WineLensApp: App {
     @StateObject private var appState = AppState()
     @StateObject private var subscriptionService = SubscriptionService.shared
 

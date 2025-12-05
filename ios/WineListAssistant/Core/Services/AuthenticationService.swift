@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+import Combine
 
 @MainActor
 final class AuthenticationService: ObservableObject {
