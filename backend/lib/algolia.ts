@@ -1,8 +1,12 @@
 import algoliasearch from 'algoliasearch';
 import type { WineWithReview, SearchResult } from '../types';
 
-const appId = process.env.ALGOLIA_APP_ID!;
-const apiKey = process.env.ALGOLIA_API_KEY!;
+const appId = process.env.ALGOLIA_APP_ID?.trim();
+const apiKey = process.env.ALGOLIA_API_KEY?.trim();
+
+if (!appId || !apiKey) {
+  throw new Error('Missing Algolia credentials: ALGOLIA_APP_ID and ALGOLIA_API_KEY must be set');
+}
 
 const client = algoliasearch(appId, apiKey);
 const wineIndex = client.initIndex('wines');
