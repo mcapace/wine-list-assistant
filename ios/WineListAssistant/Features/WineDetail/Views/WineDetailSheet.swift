@@ -40,6 +40,7 @@ struct WineDetailSheet: View {
 
                     // Actions
                     ActionButtonsSection(
+                        wine: wine,
                         isSaved: $isSaved,
                         onSave: saveWine,
                         onShare: { showShareSheet = true }
@@ -302,28 +303,58 @@ struct PriceValueSection: View {
 // MARK: - Action Buttons
 
 struct ActionButtonsSection: View {
+    let wine: Wine?
     @Binding var isSaved: Bool
     let onSave: () -> Void
     let onShare: () -> Void
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            Button(action: onSave) {
-                Label(
-                    isSaved ? "Saved" : "Save",
-                    systemImage: isSaved ? "heart.fill" : "heart"
-                )
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .tint(isSaved ? .red : .accentColor)
-            .disabled(isSaved)
-
-            Button(action: onShare) {
-                Label("Share", systemImage: "square.and.arrow.up")
+        VStack(spacing: Theme.Spacing.sm) {
+            HStack(spacing: Theme.Spacing.md) {
+                Button(action: onSave) {
+                    Label(
+                        isSaved ? "Saved" : "Save",
+                        systemImage: isSaved ? "heart.fill" : "heart"
+                    )
                     .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(isSaved ? .red : .accentColor)
+                .disabled(isSaved)
+
+                Button(action: onShare) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
+            
+            // Buy Similar Wine button
+            if let wine = wine {
+                Button(action: { buySimilarWine(wine) }) {
+                    Label("Buy Similar Wine", systemImage: "cart")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.green)
+            }
+        }
+    }
+    
+    private func buySimilarWine(_ wine: Wine) {
+        // Create search query for similar wines
+        let searchQuery = "\(wine.producer) \(wine.name) \(wine.vintage.map { String($0) } ?? "")"
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Use Wine-Searcher or general web search
+        // Wine-Searcher: https://www.wine-searcher.com/find/
+        // For now, use a web search as fallback
+        let wineSearcherURL = "https://www.wine-searcher.com/find/\(searchQuery)"
+        
+        if let url = URL(string: wineSearcherURL) {
+            UIApplication.shared.open(url)
+        } else if let fallbackURL = URL(string: "https://www.google.com/search?q=\(searchQuery)") {
+            UIApplication.shared.open(fallbackURL)
         }
     }
 }

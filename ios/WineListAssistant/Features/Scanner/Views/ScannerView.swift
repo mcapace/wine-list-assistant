@@ -47,9 +47,10 @@ struct ScannerView: View {
                 VStack {
                     Spacer()
 
-                    // Scan status
+                    // Scan status - only show count of actually matched wines
                     if viewModel.isProcessing {
-                        ScanningIndicator(winesFound: viewModel.recognizedWines.count)
+                        let matchedCount = viewModel.recognizedWines.filter { $0.isMatched }.count
+                        ScanningIndicator(winesFound: matchedCount)
                     }
 
                     FilterBar(

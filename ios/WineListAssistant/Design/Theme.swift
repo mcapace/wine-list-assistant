@@ -22,7 +22,7 @@ enum Theme {
     static func scoreColor(for score: Int) -> Color {
         switch score {
         case 95...100:
-            return .purple
+            return secondaryColor  // Gold badges for 95+ points (as per spec)
         case 90...94:
             return .green
         case 85...89:

@@ -136,8 +136,8 @@ final class OCRService {
                     return nil
                 }
 
-                // Filter out very low confidence results
-                guard candidate.confidence > 0.5 else {
+                // Filter out very low confidence results (lowered from 0.5 to 0.3 for better detection)
+                guard candidate.confidence > 0.3 else {
                     return nil
                 }
 

@@ -135,10 +135,21 @@ final class ScannerViewModel: ObservableObject {
             // Step 1: OCR - recognize text in frame
             let ocrResults = try await ocrService.recognizeText(in: frame)
             guard !Task.isCancelled else { return }
+            
+            #if DEBUG
+            print("🔍 OCR found \(ocrResults.count) text observations")
+            #endif
 
             // Step 2: Group text into wine entry candidates
             let candidates = ocrService.groupIntoWineEntries(ocrResults)
             guard !Task.isCancelled else { return }
+            
+            #if DEBUG
+            print("🍷 Grouped into \(candidates.count) wine candidates")
+            for candidate in candidates.prefix(3) {
+                print("   - \"\(candidate.fullText)\" (confidence: \(candidate.confidence))")
+            }
+            #endif
 
             // Step 3: Match each candidate against our wine database
             var matchedWines: [RecognizedWine] = []
@@ -147,21 +158,37 @@ final class ScannerViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 let matchResult = await matchingService.matchWine(from: candidate.fullText)
+                
+                #if DEBUG
+                if let match = matchResult {
+                    print("✅ Matched: \"\(candidate.fullText)\" → \(match.wine.producer) \(match.wine.name) (confidence: \(match.confidence))")
+                } else {
+                    print("❌ No match for: \"\(candidate.fullText)\"")
+                }
+                #endif
 
-                let recognized = RecognizedWine(
-                    id: UUID(),
-                    originalText: candidate.fullText,
-                    boundingBox: candidate.boundingBox,
-                    ocrConfidence: candidate.confidence,
-                    matchedWine: matchResult?.wine,
-                    matchConfidence: matchResult?.confidence ?? 0,
-                    matchedVintage: matchResult?.matchedVintage,
-                    matchType: matchResult?.matchType ?? .noMatch,
-                    listPrice: extractPrice(from: candidate.fullText)
-                )
+                // Only add wines that actually matched (or have high enough confidence)
+                // This prevents showing "wines found" for unmatched text
+                if let match = matchResult, match.confidence >= AppConfiguration.matchConfidenceThreshold {
+                    let recognized = RecognizedWine(
+                        id: UUID(),
+                        originalText: candidate.fullText,
+                        boundingBox: candidate.boundingBox,
+                        ocrConfidence: candidate.confidence,
+                        matchedWine: match.wine,
+                        matchConfidence: match.confidence,
+                        matchedVintage: match.matchedVintage,
+                        matchType: match.matchType,
+                        listPrice: extractPrice(from: candidate.fullText)
+                    )
 
-                matchedWines.append(recognized)
+                    matchedWines.append(recognized)
+                }
             }
+            
+            #if DEBUG
+            print("📊 Total matched wines this frame: \(matchedWines.count)")
+            #endif
 
             // Update UI on main thread
             await MainActor.run {
@@ -170,7 +197,7 @@ final class ScannerViewModel: ObservableObject {
             }
 
         } catch {
-            print("Frame processing error: \(error)")
+            print("❌ Frame processing error: \(error)")
         }
     }
 

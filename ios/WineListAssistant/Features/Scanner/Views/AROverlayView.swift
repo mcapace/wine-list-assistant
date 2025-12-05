@@ -36,16 +36,35 @@ struct ScoreBadgeOverlay: View {
     @State private var isPressed = false
 
     var body: some View {
-        Group {
-            if wine.isMatched {
-                ScoreBadge(
-                    score: wine.matchedWine?.score,
-                    confidence: wine.matchConfidence,
-                    vintage: wine.matchedVintage
-                )
-            } else {
-                // Unmatched indicator
-                UnmatchedBadge()
+        ZStack(alignment: .top) {
+            // Main score badge
+            Group {
+                if wine.isMatched {
+                    ScoreBadge(
+                        score: wine.matchedWine?.score,
+                        confidence: wine.matchConfidence,
+                        vintage: wine.matchedVintage
+                    )
+                } else {
+                    // Unmatched indicator
+                    UnmatchedBadge()
+                }
+            }
+            
+            // Value and drink window indicators below the badge
+            VStack(spacing: 4) {
+                Spacer()
+                    .frame(height: 28) // Space for badge
+                
+                // Show value indicator if it's a best value
+                if wine.isMatched, wine.isBestValue {
+                    ValueIndicatorOverlay(wine: wine)
+                }
+                
+                // Show drink window indicator if available
+                if wine.isMatched, let matchedWine = wine.matchedWine {
+                    DrinkWindowIndicatorOverlay(status: matchedWine.drinkWindowStatus)
+                }
             }
         }
         .position(position)

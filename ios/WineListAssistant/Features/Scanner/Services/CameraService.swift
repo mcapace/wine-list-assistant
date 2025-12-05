@@ -18,7 +18,7 @@ final class CameraService: NSObject, ObservableObject {
 
     // MARK: - Private Properties
 
-    private let captureSession = AVCaptureSession()
+    let captureSession = AVCaptureSession()  // Made internal so preview can access it
     private let videoOutput = AVCaptureVideoDataOutput()
     private let sessionQueue = DispatchQueue(label: "com.winespectator.wla.camera.session")
     private let videoOutputQueue = DispatchQueue(label: "com.winespectator.wla.camera.output")
@@ -210,6 +210,9 @@ final class CameraService: NSObject, ObservableObject {
             self?.captureSession.startRunning()
             Task { @MainActor in
                 self?.isRunning = self?.captureSession.isRunning ?? false
+                #if DEBUG
+                print("📷 Camera started: \(self?.isRunning ?? false)")
+                #endif
             }
         }
     }
@@ -303,6 +306,12 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         Task { @MainActor in
             self.currentFrame = pixelBuffer
+            #if DEBUG
+            // Log occasionally to avoid spam (every 30 frames ≈ 1 second at 30fps)
+            if Int.random(in: 0..<30) == 0 {
+                print("📹 Frame captured: \(pixelBuffer.width)x\(pixelBuffer.height)")
+            }
+            #endif
         }
     }
 
