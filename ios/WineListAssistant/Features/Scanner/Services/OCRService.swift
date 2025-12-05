@@ -196,6 +196,32 @@ final class OCRService {
     private func isLikelyWineEntry(_ candidate: WineTextCandidate) -> Bool {
         let text = candidate.fullText.lowercased()
 
+        // Reject very short or very long text (likely not wine)
+        if candidate.fullText.count < 5 || candidate.fullText.count > 200 {
+            return false
+        }
+
+        // Reject text with too many special characters (likely UI/gibberish)
+        let specialCharCount = candidate.fullText.filter { !$0.isLetter && !$0.isNumber && !$0.isWhitespace && $0 != "$" && $0 != "." && $0 != "," && $0 != "'" && $0 != "-" }.count
+        if Double(specialCharCount) / Double(candidate.fullText.count) > 0.3 {
+            return false
+        }
+
+        // Reject text that looks like file paths, code, or UI elements
+        let uiPatterns = [
+            "winelensapp", "package", "dependencies", "bundle", "assets",
+            "identity", "display", "minimum", "deployments", "localda",
+            "nslocalizedd", "executable", "filter", "version", "readme",
+            "license", "rakefile", "podspec", "gemfile", "index",
+            "script", "sources", "testates", "reserveolved", "winelensapptestates"
+        ]
+        
+        for pattern in uiPatterns {
+            if text.contains(pattern) {
+                return false
+            }
+        }
+
         // Skip common non-wine patterns
         let skipPatterns = [
             "wine list",

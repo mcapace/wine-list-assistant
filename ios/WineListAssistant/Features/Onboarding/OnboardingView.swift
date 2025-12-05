@@ -101,14 +101,30 @@ struct OnboardingPageView: View {
             Spacer()
 
             if page.isLogo {
-                // Logo page - show WineLensText image
+                // Logo page - show WineLensText image with fallback
                 VStack(spacing: Theme.Spacing.xl) {
-                    // WineLensText logo image
-                    Image("WineLensText")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 280, maxHeight: 120)
-                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                    // WineLensText logo image with fallback
+                    Group {
+                        if UIImage(named: "WineLensText") != nil {
+                            Image("WineLensText")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: 280, maxHeight: 120)
+                        } else {
+                            // Fallback if image not found
+                            VStack(spacing: 8) {
+                                Image(systemName: "wineglass.fill")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(Theme.primaryColor)
+                                Text("WINE LENS")
+                                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                                    .foregroundColor(Theme.secondaryColor)
+                                    .tracking(4)
+                            }
+                            .frame(maxWidth: 280, maxHeight: 120)
+                        }
+                    }
+                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                     
                     // Wine Spectator branding
                     Text("Wine Spectator")

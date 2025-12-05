@@ -13,8 +13,14 @@ struct ScannerView: View {
         GeometryReader { geometry in
             ZStack {
                 // Camera Preview
-                CameraPreviewView(cameraService: viewModel.cameraService)
-                    .ignoresSafeArea()
+                if viewModel.cameraService.isRunning {
+                    CameraPreviewView(cameraService: viewModel.cameraService)
+                        .ignoresSafeArea()
+                } else {
+                    // Loading/black screen while camera starts
+                    Color.black
+                        .ignoresSafeArea()
+                }
 
                 // AR Overlay
                 AROverlayView(
@@ -39,9 +45,24 @@ struct ScannerView: View {
                 }
                 .padding()
 
-                // Center instruction hint (when no wines found)
-                if viewModel.recognizedWines.isEmpty && !viewModel.isProcessing {
+                // Center instruction hint (when no wines found and camera is ready)
+                if viewModel.recognizedWines.isEmpty && !viewModel.isProcessing && viewModel.cameraService.isRunning {
                     ScannerHintView()
+                }
+                
+                // Loading indicator when camera is starting
+                if !viewModel.cameraService.isRunning && viewModel.cameraService.isAuthorized {
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.5)
+                        Text("Starting camera...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding(24)
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(16)
                 }
 
                 // Bottom Controls
@@ -577,12 +598,28 @@ struct FilterChip: View {
 
 struct ScanningIndicator: View {
     let winesFound: Int
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         HStack(spacing: 8) {
-            // Lottie scan pulse animation
+            // Lottie scan pulse animation with fallback
+            #if canImport(Lottie)
             ScanPulseAnimation()
                 .frame(width: 20, height: 20)
+            #else
+            Circle()
+                .fill(Color.white)
+                .frame(width: 8, height: 8)
+                .scaleEffect(pulseScale)
+                .animation(
+                    Animation.easeInOut(duration: 1.0)
+                        .repeatForever(autoreverses: true),
+                    value: pulseScale
+                )
+                .onAppear {
+                    pulseScale = 1.3
+                }
+            #endif
             
             if winesFound > 0 {
                 Text("\(winesFound) wines found")

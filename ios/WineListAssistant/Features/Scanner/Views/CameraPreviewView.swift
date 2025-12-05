@@ -2,19 +2,31 @@ import SwiftUI
 import AVFoundation
 
 struct CameraPreviewView: UIViewRepresentable {
-    let cameraService: CameraService
+    @ObservedObject var cameraService: CameraService
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
-        // Connect the capture session to the preview layer
-        view.previewLayer.session = cameraService.captureSession
+        // Connect the capture session to the preview layer on main thread
+        DispatchQueue.main.async {
+            view.previewLayer.session = cameraService.captureSession
+            // Set proper orientation
+            if let connection = view.previewLayer.connection, connection.isVideoOrientationSupported {
+                connection.videoOrientation = .portrait
+            }
+        }
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
         // Ensure session is still connected (in case of reconfiguration)
-        if uiView.previewLayer.session != cameraService.captureSession {
-            uiView.previewLayer.session = cameraService.captureSession
+        DispatchQueue.main.async {
+            if uiView.previewLayer.session != cameraService.captureSession {
+                uiView.previewLayer.session = cameraService.captureSession
+            }
+            // Update orientation if needed
+            if let connection = uiView.previewLayer.connection, connection.isVideoOrientationSupported {
+                connection.videoOrientation = .portrait
+            }
         }
     }
 }

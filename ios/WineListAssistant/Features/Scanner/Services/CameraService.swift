@@ -207,11 +207,23 @@ final class CameraService: NSObject, ObservableObject {
         guard !isRunning else { return }
 
         sessionQueue.async { [weak self] in
-            self?.captureSession.startRunning()
+            guard let self = self else { return }
+            
+            // Start the session
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+            }
+            
+            // Update state on main thread
             Task { @MainActor in
-                self?.isRunning = self?.captureSession.isRunning ?? false
+                // Give it a moment to start
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                self.isRunning = self.captureSession.isRunning
                 #if DEBUG
-                print("📷 Camera started: \(self?.isRunning ?? false)")
+                print("📷 Camera started: \(self.isRunning)")
+                if !self.isRunning {
+                    print("⚠️ Camera session failed to start")
+                }
                 #endif
             }
         }

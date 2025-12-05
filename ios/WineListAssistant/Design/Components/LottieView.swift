@@ -19,7 +19,9 @@ struct LottieAnimationView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
+        let containerView = UIView(frame: .zero)
+        containerView.backgroundColor = .clear
+        
         let animationView = LottieAnimationView()
         
         // Try to load from main bundle first
@@ -32,21 +34,35 @@ struct LottieAnimationView: UIViewRepresentable {
         animationView.contentMode = .scaleAspectFit
         animationView.loopMode = loopMode
         animationView.animationSpeed = animationSpeed
-        animationView.play()
+        animationView.backgroundBehavior = .pauseAndRestore
+        animationView.shouldRasterizeWhenIdle = false
         
         animationView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(animationView)
+        containerView.addSubview(animationView)
         
         NSLayoutConstraint.activate([
-            animationView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            animationView.heightAnchor.constraint(equalTo: view.heightAnchor)
+            animationView.widthAnchor.constraint(equalTo: containerView.widthAnchor),
+            animationView.heightAnchor.constraint(equalTo: containerView.heightAnchor),
+            animationView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            animationView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor)
         ])
         
-        return view
+        // Start playing after a tiny delay to ensure view is ready
+        DispatchQueue.main.async {
+            animationView.play()
+        }
+        
+        return containerView
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Animation updates handled automatically
+        // Find the animation view and ensure it's playing
+        guard let animationView = uiView.subviews.first as? LottieAnimationView else { return }
+        
+        // Only restart if it's not already playing
+        if !animationView.isAnimationPlaying {
+            animationView.play()
+        }
     }
 }
 #else
