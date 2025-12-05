@@ -4,30 +4,91 @@ struct MyWinesView: View {
     @StateObject private var viewModel = MyWinesViewModel()
     @State private var searchText = ""
     @State private var selectedWine: SavedWine?
+    @State private var selectedFilter: WineListFilter = .all
+
+    enum WineListFilter: String, CaseIterable {
+        case all = "All"
+        case top = "95+"
+        case recent = "Recent"
+
+        var icon: String {
+            switch self {
+            case .all: return "square.grid.2x2"
+            case .top: return "star.fill"
+            case .recent: return "clock"
+            }
+        }
+    }
 
     var filteredWines: [SavedWine] {
-        if searchText.isEmpty {
-            return viewModel.savedWines
+        var wines = viewModel.savedWines
+
+        // Apply text search
+        if !searchText.isEmpty {
+            wines = wines.filter { saved in
+                saved.wine.fullName.localizedCaseInsensitiveContains(searchText) ||
+                saved.wine.region.localizedCaseInsensitiveContains(searchText)
+            }
         }
-        return viewModel.savedWines.filter { saved in
-            saved.wine.fullName.localizedCaseInsensitiveContains(searchText) ||
-            saved.wine.region.localizedCaseInsensitiveContains(searchText)
+
+        // Apply filter
+        switch selectedFilter {
+        case .all:
+            break
+        case .top:
+            wines = wines.filter { $0.wine.score >= 95 }
+        case .recent:
+            wines = wines.sorted { $0.addedAt > $1.addedAt }
         }
+
+        return wines
     }
 
     var body: some View {
         NavigationView {
-            Group {
-                if viewModel.isLoading && viewModel.savedWines.isEmpty {
-                    ProgressView("Loading wines...")
-                } else if viewModel.savedWines.isEmpty {
-                    EmptyWinesView()
-                } else {
-                    wineList
+            ZStack {
+                // Background
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    // Header with branding
+                    MyWinesHeader()
+
+                    // Filter pills
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(WineListFilter.allCases, id: \.self) { filter in
+                                FilterPill(
+                                    title: filter.rawValue,
+                                    icon: filter.icon,
+                                    isSelected: selectedFilter == filter
+                                ) {
+                                    withAnimation { selectedFilter = filter }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 12)
+                    }
+                    .background(Color(.systemBackground))
+
+                    // Content
+                    Group {
+                        if viewModel.isLoading && viewModel.savedWines.isEmpty {
+                            LoadingWinesView()
+                        } else if viewModel.savedWines.isEmpty {
+                            EmptyWinesView()
+                        } else if filteredWines.isEmpty {
+                            NoResultsView(searchText: searchText)
+                        } else {
+                            wineList
+                        }
+                    }
                 }
             }
-            .navigationTitle("My Wines")
-            .searchable(text: $searchText, prompt: "Search wines")
+            .navigationBarHidden(true)
+            .searchable(text: $searchText, prompt: "Search your wines")
             .refreshable {
                 await viewModel.loadSavedWines()
             }
@@ -45,22 +106,127 @@ struct MyWinesView: View {
     }
 
     private var wineList: some View {
-        List {
-            ForEach(filteredWines) { saved in
-                SavedWineRow(savedWine: saved)
-                    .onTapGesture {
-                        selectedWine = saved
-                    }
-            }
-            .onDelete { indexSet in
-                Task {
-                    for index in indexSet {
-                        await viewModel.deleteWine(filteredWines[index])
-                    }
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(filteredWines) { saved in
+                    SavedWineCard(savedWine: saved)
+                        .onTapGesture {
+                            selectedWine = saved
+                        }
                 }
             }
+            .padding()
         }
-        .listStyle(.plain)
+    }
+}
+
+// MARK: - Header
+
+struct MyWinesHeader: View {
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("My Wines")
+                    .font(.system(size: 28, weight: .bold))
+                Text("Your personal collection")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            // Wine Lens badge
+            WineLensBadge(style: .dark)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+    }
+}
+
+// MARK: - Filter Pill
+
+struct FilterPill: View {
+    let title: String
+    let icon: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: {
+            HapticManager.shared.filterChanged()
+            action()
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12))
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .foregroundColor(isSelected ? .white : .primary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Theme.primaryColor : Color(.systemGray6))
+            )
+        }
+    }
+}
+
+// MARK: - Wine Card
+
+struct SavedWineCard: View {
+    let savedWine: SavedWine
+
+    var body: some View {
+        HStack(spacing: 14) {
+            // Score badge
+            ZStack {
+                Circle()
+                    .fill(Theme.scoreColor(for: savedWine.wine.score).opacity(0.15))
+                    .frame(width: 56, height: 56)
+
+                Text("\(savedWine.wine.score)")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.scoreColor(for: savedWine.wine.score))
+            }
+
+            // Wine info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(savedWine.wine.producer)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text(savedWine.wine.name)
+                    .font(.system(size: 16, weight: .semibold))
+                    .lineLimit(1)
+
+                HStack(spacing: 8) {
+                    if let vintage = savedWine.wine.vintage {
+                        Label("\(vintage)", systemImage: "calendar")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Label(savedWine.wine.region, systemImage: "mappin")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        )
     }
 }
 
@@ -68,21 +234,75 @@ struct MyWinesView: View {
 
 struct EmptyWinesView: View {
     var body: some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            Image(systemName: "heart.slash")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(Theme.primaryColor.opacity(0.1))
+                    .frame(width: 100, height: 100)
 
-            Text("No Saved Wines")
-                .font(.title2)
+                Image(systemName: "heart")
+                    .font(.system(size: 44))
+                    .foregroundColor(Theme.primaryColor)
+            }
+
+            Text("No Saved Wines Yet")
+                .font(.title3)
                 .fontWeight(.semibold)
 
-            Text("Wines you save while scanning will appear here.")
-                .font(.body)
+            Text("When you scan a wine list, tap the heart\nto save your favorite bottles here.")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+
+            // Hint
+            HStack(spacing: 8) {
+                Image(systemName: "lightbulb.fill")
+                    .foregroundColor(Theme.secondaryColor)
+                Text("Tip: Go to Scan tab to find wines")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 8)
         }
-        .padding()
+        .padding(40)
+    }
+}
+
+// MARK: - Loading State
+
+struct LoadingWinesView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            // Use Lottie animation if available, fallback to ProgressView
+            WineGlassFillAnimation(size: 80)
+
+            Text("Loading your wines...")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - No Results
+
+struct NoResultsView: View {
+    let searchText: String
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 40))
+                .foregroundColor(.secondary)
+
+            Text("No wines match \"\(searchText)\"")
+                .font(.headline)
+
+            Text("Try a different search term")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

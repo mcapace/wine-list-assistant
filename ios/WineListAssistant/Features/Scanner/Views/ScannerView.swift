@@ -123,22 +123,7 @@ struct ScannerTopBar: View {
             Spacer()
 
             // Center branding
-            VStack(spacing: 2) {
-                Text("WINE LENS")
-                    .font(.system(size: 12, weight: .bold, design: .default))
-                    .tracking(2)
-                    .foregroundColor(Theme.secondaryColor)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.black.opacity(0.5))
-                    .overlay(
-                        Capsule()
-                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
-                    )
-            )
+            WineLensBadge(style: .light)
 
             Spacer()
 
@@ -183,11 +168,17 @@ struct ScannerTopBar: View {
 
 struct ScannerHintView: View {
     @State private var isAnimating = false
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         VStack(spacing: 16) {
-            // Animated scan frame
+            // Animated scan frame with Lottie pulse
             ZStack {
+                // Lottie pulse animation (if available)
+                ScanPulseAnimation()
+                    .opacity(0.6)
+                    .scaleEffect(pulseScale)
+
                 // Corner brackets
                 ScanFrameCorners()
                     .stroke(Theme.secondaryColor, lineWidth: 2)
@@ -227,7 +218,15 @@ struct ScannerHintView: View {
                         .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 )
         )
-        .onAppear { isAnimating = true }
+        .onAppear {
+            isAnimating = true
+            HapticManager.shared.scanStarted()
+
+            // Subtle pulse animation
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                pulseScale = 1.05
+            }
+        }
     }
 }
 
@@ -473,7 +472,10 @@ struct FilterButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.filterChanged()
+            action()
+        }) {
             HStack(spacing: 4) {
                 Image(systemName: filter.iconName)
                     .font(.caption)

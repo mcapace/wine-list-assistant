@@ -10,116 +10,72 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                // Account Section
-                Section("Account") {
-                    if authService.isAuthenticated, let user = authService.currentUser {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(user.displayName)
-                                    .font(.headline)
-                                Text(user.email)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+            ZStack {
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Header
+                        SettingsHeader()
+
+                        // Subscription Card
+                        SubscriptionCard(
+                            subscriptionService: subscriptionService,
+                            onUpgrade: { showSubscription = true }
+                        )
+
+                        // Account Section
+                        SettingsSection(title: "Account", icon: "person.circle.fill") {
+                            if authService.isAuthenticated, let user = authService.currentUser {
+                                AccountRow(user: user, onSignOut: { showSignOut = true })
+                            } else {
+                                SignInRow(onSignIn: { showSignIn = true })
                             }
-                            Spacer()
-                            Button("Sign Out") {
-                                showSignOut = true
-                            }
-                            .foregroundColor(.red)
                         }
-                    } else {
-                        Button("Sign In") {
-                            showSignIn = true
-                        }
-                    }
-                }
 
-                // Subscription Section
-                Section("Subscription") {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(subscriptionStatusTitle)
-                                .font(.headline)
-                            Text(subscriptionStatusSubtitle)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                        if !subscriptionService.subscriptionStatus.isActive {
-                            Button("Upgrade") {
-                                showSubscription = true
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                    }
+                        // App Section
+                        SettingsSection(title: "App", icon: "app.fill") {
+                            SettingsRow(
+                                icon: "info.circle",
+                                title: "Version",
+                                value: "\(AppConfiguration.appVersion) (\(AppConfiguration.buildNumber))"
+                            )
 
-                    if !subscriptionService.subscriptionStatus.isActive {
-                        HStack {
-                            Text("Free scans remaining")
-                            Spacer()
-                            Text("\(subscriptionService.remainingFreeScans()) of \(AppConfiguration.freeScansPerMonth)")
-                                .foregroundColor(.secondary)
+                            Divider().padding(.leading, 44)
+
+                            SettingsLinkRow(
+                                icon: "lock.shield",
+                                title: "Privacy Policy",
+                                url: "https://www.winespectator.com/privacy"
+                            )
+
+                            Divider().padding(.leading, 44)
+
+                            SettingsLinkRow(
+                                icon: "doc.text",
+                                title: "Terms of Service",
+                                url: "https://www.winespectator.com/terms"
+                            )
+
+                            Divider().padding(.leading, 44)
+
+                            SettingsLinkRow(
+                                icon: "envelope",
+                                title: "Contact Support",
+                                url: "mailto:support@winespectator.com"
+                            )
                         }
-                    }
 
-                    Button("Restore Purchases") {
-                        Task {
-                            try? await subscriptionService.restorePurchases()
-                        }
-                    }
-                }
+                        // About Section
+                        AboutSection()
 
-                // App Section
-                Section("App") {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text("\(AppConfiguration.appVersion) (\(AppConfiguration.buildNumber))")
-                            .foregroundColor(.secondary)
+                        Spacer(minLength: 40)
                     }
-
-                    Link(destination: URL(string: "https://www.winespectator.com/privacy")!) {
-                        HStack {
-                            Text("Privacy Policy")
-                            Spacer()
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption)
-                        }
-                    }
-
-                    Link(destination: URL(string: "https://www.winespectator.com/terms")!) {
-                        HStack {
-                            Text("Terms of Service")
-                            Spacer()
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption)
-                        }
-                    }
-
-                    Link(destination: URL(string: "mailto:support@winespectator.com")!) {
-                        HStack {
-                            Text("Contact Support")
-                            Spacer()
-                            Image(systemName: "envelope")
-                                .font(.caption)
-                        }
-                    }
-                }
-
-                // About Section
-                Section("About") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Wine List Assistant")
-                            .font(.headline)
-                        Text("Powered by Wine Spectator's database of 450,000+ expert wine reviews.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
+                    .padding()
                 }
             }
-            .navigationTitle("Settings")
+            .navigationBarHidden(true)
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView()
             }
@@ -138,38 +94,397 @@ struct SettingsView: View {
             }
         }
     }
+}
+
+// MARK: - Settings Header
+
+struct SettingsHeader: View {
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Settings")
+                    .font(.system(size: 28, weight: .bold))
+                Text("Manage your account")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            // Wine Lens badge
+            WineLensBadge(style: .dark)
+        }
+        .padding(.bottom, 8)
+    }
+}
+
+// MARK: - Subscription Card
+
+struct SubscriptionCard: View {
+    @ObservedObject var subscriptionService: SubscriptionService
+    let onUpgrade: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Image(systemName: subscriptionIcon)
+                            .font(.system(size: 18))
+                            .foregroundColor(subscriptionColor)
+
+                        Text(subscriptionStatusTitle)
+                            .font(.headline)
+                    }
+
+                    Text(subscriptionStatusSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                if !subscriptionService.subscriptionStatus.isActive {
+                    Button(action: onUpgrade) {
+                        Text("Upgrade")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                LinearGradient(
+                                    colors: [Theme.primaryColor, Theme.primaryColor.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(20)
+                    }
+                } else {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(Theme.secondaryColor)
+                }
+            }
+
+            if !subscriptionService.subscriptionStatus.isActive {
+                // Free scans progress
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Free scans this month")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(subscriptionService.remainingFreeScans()) of \(AppConfiguration.freeScansPerMonth)")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+
+                    GeometryReader { geometry in
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color(.systemGray5))
+                                .frame(height: 8)
+
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Theme.primaryColor, Theme.secondaryColor],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: geometry.size.width * progressValue, height: 8)
+                        }
+                    }
+                    .frame(height: 8)
+                }
+
+                Button("Restore Purchases") {
+                    Task {
+                        try? await subscriptionService.restorePurchases()
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(Theme.primaryColor)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+        )
+    }
+
+    private var progressValue: CGFloat {
+        let remaining = CGFloat(subscriptionService.remainingFreeScans())
+        let total = CGFloat(AppConfiguration.freeScansPerMonth)
+        return remaining / total
+    }
+
+    private var subscriptionIcon: String {
+        switch subscriptionService.subscriptionStatus {
+        case .unknown: return "hourglass"
+        case .notSubscribed: return "gift"
+        case .subscribed: return "crown.fill"
+        case .expired: return "exclamationmark.triangle"
+        }
+    }
+
+    private var subscriptionColor: Color {
+        switch subscriptionService.subscriptionStatus {
+        case .unknown: return .secondary
+        case .notSubscribed: return Theme.primaryColor
+        case .subscribed: return Theme.secondaryColor
+        case .expired: return .red
+        }
+    }
 
     private var subscriptionStatusTitle: String {
         switch subscriptionService.subscriptionStatus {
-        case .unknown:
-            return "Loading..."
-        case .notSubscribed:
-            return "Free Plan"
-        case .subscribed:
-            return "Premium"
-        case .expired:
-            return "Expired"
+        case .unknown: return "Loading..."
+        case .notSubscribed: return "Free Plan"
+        case .subscribed: return "Premium"
+        case .expired: return "Expired"
         }
     }
 
     private var subscriptionStatusSubtitle: String {
         switch subscriptionService.subscriptionStatus {
-        case .unknown:
-            return ""
-        case .notSubscribed:
-            return "Limited to \(AppConfiguration.freeScansPerMonth) scans/month"
+        case .unknown: return ""
+        case .notSubscribed: return "Limited to \(AppConfiguration.freeScansPerMonth) scans/month"
         case .subscribed(let expiration, _):
             if let date = expiration {
                 return "Renews \(date.formatted(date: .abbreviated, time: .omitted))"
             }
             return "Active"
-        case .expired:
-            return "Please renew your subscription"
+        case .expired: return "Please renew your subscription"
         }
     }
 }
 
-// MARK: - Sign In View (Placeholder)
+// MARK: - Settings Section
+
+struct SettingsSection<Content: View>: View {
+    let title: String
+    let icon: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundColor(Theme.primaryColor)
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.leading, 4)
+
+            VStack(spacing: 0) {
+                content
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.03), radius: 5, x: 0, y: 2)
+            )
+        }
+    }
+}
+
+// MARK: - Account Row
+
+struct AccountRow: View {
+    let user: User
+    let onSignOut: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(Theme.primaryColor.opacity(0.15))
+                    .frame(width: 44, height: 44)
+
+                Text(user.displayName.prefix(1).uppercased())
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(Theme.primaryColor)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(user.displayName)
+                    .font(.system(size: 16, weight: .medium))
+                Text(user.email)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button("Sign Out") {
+                onSignOut()
+            }
+            .font(.system(size: 14))
+            .foregroundColor(.red)
+        }
+    }
+}
+
+// MARK: - Sign In Row
+
+struct SignInRow: View {
+    let onSignIn: () -> Void
+
+    var body: some View {
+        Button(action: onSignIn) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.primaryColor.opacity(0.15))
+                        .frame(width: 44, height: 44)
+
+                    Image(systemName: "person.crop.circle.badge.plus")
+                        .font(.system(size: 18))
+                        .foregroundColor(Theme.primaryColor)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Sign In")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
+                    Text("Sync your wines across devices")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+// MARK: - Settings Row
+
+struct SettingsRow: View {
+    let icon: String
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundColor(Theme.primaryColor)
+                .frame(width: 24)
+
+            Text(title)
+                .font(.system(size: 16))
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+// MARK: - Settings Link Row
+
+struct SettingsLinkRow: View {
+    let icon: String
+    let title: String
+    let url: String
+
+    var body: some View {
+        Link(destination: URL(string: url)!) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 16))
+                    .foregroundColor(Theme.primaryColor)
+                    .frame(width: 24)
+
+                Text(title)
+                    .font(.system(size: 16))
+                    .foregroundColor(.primary)
+
+                Spacer()
+
+                Image(systemName: "arrow.up.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+// MARK: - About Section
+
+struct AboutSection: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            // Logo
+            HStack(spacing: 8) {
+                Image(systemName: "wineglass.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(Theme.primaryColor)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Wine Spectator")
+                        .font(.system(size: 18, weight: .bold, design: .serif))
+
+                    if let _ = UIImage(named: "WineLensText") {
+                        Image("WineLensText")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 14)
+                    } else {
+                        Text("WINE LENS")
+                            .font(.system(size: 12, weight: .semibold))
+                            .tracking(2)
+                            .foregroundColor(Theme.secondaryColor)
+                    }
+                }
+            }
+
+            Text("Powered by Wine Spectator's database of 450,000+ expert wine reviews.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            // Wine Spectator badge
+            HStack(spacing: 4) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 10))
+                Text("Trusted by wine enthusiasts since 1976")
+                    .font(.caption2)
+            }
+            .foregroundColor(Theme.secondaryColor)
+        }
+        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        colors: [Theme.primaryColor.opacity(0.05), Theme.secondaryColor.opacity(0.05)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+    }
+}
+
+// MARK: - Sign In View
 
 struct SignInView: View {
     @Environment(\.dismiss) private var dismiss
@@ -179,51 +494,123 @@ struct SignInView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: Theme.Spacing.xl) {
-                // Logo
-                Image(systemName: "wineglass.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(Theme.primary)
+            ZStack {
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
 
-                Text("Wine List Assistant")
-                    .font(.title)
-                    .fontWeight(.bold)
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Logo
+                        VStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Theme.primaryColor.opacity(0.1))
+                                    .frame(width: 100, height: 100)
 
-                // Sign in with Apple
-                SignInWithAppleButton()
-                    .frame(height: 50)
-                    .padding(.horizontal)
+                                Image(systemName: "wineglass.fill")
+                                    .font(.system(size: 44))
+                                    .foregroundColor(Theme.primaryColor)
+                            }
 
-                Divider()
-                    .padding(.horizontal)
+                            VStack(spacing: 4) {
+                                Text("Wine Spectator")
+                                    .font(.system(size: 22, weight: .bold, design: .serif))
 
-                // Email/Password
-                VStack(spacing: Theme.Spacing.md) {
-                    TextField("Email", text: $email)
-                        .textFieldStyle(.roundedBorder)
-                        .textContentType(.emailAddress)
-                        .autocapitalization(.none)
-
-                    SecureField("Password", text: $password)
-                        .textFieldStyle(.roundedBorder)
-                        .textContentType(.password)
-
-                    Button(action: signIn) {
-                        if isLoading {
-                            ProgressView()
-                        } else {
-                            Text("Sign In")
+                                if let _ = UIImage(named: "WineLensText") {
+                                    Image("WineLensText")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 16)
+                                } else {
+                                    Text("WINE LENS")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .tracking(3)
+                                        .foregroundColor(Theme.secondaryColor)
+                                }
+                            }
                         }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .frame(maxWidth: .infinity)
-                    .disabled(email.isEmpty || password.isEmpty || isLoading)
-                }
-                .padding(.horizontal)
+                        .padding(.top, 20)
 
-                Spacer()
+                        // Sign in with Apple
+                        SignInWithAppleButton()
+                            .frame(height: 50)
+                            .padding(.horizontal)
+
+                        // Divider
+                        HStack {
+                            Rectangle()
+                                .fill(Color(.separator))
+                                .frame(height: 1)
+                            Text("or")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Rectangle()
+                                .fill(Color(.separator))
+                                .frame(height: 1)
+                        }
+                        .padding(.horizontal)
+
+                        // Email/Password
+                        VStack(spacing: 16) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Email")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                TextField("your@email.com", text: $email)
+                                    .textFieldStyle(.plain)
+                                    .textContentType(.emailAddress)
+                                    .autocapitalization(.none)
+                                    .padding()
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color(.systemBackground))
+                                    )
+                            }
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Password")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                SecureField("••••••••", text: $password)
+                                    .textFieldStyle(.plain)
+                                    .textContentType(.password)
+                                    .padding()
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color(.systemBackground))
+                                    )
+                            }
+
+                            Button(action: signIn) {
+                                HStack {
+                                    if isLoading {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Text("Sign In")
+                                            .fontWeight(.semibold)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(
+                                            (email.isEmpty || password.isEmpty) ?
+                                            Color(.systemGray4) :
+                                            Theme.primaryColor
+                                        )
+                                )
+                                .foregroundColor(.white)
+                            }
+                            .disabled(email.isEmpty || password.isEmpty || isLoading)
+                        }
+                        .padding(.horizontal)
+
+                        Spacer(minLength: 40)
+                    }
+                }
             }
-            .padding(.top, Theme.Spacing.xxl)
             .navigationTitle("Sign In")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -252,15 +639,17 @@ struct SignInView: View {
 struct SignInWithAppleButton: View {
     var body: some View {
         Button(action: {}) {
-            HStack {
+            HStack(spacing: 8) {
                 Image(systemName: "apple.logo")
+                    .font(.system(size: 18))
                 Text("Sign in with Apple")
+                    .font(.system(size: 17, weight: .medium))
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)
             .background(Color.black)
             .foregroundColor(.white)
-            .cornerRadius(8)
+            .cornerRadius(12)
         }
     }
 }

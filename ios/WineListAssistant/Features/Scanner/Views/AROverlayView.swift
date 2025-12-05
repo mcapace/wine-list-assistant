@@ -34,18 +34,27 @@ struct ScoreBadgeOverlay: View {
 
     @State private var isAppearing = false
     @State private var isPressed = false
+    @State private var showScoreReveal = false
 
     var body: some View {
-        Group {
-            if wine.isMatched {
-                ScoreBadge(
-                    score: wine.matchedWine?.score,
-                    confidence: wine.matchConfidence,
-                    vintage: wine.matchedVintage
-                )
-            } else {
-                // Unmatched indicator
-                UnmatchedBadge()
+        ZStack {
+            // Score reveal animation (for high scores)
+            if showScoreReveal && (wine.matchedWine?.score ?? 0) >= 95 {
+                ScoreRevealAnimation()
+                    .opacity(0.8)
+            }
+
+            Group {
+                if wine.isMatched {
+                    ScoreBadge(
+                        score: wine.matchedWine?.score,
+                        confidence: wine.matchConfidence,
+                        vintage: wine.matchedVintage
+                    )
+                } else {
+                    // Unmatched indicator
+                    UnmatchedBadge()
+                }
             }
         }
         .position(position)
@@ -53,6 +62,7 @@ struct ScoreBadgeOverlay: View {
         .opacity(isAppearing ? 1.0 : 0.0)
         .onTapGesture {
             if wine.isMatched {
+                HapticManager.shared.mediumImpact()
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
                 }
@@ -67,6 +77,20 @@ struct ScoreBadgeOverlay: View {
         .onAppear {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isAppearing = true
+            }
+
+            // Haptic feedback when wine is found
+            if wine.isMatched {
+                if (wine.matchedWine?.score ?? 0) >= 95 {
+                    HapticManager.shared.highScoreWine()
+                    showScoreReveal = true
+                    // Hide animation after it plays
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        showScoreReveal = false
+                    }
+                } else {
+                    HapticManager.shared.wineFound()
+                }
             }
         }
         .onDisappear {
