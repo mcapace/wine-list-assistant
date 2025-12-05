@@ -3,14 +3,19 @@ import SwiftUI
 enum Theme {
     // MARK: - Colors
 
-    static let primaryColor = Color("PrimaryColor", bundle: nil)
-    static let secondaryColor = Color("SecondaryColor", bundle: nil)
-    static let accentColor = Color("AccentColor", bundle: nil)
+    // Brand colors - Wine Spectator Wine Lens
+    static let primaryColor = Color(red: 0.45, green: 0.18, blue: 0.22)  // Burgundy #722F37
+    static let secondaryColor = Color(red: 0.79, green: 0.64, blue: 0.15)  // Gold #C9A227
+    static let accentColor = Color(red: 0.79, green: 0.64, blue: 0.15)  // Gold accent
 
-    // Fallback colors if assets not available
-    static let primary = Color(red: 0.5, green: 0.1, blue: 0.15)  // Wine red
-    static let secondary = Color(red: 0.85, green: 0.75, blue: 0.55)  // Gold
-    static let accent = Color(red: 0.2, green: 0.5, blue: 0.3)  // Green for "good"
+    // Convenience aliases
+    static let primary = primaryColor
+    static let secondary = secondaryColor
+    static let accent = accentColor
+
+    // Background colors
+    static let darkBackground = Color(red: 0.04, green: 0.04, blue: 0.04)  // #0A0A0A
+    static let cardBackground = Color(red: 0.11, green: 0.11, blue: 0.12)  // #1C1C1E
 
     // MARK: - Score Colors
 
