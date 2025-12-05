@@ -1,6 +1,23 @@
 {
   "version": 2,
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "framework": null
+  "builds": [
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/wines/search",
+      "dest": "/api/wines/search.ts"
+    },
+    {
+      "src": "/api/wines/batch-match",
+      "dest": "/api/wines/batch-match.ts"
+    },
+    {
+      "src": "/api/wines/([^/]+)",
+      "dest": "/api/wines/[id].ts"
+    }
+  ]
 }

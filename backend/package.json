@@ -1,7 +1,6 @@
 {
   "name": "wine-list-assistant-api",
   "version": "1.0.0",
-  "type": "module",
   "description": "Backend API for Wine List Assistant",
   "main": "dist/index.js",
   "scripts": {
