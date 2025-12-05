@@ -20,11 +20,11 @@ enum AppConfiguration {
     static var apiBaseURL: String {
         switch current {
         case .development:
-            return "https://api-dev.winespectator.com/wla/v1"
+            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
         case .staging:
-            return "https://api-staging.winespectator.com/wla/v1"
+            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
         case .production:
-            return "https://api.winespectator.com/wla/v1"
+            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
         }
     }
 
