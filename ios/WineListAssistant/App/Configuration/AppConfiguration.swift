@@ -20,11 +20,11 @@ enum AppConfiguration {
     static var apiBaseURL: String {
         switch current {
         case .development:
-            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
+            return "https://backend-theta-mauve-9kehaxzmz7.vercel.app/api"
         case .staging:
-            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
+            return "https://backend-theta-mauve-9kehaxzmz7.vercel.app/api"
         case .production:
-            return "https://backend-nnzgv9wdv-michael-capaces-projects-f6224d63.vercel.app/api"
+            return "https://backend-theta-mauve-9kehaxzmz7.vercel.app/api"
         }
     }
 
