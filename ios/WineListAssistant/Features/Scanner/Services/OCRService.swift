@@ -33,7 +33,8 @@ final class OCRService {
     private let requestHandler = VNSequenceRequestHandler()
 
     /// Languages to recognize (prioritized)
-    private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
+    /// Added nl-NL and tr-TR to support more locales and reduce warnings
+    private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT", "nl-NL", "tr-TR"]
 
     // MARK: - Public Methods
 
@@ -213,7 +214,12 @@ final class OCRService {
             "identity", "display", "minimum", "deployments", "localda",
             "nslocalizedd", "executable", "filter", "version", "readme",
             "license", "rakefile", "podspec", "gemfile", "index",
-            "script", "sources", "testates", "reserveolved", "winelensapptestates"
+            "script", "sources", "testates", "reserveolved", "winelensapptestates",
+            "lottie", "spm", "swift", "json", "xcassets", "imageset",
+            "contents.json", "podfile", "gemfile.lock", "package.resolved",
+            "rakefile", "example", "labels", "ger", "gen", "inde", "lice",
+            "al", "pack", "raket", "versic", "si", "u", "r", "pa", "pi",
+            "_g", "m", "exa", "scr", "sot", "tes", "e", "g", "bi"
         ]
         
         for pattern in uiPatterns {

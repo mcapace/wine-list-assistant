@@ -15,9 +15,25 @@ final class MyWinesViewModel: ObservableObject {
 
         do {
             savedWines = try await apiClient.getSavedWines()
+        } catch let apiError as WineAPIClient.APIError {
+            // Handle unauthorized gracefully (user not logged in)
+            if case .unauthorized = apiError {
+                // User not authenticated - empty list is fine
+                savedWines = []
+                #if DEBUG
+                print("ℹ️ User not authenticated, showing empty saved wines list")
+                #endif
+            } else {
+                self.error = apiError
+                #if DEBUG
+                print("Failed to load saved wines: \(apiError)")
+                #endif
+            }
         } catch {
             self.error = error
+            #if DEBUG
             print("Failed to load saved wines: \(error)")
+            #endif
         }
 
         isLoading = false
