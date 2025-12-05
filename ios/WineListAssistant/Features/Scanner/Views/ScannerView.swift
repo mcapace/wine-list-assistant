@@ -6,6 +6,8 @@ struct ScannerView: View {
     @State private var selectedWine: RecognizedWine?
     @State private var showFilters = false
     @State private var showPaywall = false
+    @State private var showInstructions = false
+    @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -23,17 +25,23 @@ struct ScannerView: View {
                     }
                 )
 
-                // Top Controls
+                // Top Controls with branding
                 VStack {
-                    TopControlBar(
+                    ScannerTopBar(
                         torchEnabled: $viewModel.torchEnabled,
                         scansRemaining: subscriptionService.remainingFreeScans(),
-                        isPremium: subscriptionService.subscriptionStatus.isActive
+                        isPremium: subscriptionService.subscriptionStatus.isActive,
+                        onHelpTapped: { showInstructions = true }
                     )
 
                     Spacer()
                 }
                 .padding()
+
+                // Center instruction hint (when no wines found)
+                if viewModel.recognizedWines.isEmpty && !viewModel.isProcessing {
+                    ScannerHintView()
+                }
 
                 // Bottom Controls
                 VStack {
@@ -61,6 +69,14 @@ struct ScannerView: View {
                 if !subscriptionService.canPerformScan() {
                     ScanLimitReachedView(onSubscribe: { showPaywall = true })
                 }
+
+                // First-time instructions overlay
+                if showInstructions || !hasSeenInstructions {
+                    ScannerInstructionsOverlay(onDismiss: {
+                        hasSeenInstructions = true
+                        showInstructions = false
+                    })
+                }
             }
         }
         .sheet(item: $selectedWine) { wine in
@@ -76,6 +92,300 @@ struct ScannerView: View {
             viewModel.stopScanning()
         }
     }
+}
+
+// MARK: - Scanner Top Bar with Branding
+
+struct ScannerTopBar: View {
+    @Binding var torchEnabled: Bool
+    let scansRemaining: Int
+    let isPremium: Bool
+    let onHelpTapped: () -> Void
+
+    var body: some View {
+        HStack(alignment: .center) {
+            // Torch button
+            Button(action: { torchEnabled.toggle() }) {
+                Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
+                    .font(.title3)
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        Circle()
+                            .fill(Color.black.opacity(0.5))
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                    )
+            }
+
+            Spacer()
+
+            // Center branding
+            VStack(spacing: 2) {
+                Text("WINE LENS")
+                    .font(.system(size: 12, weight: .bold, design: .default))
+                    .tracking(2)
+                    .foregroundColor(Theme.secondaryColor)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.5))
+                    .overlay(
+                        Capsule()
+                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                    )
+            )
+
+            Spacer()
+
+            // Right side - scan count or help
+            HStack(spacing: 8) {
+                if !isPremium {
+                    HStack(spacing: 4) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.caption)
+                        Text("\(scansRemaining)")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.5))
+                    )
+                }
+
+                Button(action: onHelpTapped) {
+                    Image(systemName: "questionmark.circle")
+                        .font(.title3)
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(Color.black.opacity(0.5))
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                )
+                        )
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Scanner Hint View
+
+struct ScannerHintView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            // Animated scan frame
+            ZStack {
+                // Corner brackets
+                ScanFrameCorners()
+                    .stroke(Theme.secondaryColor, lineWidth: 2)
+                    .frame(width: 200, height: 140)
+
+                // Scanning line animation
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Theme.secondaryColor.opacity(0), Theme.secondaryColor.opacity(0.5), Theme.secondaryColor.opacity(0)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: 180, height: 2)
+                    .offset(y: isAnimating ? 60 : -60)
+                    .animation(
+                        Animation.easeInOut(duration: 2).repeatForever(autoreverses: true),
+                        value: isAnimating
+                    )
+            }
+
+            Text("Point at a wine list")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundColor(.white)
+
+            Text("Hold steady to scan wine names")
+                .font(.system(size: 14))
+                .foregroundColor(.white.opacity(0.7))
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.black.opacity(0.6))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .onAppear { isAnimating = true }
+    }
+}
+
+// MARK: - Scan Frame Shape
+
+struct ScanFrameCorners: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let cornerLength: CGFloat = 20
+
+        // Top left
+        path.move(to: CGPoint(x: 0, y: cornerLength))
+        path.addLine(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: cornerLength, y: 0))
+
+        // Top right
+        path.move(to: CGPoint(x: rect.width - cornerLength, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: cornerLength))
+
+        // Bottom right
+        path.move(to: CGPoint(x: rect.width, y: rect.height - cornerLength))
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.addLine(to: CGPoint(x: rect.width - cornerLength, y: rect.height))
+
+        // Bottom left
+        path.move(to: CGPoint(x: cornerLength, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: rect.height - cornerLength))
+
+        return path
+    }
+}
+
+// MARK: - Instructions Overlay
+
+struct ScannerInstructionsOverlay: View {
+    let onDismiss: () -> Void
+    @State private var currentStep = 0
+
+    let steps = [
+        InstructionStep(
+            icon: "camera.viewfinder",
+            title: "Point & Scan",
+            description: "Hold your phone over any wine list. The camera will automatically detect wine names."
+        ),
+        InstructionStep(
+            icon: "sparkles",
+            title: "See Scores Instantly",
+            description: "Wine Spectator scores appear right on the list. Gold badges mean 95+ points!"
+        ),
+        InstructionStep(
+            icon: "hand.tap",
+            title: "Tap for Details",
+            description: "Tap any wine to see tasting notes, drink window, and price information."
+        ),
+        InstructionStep(
+            icon: "slider.horizontal.3",
+            title: "Filter Results",
+            description: "Use filters to show only 90+ wines, best values, or wines ready to drink now."
+        )
+    ]
+
+    var body: some View {
+        ZStack {
+            // Dimmed background
+            Color.black.opacity(0.85)
+                .ignoresSafeArea()
+
+            VStack(spacing: 32) {
+                // Close button
+                HStack {
+                    Spacer()
+                    Button(action: onDismiss) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title)
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                }
+                .padding(.horizontal)
+
+                Spacer()
+
+                // Current instruction
+                VStack(spacing: 24) {
+                    ZStack {
+                        Circle()
+                            .fill(Theme.primaryColor.opacity(0.2))
+                            .frame(width: 100, height: 100)
+
+                        Image(systemName: steps[currentStep].icon)
+                            .font(.system(size: 44))
+                            .foregroundColor(Theme.secondaryColor)
+                    }
+
+                    Text(steps[currentStep].title)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text(steps[currentStep].description)
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                }
+
+                Spacer()
+
+                // Page indicator
+                HStack(spacing: 8) {
+                    ForEach(0..<steps.count, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentStep ? Theme.secondaryColor : Color.white.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                    }
+                }
+
+                // Buttons
+                HStack(spacing: 16) {
+                    if currentStep > 0 {
+                        Button(action: { withAnimation { currentStep -= 1 } }) {
+                            Text("Back")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.white.opacity(0.2))
+                                .cornerRadius(12)
+                        }
+                    }
+
+                    Button(action: {
+                        if currentStep < steps.count - 1 {
+                            withAnimation { currentStep += 1 }
+                        } else {
+                            onDismiss()
+                        }
+                    }) {
+                        Text(currentStep < steps.count - 1 ? "Next" : "Start Scanning")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Theme.secondaryColor)
+                            .cornerRadius(12)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
+            }
+        }
+    }
+}
+
+struct InstructionStep {
+    let icon: String
+    let title: String
+    let description: String
 }
 
 // MARK: - Top Control Bar
