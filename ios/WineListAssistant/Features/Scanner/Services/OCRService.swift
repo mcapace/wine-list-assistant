@@ -35,20 +35,38 @@ final class OCRService {
     /// Languages to recognize (prioritized)
     private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
 
+    /// Track if we should use fast mode due to ANE issues
+    private var useFastRecognition = false
+
     // MARK: - Public Methods
 
     /// Recognize text in a pixel buffer (real-time camera frame)
     func recognizeText(in pixelBuffer: CVPixelBuffer) async throws -> [OCRResult] {
-        try await withCheckedThrowingContinuation { continuation in
-            let request = createTextRecognitionRequest { result in
-                continuation.resume(with: result)
-            }
+        do {
+            return try await withCheckedThrowingContinuation { continuation in
+                let request = createTextRecognitionRequest { result in
+                    continuation.resume(with: result)
+                }
 
-            do {
-                try requestHandler.perform([request], on: pixelBuffer)
-            } catch {
-                continuation.resume(throwing: error)
+                do {
+                    try requestHandler.perform([request], on: pixelBuffer)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
             }
+        } catch {
+            // Handle Vision/ANE errors gracefully
+            // These errors (numANECores, fopen data file) are internal to Apple's
+            // Vision framework and are recoverable - just return empty results
+            let nsError = error as NSError
+            if nsError.domain == "com.apple.Vision" ||
+               nsError.domain.contains("VN") ||
+               nsError.localizedDescription.contains("ANE") {
+                // Try switching to fast mode for subsequent requests
+                useFastRecognition = true
+                return []
+            }
+            throw error
         }
     }
 
@@ -151,10 +169,11 @@ final class OCRService {
             completion(.success(results))
         }
 
-        // Configure for best text recognition
-        request.recognitionLevel = .accurate
+        // Configure for text recognition
+        // Use fast mode if we've encountered ANE issues, otherwise use accurate mode
+        request.recognitionLevel = useFastRecognition ? .fast : .accurate
         request.recognitionLanguages = recognitionLanguages
-        request.usesLanguageCorrection = true
+        request.usesLanguageCorrection = !useFastRecognition  // Disable for fast mode
         request.revision = VNRecognizeTextRequestRevision3
 
         return request

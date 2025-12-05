@@ -23,6 +23,7 @@ final class CameraService: NSObject, ObservableObject {
     private let sessionQueue = DispatchQueue(label: "com.winespectator.wla.camera.session")
     private let videoOutputQueue = DispatchQueue(label: "com.winespectator.wla.camera.output")
     private var currentDevice: AVCaptureDevice?
+    private var isConfigured = false
 
     // MARK: - Error Types
 
@@ -103,9 +104,17 @@ final class CameraService: NSObject, ObservableObject {
     // MARK: - Configuration
 
     func configure() throws {
+        // Skip if already configured to avoid FigCaptureSource errors
+        guard !isConfigured else { return }
+
         sessionQueue.sync {
             do {
+                // Ensure session is stopped before configuration
+                if captureSession.isRunning {
+                    captureSession.stopRunning()
+                }
                 try configureSession()
+                isConfigured = true
             } catch {
                 Task { @MainActor in
                     self.error = error as? CameraError ?? .configurationFailed
@@ -218,10 +227,16 @@ final class CameraService: NSObject, ObservableObject {
         guard isRunning else { return }
 
         sessionQueue.async { [weak self] in
-            self?.captureSession.stopRunning()
+            guard let self = self else { return }
+            // Clear frame first to stop processing before stopping session
             Task { @MainActor in
-                self?.isRunning = false
-                self?.currentFrame = nil
+                self.currentFrame = nil
+            }
+            // Small delay to allow frame processing to complete
+            Thread.sleep(forTimeInterval: 0.1)
+            self.captureSession.stopRunning()
+            Task { @MainActor in
+                self.isRunning = false
             }
         }
     }
@@ -301,7 +316,10 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
             return
         }
 
+        // Only publish frame if session is actively running
+        // This helps prevent FigCaptureSource errors during session transitions
         Task { @MainActor in
+            guard self.isRunning else { return }
             self.currentFrame = pixelBuffer
         }
     }
@@ -311,6 +329,7 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
         didDrop sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        // Frames are being dropped - could log for performance monitoring
+        // Frames are being dropped - this is normal during heavy processing
+        // FigCaptureSource may log errors here but they're recoverable
     }
 }
