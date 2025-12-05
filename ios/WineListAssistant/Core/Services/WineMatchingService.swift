@@ -321,7 +321,30 @@ final class WineMatchingService {
             if let urlError = error as? URLError, urlError.code == .cancelled {
                 return Dictionary(uniqueKeysWithValues: texts.map { ($0, nil as MatchResult?) })
             }
-            print("Batch API match failed: \(error)")
+            
+            // Log server errors but don't spam console
+            if let apiError = error as? WineAPIClient.APIError {
+                switch apiError {
+                case .serverError(let code):
+                    if code >= 500 {
+                        #if DEBUG
+                        print("⚠️ Batch API server error \(code)")
+                        #endif
+                    } else {
+                        #if DEBUG
+                        print("Batch API match failed: \(apiError)")
+                        #endif
+                    }
+                default:
+                    #if DEBUG
+                    print("Batch API match failed: \(apiError)")
+                    #endif
+                }
+            } else {
+                #if DEBUG
+                print("Batch API match failed: \(error)")
+                #endif
+            }
             return Dictionary(uniqueKeysWithValues: texts.map { ($0, nil as MatchResult?) })
         }
     }
