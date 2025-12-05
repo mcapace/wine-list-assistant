@@ -203,13 +203,15 @@ export async function configureAlgoliaIndex(): Promise<void> {
     typoTolerance: true,
     minWordSizefor1Typo: 3,
     minWordSizefor2Typos: 6,
-    synonyms: [
-      { objectID: 'cab', type: 'synonym', synonyms: ['cabernet', 'cab', 'cabernet sauvignon', 'cs'] },
-      { objectID: 'chard', type: 'synonym', synonyms: ['chardonnay', 'chard'] },
-      { objectID: 'sauv', type: 'synonym', synonyms: ['sauvignon', 'sauv', 'sauvignon blanc', 'sb'] },
-      { objectID: 'pn', type: 'synonym', synonyms: ['pinot noir', 'pn', 'pinot'] },
-      { objectID: 'chateau', type: 'synonym', synonyms: ['chateau', 'ch', 'cht', 'château'] },
-      { objectID: 'domaine', type: 'synonym', synonyms: ['domaine', 'dom', 'domaine de'] },
-    ],
   });
+
+  // Configure synonyms separately
+  await wineIndex.saveSynonyms([
+    { objectID: 'cab', type: 'synonym', synonyms: ['cabernet', 'cab', 'cabernet sauvignon', 'cs'] },
+    { objectID: 'chard', type: 'synonym', synonyms: ['chardonnay', 'chard'] },
+    { objectID: 'sauv', type: 'synonym', synonyms: ['sauvignon', 'sauv', 'sauvignon blanc', 'sb'] },
+    { objectID: 'pn', type: 'synonym', synonyms: ['pinot noir', 'pn', 'pinot'] },
+    { objectID: 'chateau', type: 'synonym', synonyms: ['chateau', 'ch', 'cht', 'château'] },
+    { objectID: 'domaine', type: 'synonym', synonyms: ['domaine', 'dom', 'domaine de'] },
+  ]);
 }
