@@ -62,8 +62,12 @@ final class WineMatchingService {
         // First, try local matches
         for text in texts {
             let parsed = parseWineText(text)
-            let exactMatch = await tryExactMatch(parsed)
-            let match = exactMatch ?? await tryFuzzyMatch(parsed)
+            var match: MatchResult?
+            if let exactMatch = await tryExactMatch(parsed) {
+                match = exactMatch
+            } else {
+                match = await tryFuzzyMatch(parsed)
+            }
             if let match = match {
                 results[text] = match
             }
