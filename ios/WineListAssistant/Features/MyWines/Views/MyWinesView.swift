@@ -152,7 +152,10 @@ struct FilterPill: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.filterChanged()
+            action()
+        }) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.system(size: 12))
@@ -270,8 +273,8 @@ struct EmptyWinesView: View {
 struct LoadingWinesView: View {
     var body: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .scaleEffect(1.2)
+            // Use Lottie animation if available, fallback to ProgressView
+            WineGlassFillAnimation(size: 80)
 
             Text("Loading your wines...")
                 .font(.subheadline)

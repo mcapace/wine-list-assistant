@@ -168,11 +168,17 @@ struct ScannerTopBar: View {
 
 struct ScannerHintView: View {
     @State private var isAnimating = false
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         VStack(spacing: 16) {
-            // Animated scan frame
+            // Animated scan frame with Lottie pulse
             ZStack {
+                // Lottie pulse animation (if available)
+                ScanPulseAnimation()
+                    .opacity(0.6)
+                    .scaleEffect(pulseScale)
+
                 // Corner brackets
                 ScanFrameCorners()
                     .stroke(Theme.secondaryColor, lineWidth: 2)
@@ -212,7 +218,15 @@ struct ScannerHintView: View {
                         .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 )
         )
-        .onAppear { isAnimating = true }
+        .onAppear {
+            isAnimating = true
+            HapticManager.shared.scanStarted()
+
+            // Subtle pulse animation
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                pulseScale = 1.05
+            }
+        }
     }
 }
 
@@ -458,7 +472,10 @@ struct FilterButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.filterChanged()
+            action()
+        }) {
             HStack(spacing: 4) {
                 Image(systemName: filter.iconName)
                     .font(.caption)
