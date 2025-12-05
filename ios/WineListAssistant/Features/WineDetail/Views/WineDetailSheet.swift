@@ -311,27 +311,36 @@ struct ActionButtonsSection: View {
     var body: some View {
         VStack(spacing: Theme.Spacing.sm) {
             HStack(spacing: Theme.Spacing.md) {
-                Button(action: onSave) {
-                    Label(
-                        isSaved ? "Saved" : "Save",
-                        systemImage: isSaved ? "heart.fill" : "heart"
-                    )
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(isSaved ? .red : .accentColor)
-                .disabled(isSaved)
+            Button(action: {
+                HapticService.shared.buttonTap()
+                onSave()
+            }) {
+                Label(
+                    isSaved ? "Saved" : "Save",
+                    systemImage: isSaved ? "heart.fill" : "heart"
+                )
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(isSaved ? .red : .accentColor)
+            .disabled(isSaved)
 
-                Button(action: onShare) {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
+            Button(action: {
+                HapticService.shared.buttonTap()
+                onShare()
+            }) {
+                Label("Share", systemImage: "square.and.arrow.up")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
             }
             
             // Buy Similar Wine button
             if let wine = wine {
-                Button(action: { buySimilarWine(wine) }) {
+                Button(action: {
+                    HapticService.shared.buttonTap()
+                    buySimilarWine(wine)
+                }) {
                     Label("Buy Similar Wine", systemImage: "cart")
                         .frame(maxWidth: .infinity)
                 }

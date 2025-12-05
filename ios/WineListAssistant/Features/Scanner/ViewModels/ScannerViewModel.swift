@@ -193,7 +193,14 @@ final class ScannerViewModel: ObservableObject {
             // Update UI on main thread
             await MainActor.run {
                 // Merge with existing results to avoid flickering
+                let previousCount = self.recognizedWines.filter { $0.isMatched }.count
                 self.mergeResults(matchedWines)
+                let newCount = self.recognizedWines.filter { $0.isMatched }.count
+                
+                // Haptic feedback for new matches
+                if newCount > previousCount {
+                    HapticService.shared.wineMatched()
+                }
             }
 
         } catch {

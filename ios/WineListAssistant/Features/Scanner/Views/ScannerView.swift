@@ -21,6 +21,7 @@ struct ScannerView: View {
                     recognizedWines: viewModel.filteredWines,
                     viewSize: geometry.size,
                     onWineTapped: { wine in
+                        HapticService.shared.buttonTap()
                         selectedWine = wine
                     }
                 )
@@ -104,9 +105,12 @@ struct ScannerTopBar: View {
     let onHelpTapped: () -> Void
 
     var body: some View {
-        HStack(alignment: .center) {
-            // Torch button
-            Button(action: { torchEnabled.toggle() }) {
+        HStack(alignment: .center, spacing: 12) {
+            // Left: Torch button
+            Button(action: {
+                HapticService.shared.buttonTap()
+                torchEnabled.toggle()
+            }) {
                 Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
                     .font(.title3)
                     .foregroundColor(.white)
@@ -123,27 +127,25 @@ struct ScannerTopBar: View {
 
             Spacer()
 
-            // Center branding
-            VStack(spacing: 2) {
-                Text("WINE LENS")
-                    .font(.system(size: 12, weight: .bold, design: .default))
-                    .tracking(2)
-                    .foregroundColor(Theme.secondaryColor)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.black.opacity(0.5))
-                    .overlay(
-                        Capsule()
-                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
-                    )
-            )
+            // Center: WineLensText branding (symmetrical)
+            Image("WineLensText")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(height: 20)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.5))
+                        .overlay(
+                            Capsule()
+                                .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                        )
+                )
 
             Spacer()
 
-            // Right side - scan count or help
+            // Right: Scan count + Help button (symmetrical to left)
             HStack(spacing: 8) {
                 if !isPremium {
                     HStack(spacing: 4) {
@@ -161,7 +163,10 @@ struct ScannerTopBar: View {
                     )
                 }
 
-                Button(action: onHelpTapped) {
+                Button(action: {
+                    HapticService.shared.buttonTap()
+                    onHelpTapped()
+                }) {
                     Image(systemName: "questionmark.circle")
                         .font(.title3)
                         .foregroundColor(.white)
@@ -399,7 +404,10 @@ struct TopControlBar: View {
     var body: some View {
         HStack {
             // Torch button
-            Button(action: { torchEnabled.toggle() }) {
+            Button(action: {
+                HapticService.shared.buttonTap()
+                torchEnabled.toggle()
+            }) {
                 Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
                     .font(.title2)
                     .foregroundColor(.white)
@@ -441,7 +449,10 @@ struct FilterBar: View {
                     FilterButton(
                         filter: filter,
                         isActive: filters.contains(filter),
-                        action: { filters.toggle(filter) }
+                        action: {
+                            HapticService.shared.filterChanged()
+                            filters.toggle(filter)
+                        }
                     )
                 }
 
@@ -569,9 +580,10 @@ struct ScanningIndicator: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-
+            // Lottie scan pulse animation
+            ScanPulseAnimation()
+                .frame(width: 20, height: 20)
+            
             if winesFound > 0 {
                 Text("\(winesFound) wines found")
             } else {

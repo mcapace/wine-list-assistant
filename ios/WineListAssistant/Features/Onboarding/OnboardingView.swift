@@ -57,6 +57,7 @@ struct OnboardingView: View {
             VStack(spacing: Theme.Spacing.md) {
                 if currentPage < pages.count - 1 {
                     Button("Next") {
+                        HapticService.shared.buttonTap()
                         withAnimation {
                             currentPage += 1
                         }
@@ -65,11 +66,13 @@ struct OnboardingView: View {
                     .controlSize(.large)
 
                     Button("Skip") {
+                        HapticService.shared.buttonTap()
                         appState.completeOnboarding()
                     }
                     .foregroundColor(.secondary)
                 } else {
                     Button("Get Started") {
+                        HapticService.shared.success()
                         appState.completeOnboarding()
                     }
                     .buttonStyle(.borderedProminent)
@@ -98,38 +101,21 @@ struct OnboardingPageView: View {
             Spacer()
 
             if page.isLogo {
-                // Logo page - show app icon/logo
-                VStack(spacing: Theme.Spacing.lg) {
-                    // App logo placeholder - will use actual image from assets
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Theme.cardBackground)
-                            .frame(width: 140, height: 140)
-
-                        // Wine bottle + lens icon representation
-                        HStack(spacing: 4) {
-                            Image(systemName: "wineglass.fill")
-                                .font(.system(size: 50))
-                                .foregroundColor(Theme.primaryColor)
-
-                            Image(systemName: "camera.aperture")
-                                .font(.system(size: 40))
-                                .foregroundColor(Theme.secondaryColor)
-                        }
-                    }
-                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-
-                    // Wine Spectator text logo
-                    VStack(spacing: 4) {
-                        Text("Wine Spectator")
-                            .font(.system(size: 28, weight: .bold, design: .serif))
-                            .foregroundColor(.primary)
-                        Text("WINE LENS")
-                            .font(.system(size: 18, weight: .semibold, design: .default))
-                            .tracking(4)
-                            .foregroundColor(Theme.secondaryColor)
-                    }
+                // Logo page - show WineLensText image
+                VStack(spacing: Theme.Spacing.xl) {
+                    // WineLensText logo image
+                    Image("WineLensText")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 280, maxHeight: 120)
+                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                    
+                    // Wine Spectator branding
+                    Text("Wine Spectator")
+                        .font(.system(size: 24, weight: .bold, design: .serif))
+                        .foregroundColor(.primary)
                 }
+                .padding(.horizontal, Theme.Spacing.xl)
             } else {
                 // Standard icon page
                 ZStack {

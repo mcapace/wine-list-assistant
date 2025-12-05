@@ -84,6 +84,10 @@ struct ScoreBadgeOverlay: View {
             }
         }
         .onAppear {
+            // Haptic feedback when score appears
+            if wine.isMatched {
+                HapticService.shared.scoreRevealed()
+            }
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isAppearing = true
             }
