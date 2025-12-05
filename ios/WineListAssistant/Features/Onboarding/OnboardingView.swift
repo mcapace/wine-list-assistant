@@ -101,17 +101,23 @@ struct OnboardingPageView: View {
             Spacer()
 
             if page.isLogo {
-                // Logo page - show WineLensText image with fallback
+                // Logo page - show WineLens Logo image with fallback
                 VStack(spacing: Theme.Spacing.xl) {
-                    // WineLensText logo image with fallback
+                    // WineLens Logo image with fallback
                     Group {
-                        if UIImage(named: "WineLensText") != nil {
+                        if UIImage(named: "WineLensLogo") != nil {
+                            Image("WineLensLogo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: 300, maxHeight: 300)
+                        } else if UIImage(named: "WineLensText") != nil {
+                            // Fallback to WineLensText if logo not found
                             Image("WineLensText")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(maxWidth: 280, maxHeight: 120)
                         } else {
-                            // Fallback if image not found
+                            // Final fallback if no images found
                             VStack(spacing: 8) {
                                 Image(systemName: "wineglass.fill")
                                     .font(.system(size: 60))

@@ -115,6 +115,11 @@ final class CameraService: NSObject, ObservableObject {
     }
 
     private func configureSession() throws {
+        // Stop session if running before reconfiguration
+        if captureSession.isRunning {
+            captureSession.stopRunning()
+        }
+        
         captureSession.beginConfiguration()
         defer { captureSession.commitConfiguration() }
 
@@ -209,20 +214,36 @@ final class CameraService: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
             
+            // Ensure session is configured before starting
+            guard !self.captureSession.inputs.isEmpty else {
+                #if DEBUG
+                print("⚠️ Cannot start camera: no inputs configured")
+                #endif
+                Task { @MainActor in
+                    self.error = .configurationFailed
+                }
+                return
+            }
+            
             // Start the session
             if !self.captureSession.isRunning {
                 self.captureSession.startRunning()
             }
             
-            // Update state on main thread
+            // Update state on main thread after a brief delay
             Task { @MainActor in
                 // Give it a moment to start
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
                 self.isRunning = self.captureSession.isRunning
                 #if DEBUG
                 print("📷 Camera started: \(self.isRunning)")
+                print("📷 Session inputs: \(self.captureSession.inputs.count)")
+                print("📷 Session outputs: \(self.captureSession.outputs.count)")
                 if !self.isRunning {
                     print("⚠️ Camera session failed to start")
+                    if self.captureSession.inputs.isEmpty {
+                        print("⚠️ No camera inputs configured")
+                    }
                 }
                 #endif
             }

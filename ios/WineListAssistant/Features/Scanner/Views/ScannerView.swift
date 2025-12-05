@@ -12,15 +12,9 @@ struct ScannerView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Camera Preview
-                if viewModel.cameraService.isRunning {
-                    CameraPreviewView(cameraService: viewModel.cameraService)
-                        .ignoresSafeArea()
-                } else {
-                    // Loading/black screen while camera starts
-                    Color.black
-                        .ignoresSafeArea()
-                }
+                // Camera Preview - always show, preview layer will handle black screen if not running
+                CameraPreviewView(cameraService: viewModel.cameraService)
+                    .ignoresSafeArea()
 
                 // AR Overlay
                 AROverlayView(

@@ -6,27 +6,27 @@ struct CameraPreviewView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
-        // Connect the capture session to the preview layer on main thread
-        DispatchQueue.main.async {
-            view.previewLayer.session = cameraService.captureSession
-            // Set proper orientation
-            if let connection = view.previewLayer.connection, connection.isVideoOrientationSupported {
-                connection.videoOrientation = .portrait
-            }
+        // Connect session immediately (must be on main thread)
+        view.previewLayer.session = cameraService.captureSession
+        view.previewLayer.videoGravity = .resizeAspectFill
+        
+        // Set proper orientation
+        if let connection = view.previewLayer.connection, connection.isVideoOrientationSupported {
+            connection.videoOrientation = .portrait
         }
+        
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
-        // Ensure session is still connected (in case of reconfiguration)
-        DispatchQueue.main.async {
-            if uiView.previewLayer.session != cameraService.captureSession {
-                uiView.previewLayer.session = cameraService.captureSession
-            }
-            // Update orientation if needed
-            if let connection = uiView.previewLayer.connection, connection.isVideoOrientationSupported {
-                connection.videoOrientation = .portrait
-            }
+        // Ensure session is still connected
+        if uiView.previewLayer.session != cameraService.captureSession {
+            uiView.previewLayer.session = cameraService.captureSession
+        }
+        
+        // Update orientation if needed
+        if let connection = uiView.previewLayer.connection, connection.isVideoOrientationSupported {
+            connection.videoOrientation = .portrait
         }
     }
 }
