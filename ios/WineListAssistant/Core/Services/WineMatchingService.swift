@@ -256,6 +256,12 @@ final class WineMatchingService {
                 matchType: .fuzzyName
             )
         } catch {
+            // Don't log cancellation errors - they're expected when new frames arrive
+            let nsError = error as NSError
+            if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled {
+                // Request was cancelled, this is normal during rapid scanning
+                return nil
+            }
             print("API match failed: \(error)")
             return nil
         }
@@ -290,7 +296,11 @@ final class WineMatchingService {
 
             return results
         } catch {
-            print("Batch API match failed: \(error)")
+            // Don't log cancellation errors - they're expected when new frames arrive
+            let nsError = error as NSError
+            if !(nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled) {
+                print("Batch API match failed: \(error)")
+            }
             return Dictionary(uniqueKeysWithValues: texts.map { ($0, nil as MatchResult?) })
         }
     }

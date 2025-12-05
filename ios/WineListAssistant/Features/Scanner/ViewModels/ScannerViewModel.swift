@@ -29,6 +29,7 @@ final class ScannerViewModel: ObservableObject {
     private var frameProcessingTask: Task<Void, Never>?
     private var lastProcessedTime = Date.distantPast
     private let processingInterval: TimeInterval
+    private var pendingMatchTasks: Set<UUID> = []
 
     // MARK: - Computed Properties
 
@@ -141,36 +142,49 @@ final class ScannerViewModel: ObservableObject {
             guard !Task.isCancelled else { return }
 
             // Step 3: Match each candidate against our wine database
-            var matchedWines: [RecognizedWine] = []
+            // Use detached tasks to prevent API request cancellation when new frames arrive
+            let taskId = UUID()
+            pendingMatchTasks.insert(taskId)
 
-            for candidate in candidates {
-                guard !Task.isCancelled else { return }
+            // Capture what we need for the detached task
+            let matchingService = self.matchingService
 
-                let matchResult = await matchingService.matchWine(from: candidate.fullText)
+            Task.detached { [weak self] in
+                var matchedWines: [RecognizedWine] = []
 
-                let recognized = RecognizedWine(
-                    id: UUID(),
-                    originalText: candidate.fullText,
-                    boundingBox: candidate.boundingBox,
-                    ocrConfidence: candidate.confidence,
-                    matchedWine: matchResult?.wine,
-                    matchConfidence: matchResult?.confidence ?? 0,
-                    matchedVintage: matchResult?.matchedVintage,
-                    matchType: matchResult?.matchType ?? .noMatch,
-                    listPrice: extractPrice(from: candidate.fullText)
-                )
+                for candidate in candidates {
+                    // Note: We don't check Task.isCancelled here because this is a
+                    // detached task that should complete its API calls
+                    let matchResult = await matchingService.matchWine(from: candidate.fullText)
 
-                matchedWines.append(recognized)
-            }
+                    let recognized = RecognizedWine(
+                        id: UUID(),
+                        originalText: candidate.fullText,
+                        boundingBox: candidate.boundingBox,
+                        ocrConfidence: candidate.confidence,
+                        matchedWine: matchResult?.wine,
+                        matchConfidence: matchResult?.confidence ?? 0,
+                        matchedVintage: matchResult?.matchedVintage,
+                        matchType: matchResult?.matchType ?? .noMatch,
+                        listPrice: self?.extractPrice(from: candidate.fullText)
+                    )
 
-            // Update UI on main thread
-            await MainActor.run {
-                // Merge with existing results to avoid flickering
-                self.mergeResults(matchedWines)
+                    matchedWines.append(recognized)
+                }
+
+                // Update UI on main thread
+                await MainActor.run {
+                    self?.pendingMatchTasks.remove(taskId)
+                    // Merge with existing results to avoid flickering
+                    self?.mergeResults(matchedWines)
+                }
             }
 
         } catch {
-            print("Frame processing error: \(error)")
+            // Don't log cancellation errors - they're expected during rapid frame processing
+            if !(error is CancellationError) {
+                print("Frame processing error: \(error)")
+            }
         }
     }
 
