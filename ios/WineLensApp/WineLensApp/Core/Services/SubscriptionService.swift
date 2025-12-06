@@ -169,6 +169,11 @@ final class SubscriptionService: ObservableObject {
             return true
         }
 
+        #if DEBUG
+        // In development, allow unlimited scans for testing
+        return true
+        #endif
+
         // Check free tier limit
         let scansThisMonth = getScansThisMonth()
         return scansThisMonth < AppConfiguration.freeScansPerMonth
@@ -205,8 +210,24 @@ final class SubscriptionService: ObservableObject {
         if subscriptionStatus.isActive {
             return Int.max
         }
+        
+        #if DEBUG
+        // In development, show unlimited for testing
+        return 999
+        #endif
+        
         return max(0, AppConfiguration.freeScansPerMonth - getScansThisMonth())
     }
+    
+    // MARK: - Development Helpers
+    
+    #if DEBUG
+    /// Reset scan count for development/testing
+    func resetScanCount() {
+        UserDefaults.standard.set(0, forKey: Constants.StorageKeys.scansThisMonth)
+        UserDefaults.standard.set(Date(), forKey: Constants.StorageKeys.scansMonthStart)
+    }
+    #endif
 
     // MARK: - Private Methods
 

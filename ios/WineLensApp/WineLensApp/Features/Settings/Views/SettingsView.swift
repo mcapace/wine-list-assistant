@@ -78,6 +78,19 @@ struct SettingsView: View {
                         Text("\(AppConfiguration.appVersion) (\(AppConfiguration.buildNumber))")
                             .foregroundColor(.secondary)
                     }
+                    
+                    #if DEBUG
+                    // Development: Reset scan count
+                    Button(action: {
+                        subscriptionService.resetScanCount()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                            Text("Reset Scan Count (Dev)")
+                        }
+                        .foregroundColor(.orange)
+                    }
+                    #endif
 
                     Link(destination: URL(string: "https://www.winespectator.com/privacy")!) {
                         HStack {

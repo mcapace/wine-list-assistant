@@ -56,7 +56,7 @@ enum AppConfiguration {
 
     // MARK: - Subscription
 
-    static let freeScansPerMonth = 5
+    static let freeScansPerMonth = 20  // Increased from 5 to 20 for better UX
     static let subscriptionGroupID = "21234567"  // App Store Connect subscription group ID
 
     // MARK: - Timeouts
