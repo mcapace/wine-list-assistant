@@ -651,20 +651,22 @@ struct FilterButton: View {
                             )
                     )
                     .overlay(
-                        Capsule()
-                            .stroke(
-                                isActive
-                                    ? Color.clear
-                                    : LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(0.3),
-                                            Color.white.opacity(0.1)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                lineWidth: isActive ? 0 : 1.5
-                            )
+                        Group {
+                            if !isActive {
+                                Capsule()
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [
+                                                Color.white.opacity(0.3),
+                                                Color.white.opacity(0.1)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                            }
+                        }
                     )
             )
             .shadow(
