@@ -9,9 +9,13 @@ struct ScannerView: View {
     @State private var showInstructions = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
-    // Computed property for matched wines (only wines with actual database matches)
+    // Computed properties
+    private var allRecognizedWines: [RecognizedWine] {
+        viewModel.filteredWines
+    }
+    
     private var matchedWines: [RecognizedWine] {
-        viewModel.filteredWines.filter { $0.matchedWine != nil }
+        allRecognizedWines.filter { $0.isMatched }
     }
 
     var body: some View {
@@ -23,7 +27,6 @@ struct ScannerView: View {
 
                 // AR Overlay - show ALL recognized wines (matched and unmatched for visibility)
                 // This helps users see that OCR is working even if matching fails
-                let allRecognizedWines = viewModel.filteredWines
                 if !allRecognizedWines.isEmpty {
                     AROverlayView(
                         recognizedWines: allRecognizedWines,
@@ -51,7 +54,6 @@ struct ScannerView: View {
                 .padding(.horizontal, 0)
 
                 // Center instruction hint (when no wines detected at all) - perfectly centered
-                let allRecognizedWines = viewModel.filteredWines
                 if allRecognizedWines.isEmpty && viewModel.cameraService.isRunning {
                     VStack {
                         Spacer()
@@ -66,8 +68,7 @@ struct ScannerView: View {
                     Spacer()
 
                     // Scan status - show when we have ANY recognized wines (matched or unmatched)
-                    let allRecognizedWines = viewModel.filteredWines
-                    let matchedCount = allRecognizedWines.filter { $0.isMatched }.count
+                    let matchedCount = matchedWines.count
                     
                     if allRecognizedWines.count > 0 {
                         VStack(spacing: 16) {

@@ -171,7 +171,7 @@ struct DrinkWindowIndicatorOverlay: View {
                 RecognizedWine.previewNoMatch
             ],
             viewSize: CGSize(width: 390, height: 844),
-            onWineTapped: { _ in }
+            onWineTapped: { wine in }
         )
     }
 }
