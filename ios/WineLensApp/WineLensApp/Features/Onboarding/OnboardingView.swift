@@ -15,29 +15,29 @@ struct OnboardingView: View {
         OnboardingPage(
             title: "Scan Any Wine List",
             subtitle: "Point your camera at a restaurant wine list and see Wine Spectator scores instantly.",
-            imageName: "camera.viewfinder",
-            color: Theme.primary,
+            imageName: "camera.aperture",
+            color: Theme.primaryColor,
             isLogo: false
         ),
         OnboardingPage(
             title: "Expert Scores, Not Crowds",
             subtitle: "Unlike other apps, our scores come from professional blind tastings by experienced critics.",
-            imageName: "star.fill",
-            color: .yellow,
+            imageName: "sparkles",
+            color: Theme.secondaryColor,
             isLogo: false
         ),
         OnboardingPage(
             title: "Find the Best Value",
             subtitle: "Filter by score, drink window, and value to find the perfect bottle for your budget.",
-            imageName: "tag.fill",
+            imageName: "chart.line.uptrend.xyaxis",
             color: .green,
             isLogo: false
         ),
         OnboardingPage(
             title: "Save Your Favorites",
             subtitle: "Build your personal wine list and never forget a great bottle.",
-            imageName: "heart.fill",
-            color: .red,
+            imageName: "bookmark.fill",
+            color: Theme.primaryColor,
             isLogo: false
         )
     ]
@@ -101,33 +101,85 @@ struct OnboardingPageView: View {
                 // Logo page - use WineLensBadge component with actual logos
                 WineLensBadge(style: .onboarding)
             } else {
-                // Standard icon page
+                // Standard icon page - elevated design with gradients and shadows
                 ZStack {
+                    // Outer glow
                     Circle()
-                        .fill(page.color.opacity(0.15))
-                        .frame(width: 160, height: 160)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    page.color.opacity(0.25),
+                                    page.color.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 200, height: 200)
+                        .blur(radius: 20)
+                    
+                    // Main circle with gradient
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    page.color.opacity(0.2),
+                                    page.color.opacity(0.08)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 180, height: 180)
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            page.color.opacity(0.4),
+                                            page.color.opacity(0.2)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                        )
+                        .shadow(color: page.color.opacity(0.3), radius: 20, x: 0, y: 10)
+                        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
 
+                    // Icon with enhanced styling
                     Image(systemName: page.imageName)
-                        .font(.system(size: 70))
-                        .foregroundColor(page.color)
+                        .font(.system(size: 80, weight: .medium))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [page.color, page.color.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .shadow(color: page.color.opacity(0.3), radius: 8, x: 0, y: 4)
                 }
             }
 
-            // Text
+            // Text - elevated typography
             VStack(spacing: Theme.Spacing.md) {
                 if !page.isLogo {
                     Text(page.title)
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
+                        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
                 }
 
                 Text(page.subtitle)
-                    .font(.body)
+                    .font(.system(size: 17, weight: .regular))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(4)
                     .padding(.horizontal, Theme.Spacing.xl)
             }
+            .padding(.top, Theme.Spacing.lg)
 
             Spacer()
             Spacer()

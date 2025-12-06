@@ -1,70 +1,80 @@
-import Vision
-import CoreImage
+import Foundation
 import UIKit
 import CoreVideo
 
-/// Apple Vision Framework OCR implementation
-final class AppleVisionOCRService: OCRProvider {
+/// Manages OCR providers and provides unified interface
+final class OCRService {
+    // MARK: - Shared Instance
+    
+    static let shared = OCRService()
+    
     // MARK: - Properties
     
-    let name = "Apple Vision"
-    let requiresInternet = false
+    private var currentProvider: OCRProvider
+    private let appleVisionProvider: AppleVisionOCRService
+    private var googleCloudProvider: GoogleCloudOCRService?
     
-    private let requestHandler = VNSequenceRequestHandler()
-    private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
-
-    struct WineTextCandidate {
-        let fullText: String
-        let boundingBox: CGRect
-        let confidence: Float
-        let lineCount: Int
-    }
-
-    // MARK: - Properties
-
-    private let requestHandler = VNSequenceRequestHandler()
-
-    /// Languages to recognize (prioritized)
-    private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
-
-    // MARK: - OCRProvider Implementation
+    // MARK: - Initialization
     
-    func recognizeText(in pixelBuffer: CVPixelBuffer) async throws -> [OCRService.OCRResult] {
-        try await withCheckedThrowingContinuation { continuation in
-            let request = createTextRecognitionRequest { result in
-                continuation.resume(with: result)
+    private init() {
+        self.appleVisionProvider = AppleVisionOCRService()
+        
+        // Initialize Google Cloud provider if API key is available
+        if let apiKey = AppConfiguration.googleCloudVisionAPIKey, !apiKey.isEmpty {
+            self.googleCloudProvider = GoogleCloudOCRService(apiKey: apiKey)
+        }
+        
+        // Set provider based on preference
+        setProvider(AppConfiguration.preferredOCRProvider)
+    }
+    
+    // MARK: - Provider Management
+    
+    /// Available OCR providers
+    var availableProviders: [OCRProvider] {
+        var providers: [OCRProvider] = [appleVisionProvider]
+        if let googleCloud = googleCloudProvider {
+            providers.append(googleCloud)
+        }
+        return providers
+    }
+    
+    /// Current OCR provider
+    var provider: OCRProvider {
+        return currentProvider
+    }
+    
+    /// Switch to a different OCR provider
+    func setProvider(_ providerName: String) {
+        switch providerName.lowercased() {
+        case "apple", "vision":
+            currentProvider = appleVisionProvider
+        case "google", "googlecloud", "google cloud":
+            if let googleCloud = googleCloudProvider {
+                currentProvider = googleCloud
+            } else {
+                print("⚠️ Google Cloud Vision not available - API key missing")
+                currentProvider = appleVisionProvider
             }
-
-            do {
-                try requestHandler.perform([request], on: pixelBuffer)
-            } catch {
-                continuation.resume(throwing: error)
-            }
+        default:
+            currentProvider = appleVisionProvider
         }
     }
-
-    func recognizeText(in image: UIImage) async throws -> [OCRService.OCRResult] {
-        guard let cgImage = image.cgImage else {
-            throw OCRError.invalidImage
-        }
-
-        return try await withCheckedThrowingContinuation { continuation in
-            let request = createTextRecognitionRequest { result in
-                continuation.resume(with: result)
-            }
-
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
-            do {
-                try handler.perform([request])
-            } catch {
-                continuation.resume(throwing: error)
-            }
-        }
+    
+    // MARK: - OCR Methods (Delegate to current provider)
+    
+    /// Recognize text in a pixel buffer (real-time camera frame)
+    func recognizeText(in pixelBuffer: CVPixelBuffer) async throws -> [OCRResult] {
+        return try await currentProvider.recognizeText(in: pixelBuffer)
     }
-
+    
+    /// Recognize text in a UIImage (captured photo)
+    func recognizeText(in image: UIImage) async throws -> [OCRResult] {
+        return try await currentProvider.recognizeText(in: image)
+    }
+    
     /// Group OCR results into likely wine entries
-    func groupIntoWineEntries(_ results: [OCRService.OCRResult]) -> [WineTextCandidate] {
+    func groupIntoWineEntries(_ results: [OCRResult]) -> [WineTextCandidate] {
         guard !results.isEmpty else { return [] }
 
         // Sort by vertical position (top to bottom in view coordinates)
@@ -104,53 +114,10 @@ final class AppleVisionOCRService: OCRProvider {
         // Filter out likely non-wine entries (headers, page numbers, etc.)
         return candidates.filter { isLikelyWineEntry($0) }
     }
-
-    // MARK: - Private Methods
-
-    private func createTextRecognitionRequest(
-        completion: @escaping (Result<[OCRService.OCRResult], Error>) -> Void
-    ) -> VNRecognizeTextRequest {
-        let request = VNRecognizeTextRequest { request, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-
-            guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                completion(.success([]))
-                return
-            }
-
-            let results = observations.compactMap { observation -> OCRService.OCRResult? in
-                guard let candidate = observation.topCandidates(1).first else {
-                    return nil
-                }
-
-                // Filter out very low confidence results
-                guard candidate.confidence > 0.5 else {
-                    return nil
-                }
-
-                return OCRService.OCRResult(
-                    text: candidate.string,
-                    boundingBox: observation.boundingBox,
-                    confidence: candidate.confidence
-                )
-            }
-
-            completion(.success(results))
-        }
-
-        // Configure for best text recognition
-        request.recognitionLevel = .accurate
-        request.recognitionLanguages = recognitionLanguages
-        request.usesLanguageCorrection = true
-        request.revision = VNRecognizeTextRequestRevision3
-
-        return request
-    }
-
-    private func createCandidate(from results: [OCRService.OCRResult]) -> WineTextCandidate? {
+    
+    // MARK: - Private Helper Methods
+    
+    private func createCandidate(from results: [OCRResult]) -> WineTextCandidate? {
         guard !results.isEmpty else { return nil }
 
         // Combine text from all lines
@@ -182,7 +149,7 @@ final class AppleVisionOCRService: OCRProvider {
             lineCount: results.count
         )
     }
-
+    
     private func isLikelyWineEntry(_ candidate: WineTextCandidate) -> Bool {
         let text = candidate.fullText.lowercased()
 
@@ -246,20 +213,16 @@ final class AppleVisionOCRService: OCRProvider {
         let wordCount = text.split(separator: " ").count
         return wordCount >= 3 && candidate.fullText.count >= 15
     }
+}
 
-    // MARK: - Errors
+// MARK: - Types
 
-    enum OCRError: Error, LocalizedError {
-        case invalidImage
-        case recognitionFailed
-
-        var errorDescription: String? {
-            switch self {
-            case .invalidImage:
-                return "Invalid image format"
-            case .recognitionFailed:
-                return "Text recognition failed"
-            }
-        }
+extension OCRService {
+    struct WineTextCandidate {
+        let fullText: String
+        let boundingBox: CGRect
+        let confidence: Float
+        let lineCount: Int
     }
 }
+

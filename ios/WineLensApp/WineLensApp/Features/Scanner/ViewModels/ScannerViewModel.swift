@@ -19,7 +19,7 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Services
 
     let cameraService = CameraService()
-    private let ocrService = OCRService()
+    private let ocrService = OCRService.shared
     private let matchingService: WineMatchingService
     private let subscriptionService = SubscriptionService.shared
 

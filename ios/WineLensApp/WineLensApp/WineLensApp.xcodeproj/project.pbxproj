@@ -43,6 +43,9 @@
 		CEB4BB272EE37EBA00014979 /* Wine_Glass_Fill.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */; };
 		CEB4BB282EE37EBA00014979 /* Scan_Pulse.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB022EE37EBA00014979 /* Scan_Pulse.json */; };
 		CEB4BB292EE37EBA00014979 /* WineLensBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */; };
+		CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */; };
+		CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */; };
+		CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +104,9 @@
 		CEB4BB032EE37EBA00014979 /* Score_Reveal.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Score_Reveal.json; sourceTree = "<group>"; };
 		CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Glass_Fill.json; sourceTree = "<group>"; };
 		CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WineLensBadge.swift; sourceTree = "<group>"; };
+		CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCloudOCRService.swift; sourceTree = "<group>"; };
+		CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRProviderProtocol.swift; sourceTree = "<group>"; };
+		CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRServiceManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -298,6 +304,9 @@
 			children = (
 				CEB4BAEF2EE37EBA00014979 /* CameraService.swift */,
 				CEB4BAF02EE37EBA00014979 /* OCRService.swift */,
+				CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */,
+				CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */,
+				CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -577,6 +586,9 @@
 				CEB4BB232EE37EBA00014979 /* WineAPIClient.swift in Sources */,
 				CEB4BB242EE37EBA00014979 /* Wine.swift in Sources */,
 				CEB4BB292EE37EBA00014979 /* WineLensBadge.swift in Sources */,
+				CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */,
+				CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */,
+				CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -741,6 +753,7 @@
 				DEVELOPMENT_TEAM = 346J27QJCB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_GOOGLE_CLOUD_VISION_API_KEY = "AIzaSyAcHGPG8m4qVPCJRy9-opQRlXayQCoqtks";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -774,6 +787,7 @@
 				DEVELOPMENT_TEAM = 346J27QJCB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_GOOGLE_CLOUD_VISION_API_KEY = "AIzaSyAcHGPG8m4qVPCJRy9-opQRlXayQCoqtks";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

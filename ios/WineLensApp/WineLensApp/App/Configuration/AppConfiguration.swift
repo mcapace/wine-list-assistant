@@ -64,4 +64,19 @@ enum AppConfiguration {
     static let apiTimeoutSeconds: TimeInterval = 10
     static let ocrProcessingIntervalSeconds: TimeInterval = 0.5
     static let matchConfidenceThreshold: Double = 0.7
+    
+    // MARK: - OCR Configuration
+    
+    /// Google Cloud Vision API Key
+    /// Set this in Info.plist or via build configuration
+    static var googleCloudVisionAPIKey: String? {
+        return Bundle.main.object(forInfoDictionaryKey: "GOOGLE_CLOUD_VISION_API_KEY") as? String
+    }
+    
+    /// Default OCR provider preference
+    /// Can be changed in app settings
+    static var preferredOCRProvider: String {
+        get { UserDefaults.standard.string(forKey: "ocrProvider") ?? "apple" }
+        set { UserDefaults.standard.set(newValue, forKey: "ocrProvider") }
+    }
 }

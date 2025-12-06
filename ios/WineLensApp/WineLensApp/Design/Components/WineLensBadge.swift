@@ -104,43 +104,46 @@ struct WineLensBadge: View {
     // MARK: - Onboarding Style (larger)
 
     private var onboardingStyleBadge: some View {
-        VStack(spacing: 16) {
-            // Wine Spectator logo
+        VStack(spacing: 24) {
+            // Wine Spectator logo - much larger
             if let _ = UIImage(named: "WSLogoBlack") {
                 Image("WSLogoBlack")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 36)
+                    .frame(height: 60)
+                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
             } else {
                 // Fallback to text if image not available
                 Text("Wine Spectator")
-                    .font(.system(size: 28, weight: .bold, design: .serif))
+                    .font(.system(size: 42, weight: .bold, design: .serif))
                     .foregroundColor(.primary)
             }
 
-            // Wine Lens logo
+            // Wine Lens logo - much larger
             if let _ = UIImage(named: "WineLensText") {
                 Image("WineLensText")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 40)
+                    .frame(height: 80)
+                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
             } else {
                 // Fallback to text if image not available
-                HStack(spacing: 8) {
+                HStack(spacing: 12) {
                     Image(systemName: "wineglass.fill")
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.system(size: 32, weight: .medium))
                         .foregroundColor(Theme.secondaryColor)
 
                     Text("WINE")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 36, weight: .bold))
                         .foregroundColor(.primary)
                     +
                     Text("LENS")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 36, weight: .bold))
                         .foregroundColor(Theme.secondaryColor)
                 }
             }
         }
+        .padding(.vertical, 20)
     }
 }
 
