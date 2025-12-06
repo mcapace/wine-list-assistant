@@ -1,1 +1,5 @@
 .vercel
+# Xcode user-specific files (should not be committed)
+*.xcuserstate
+*.xcuserdatad/
+.DS_Store
