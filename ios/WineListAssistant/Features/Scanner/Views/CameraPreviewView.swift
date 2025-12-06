@@ -6,11 +6,16 @@ struct CameraPreviewView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
+        // CRITICAL: Connect the camera session to the preview layer
+        view.previewLayer.session = cameraService.captureSession
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
-        // Update handled via Combine in the view
+        // Ensure session is connected (in case it gets reset)
+        if uiView.previewLayer.session !== cameraService.captureSession {
+            uiView.previewLayer.session = cameraService.captureSession
+        }
     }
 }
 

@@ -18,7 +18,8 @@ final class CameraService: NSObject, ObservableObject {
 
     // MARK: - Private Properties
 
-    private let captureSession = AVCaptureSession()
+    /// The capture session - exposed for preview layer connection
+    let captureSession = AVCaptureSession()
     private let videoOutput = AVCaptureVideoDataOutput()
     private let sessionQueue = DispatchQueue(label: "com.winespectator.wla.camera.session")
     private let videoOutputQueue = DispatchQueue(label: "com.winespectator.wla.camera.output")

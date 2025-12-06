@@ -12,53 +12,61 @@ struct ScannerView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Camera Preview
+                // Camera Preview - full screen background
                 CameraPreviewView(cameraService: viewModel.cameraService)
                     .ignoresSafeArea()
 
-                // AR Overlay
-                AROverlayView(
-                    recognizedWines: viewModel.filteredWines,
-                    viewSize: geometry.size,
-                    onWineTapped: { wine in
-                        selectedWine = wine
-                    }
-                )
+                // AR Overlay - shows wine recognition badges
+                if !viewModel.filteredWines.isEmpty {
+                    AROverlayView(
+                        recognizedWines: viewModel.filteredWines,
+                        viewSize: geometry.size,
+                        onWineTapped: { wine in
+                            selectedWine = wine
+                        }
+                    )
+                }
 
-                // Top Controls with branding
-                VStack {
+                // Main UI overlay
+                VStack(spacing: 0) {
+                    // Top Controls with branding
                     ScannerTopBar(
                         torchEnabled: $viewModel.torchEnabled,
                         scansRemaining: subscriptionService.remainingFreeScans(),
                         isPremium: subscriptionService.subscriptionStatus.isActive,
                         onHelpTapped: { showInstructions = true }
                     )
+                    .padding(.horizontal)
+                    .padding(.top, geometry.safeAreaInsets.top + 8)
 
                     Spacer()
-                }
-                .padding()
 
-                // Center instruction hint (when no wines found)
-                if viewModel.recognizedWines.isEmpty && !viewModel.isProcessing {
-                    ScannerHintView()
-                }
-
-                // Bottom Controls
-                VStack {
-                    Spacer()
-
-                    // Scan status
-                    if viewModel.isProcessing {
-                        ScanningIndicator(winesFound: viewModel.recognizedWines.count)
+                    // Center instruction hint (when camera is ready but no wines found yet)
+                    if viewModel.recognizedWines.isEmpty && viewModel.cameraService.isRunning {
+                        ScannerHintView()
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
 
-                    FilterBar(
-                        filters: $viewModel.filters,
-                        isExpanded: $showFilters
-                    )
-                    .padding(.horizontal)
+                    Spacer()
+
+                    // Bottom section - status and filters
+                    VStack(spacing: 12) {
+                        // Scan status - only show when actively processing AND found wines
+                        if viewModel.isProcessing && viewModel.recognizedWines.count > 0 {
+                            ScanningIndicator(winesFound: viewModel.recognizedWines.count)
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+
+                        FilterBar(
+                            filters: $viewModel.filters,
+                            isExpanded: $showFilters
+                        )
+                        .padding(.horizontal)
+                    }
                     .padding(.bottom, geometry.safeAreaInsets.bottom + 16)
                 }
+                .animation(.easeInOut(duration: 0.3), value: viewModel.recognizedWines.isEmpty)
+                .animation(.easeInOut(duration: 0.2), value: viewModel.isProcessing)
 
                 // Permission denied overlay
                 if viewModel.cameraService.error == .notAuthorized {
@@ -168,18 +176,17 @@ struct ScannerTopBar: View {
 
 struct ScannerHintView: View {
     @State private var isAnimating = false
-    @State private var pulseScale: CGFloat = 1.0
+    @State private var scanLineOffset: CGFloat = -60
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Animated scan frame with Lottie pulse
+        VStack(spacing: 20) {
+            // Animated scan frame with pulse effect
             ZStack {
-                // Lottie pulse animation (if available)
+                // Pulse animation
                 ScanPulseAnimation()
-                    .opacity(0.6)
-                    .scaleEffect(pulseScale)
+                    .opacity(0.5)
 
-                // Corner brackets
+                // Corner brackets frame
                 ScanFrameCorners()
                     .stroke(Theme.secondaryColor, lineWidth: 2)
                     .frame(width: 200, height: 140)
@@ -188,43 +195,48 @@ struct ScannerHintView: View {
                 Rectangle()
                     .fill(
                         LinearGradient(
-                            colors: [Theme.secondaryColor.opacity(0), Theme.secondaryColor.opacity(0.5), Theme.secondaryColor.opacity(0)],
+                            colors: [
+                                Theme.secondaryColor.opacity(0),
+                                Theme.secondaryColor.opacity(0.6),
+                                Theme.secondaryColor.opacity(0)
+                            ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .frame(width: 180, height: 2)
-                    .offset(y: isAnimating ? 60 : -60)
-                    .animation(
-                        Animation.easeInOut(duration: 2).repeatForever(autoreverses: true),
-                        value: isAnimating
-                    )
+                    .offset(y: scanLineOffset)
             }
+            .frame(width: 200, height: 200)
 
-            Text("Point at a wine list")
-                .font(.system(size: 17, weight: .medium))
-                .foregroundColor(.white)
+            VStack(spacing: 8) {
+                Text("Point at a wine list")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
 
-            Text("Hold steady to scan wine names")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
+                Text("Hold steady to scan wine names")
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(.white.opacity(0.7))
+            }
+            .multilineTextAlignment(.center)
         }
-        .padding(24)
+        .padding(.horizontal, 32)
+        .padding(.vertical, 28)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.black.opacity(0.6))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.black.opacity(0.75))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Theme.secondaryColor.opacity(0.2), lineWidth: 1)
                 )
         )
+        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
         .onAppear {
-            isAnimating = true
             HapticManager.shared.scanStarted()
 
-            // Subtle pulse animation
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                pulseScale = 1.05
+            // Animate scan line
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                scanLineOffset = 60
             }
         }
     }
@@ -569,22 +581,31 @@ struct ScanningIndicator: View {
     let winesFound: Int
 
     var body: some View {
-        HStack(spacing: 8) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+        HStack(spacing: 10) {
+            // Wine glass icon with count
+            Image(systemName: "wineglass.fill")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(Theme.secondaryColor)
 
-            if winesFound > 0 {
-                Text("\(winesFound) wines found")
-            } else {
-                Text("Scanning...")
-            }
+            Text("\(winesFound)")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+
+            Text(winesFound == 1 ? "wine found" : "wines found")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
         }
-        .font(.subheadline)
-        .foregroundColor(.white)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 18)
         .padding(.vertical, 10)
-        .background(Color.black.opacity(0.7))
-        .clipShape(Capsule())
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.8))
+                .overlay(
+                    Capsule()
+                        .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 }
 

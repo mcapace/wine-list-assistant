@@ -99,44 +99,34 @@ struct OnboardingPageView: View {
 
             if page.isLogo {
                 // Logo page - show app icon/logo
-                VStack(spacing: Theme.Spacing.lg) {
-                    // App logo placeholder - will use actual image from assets
+                VStack(spacing: Theme.Spacing.xl) {
+                    // App icon
                     ZStack {
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Theme.cardBackground)
+                        RoundedRectangle(cornerRadius: 32)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.primaryColor, Theme.primaryColor.opacity(0.8)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                             .frame(width: 140, height: 140)
 
-                        // Wine bottle + lens icon representation
-                        HStack(spacing: 4) {
+                        // Wine glass + lens icon
+                        VStack(spacing: 8) {
                             Image(systemName: "wineglass.fill")
-                                .font(.system(size: 50))
-                                .foregroundColor(Theme.primaryColor)
+                                .font(.system(size: 50, weight: .light))
+                                .foregroundColor(.white)
 
-                            Image(systemName: "camera.aperture")
-                                .font(.system(size: 40))
+                            Image(systemName: "viewfinder")
+                                .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(Theme.secondaryColor)
                         }
                     }
-                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                    .shadow(color: Theme.primaryColor.opacity(0.4), radius: 20, x: 0, y: 10)
 
-                    // Wine Spectator text logo
-                    VStack(spacing: 4) {
-                        Text("Wine Spectator")
-                            .font(.system(size: 28, weight: .bold, design: .serif))
-                            .foregroundColor(.primary)
-
-                        if let _ = UIImage(named: "WineLensText") {
-                            Image("WineLensText")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 20)
-                        } else {
-                            Text("WINE LENS")
-                                .font(.system(size: 18, weight: .semibold, design: .default))
-                                .tracking(4)
-                                .foregroundColor(Theme.secondaryColor)
-                        }
-                    }
+                    // Use the WineLensBadge component for consistent branding
+                    WineLensBadge(style: .onboarding)
                 }
             } else {
                 // Standard icon page
