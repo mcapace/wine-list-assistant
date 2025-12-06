@@ -9,6 +9,11 @@ struct ScannerView: View {
     @State private var showInstructions = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
+    // Count only wines that have been matched from the database
+    private var matchedWineCount: Int {
+        viewModel.filteredWines.filter { $0.matchedWine != nil }.count
+    }
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -16,10 +21,11 @@ struct ScannerView: View {
                 CameraPreviewView(cameraService: viewModel.cameraService)
                     .ignoresSafeArea()
 
-                // AR Overlay - shows wine recognition badges
-                if !viewModel.filteredWines.isEmpty {
+                // AR Overlay - shows wine recognition badges (only for matched wines)
+                let matchedWines = viewModel.filteredWines.filter { $0.matchedWine != nil }
+                if !matchedWines.isEmpty {
                     AROverlayView(
-                        recognizedWines: viewModel.filteredWines,
+                        recognizedWines: matchedWines,
                         viewSize: geometry.size,
                         onWineTapped: { wine in
                             selectedWine = wine
@@ -41,8 +47,8 @@ struct ScannerView: View {
 
                     Spacer()
 
-                    // Center instruction hint (when camera is ready but no wines found yet)
-                    if viewModel.recognizedWines.isEmpty && viewModel.cameraService.isRunning {
+                    // Center instruction hint (when camera is ready but no matched wines yet)
+                    if matchedWineCount == 0 && viewModel.cameraService.isRunning {
                         ScannerHintView()
                             .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
@@ -51,9 +57,9 @@ struct ScannerView: View {
 
                     // Bottom section - status and filters
                     VStack(spacing: 12) {
-                        // Scan status - only show when actively processing AND found wines
-                        if viewModel.isProcessing && viewModel.recognizedWines.count > 0 {
-                            ScanningIndicator(winesFound: viewModel.recognizedWines.count)
+                        // Scan status - only show when we have MATCHED wines (not just detected text)
+                        if matchedWineCount > 0 {
+                            ScanningIndicator(winesFound: matchedWineCount)
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
 
@@ -65,7 +71,7 @@ struct ScannerView: View {
                     }
                     .padding(.bottom, geometry.safeAreaInsets.bottom + 16)
                 }
-                .animation(.easeInOut(duration: 0.3), value: viewModel.recognizedWines.isEmpty)
+                .animation(.easeInOut(duration: 0.3), value: matchedWineCount)
                 .animation(.easeInOut(duration: 0.2), value: viewModel.isProcessing)
 
                 // Permission denied overlay
@@ -115,16 +121,12 @@ struct ScannerTopBar: View {
             // Torch button
             Button(action: { torchEnabled.toggle() }) {
                 Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
-                    .font(.title3)
-                    .foregroundColor(.white)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(torchEnabled ? Theme.secondaryColor : .white)
                     .frame(width: 44, height: 44)
                     .background(
                         Circle()
-                            .fill(Color.black.opacity(0.5))
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                            )
+                            .fill(Color.black.opacity(0.6))
                     )
             }
 
@@ -135,38 +137,25 @@ struct ScannerTopBar: View {
 
             Spacer()
 
-            // Right side - scan count or help
-            HStack(spacing: 8) {
-                if !isPremium {
-                    HStack(spacing: 4) {
-                        Image(systemName: "camera.viewfinder")
-                            .font(.caption)
-                        Text("\(scansRemaining)")
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(Color.black.opacity(0.5))
-                    )
+            // Right side - scan count only (removed confusing help button)
+            if !isPremium {
+                HStack(spacing: 4) {
+                    Image(systemName: "camera.viewfinder")
+                        .font(.system(size: 12))
+                    Text("\(scansRemaining)")
+                        .font(.system(size: 14, weight: .semibold))
                 }
-
-                Button(action: onHelpTapped) {
-                    Image(systemName: "questionmark.circle")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                        .frame(width: 44, height: 44)
-                        .background(
-                            Circle()
-                                .fill(Color.black.opacity(0.5))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                )
-                        )
-                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.6))
+                )
+            } else {
+                // Empty spacer to balance layout for premium users
+                Color.clear
+                    .frame(width: 44, height: 44)
             }
         }
     }

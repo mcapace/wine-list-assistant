@@ -215,6 +215,9 @@ final class OCRService {
     private func isLikelyWineEntry(_ candidate: WineTextCandidate) -> Bool {
         let text = candidate.fullText.lowercased()
 
+        // Must have minimum length
+        guard text.count >= 10 else { return false }
+
         // Skip common non-wine patterns
         let skipPatterns = [
             "wine list",
@@ -229,7 +232,18 @@ final class OCRService {
             "continued",
             "see server",
             "ask your",
-            "reserve list"
+            "reserve list",
+            "menu",
+            "restaurant",
+            "price",
+            "selection",
+            "our ",
+            "the ",
+            "welcome",
+            "thank you",
+            "scan",
+            "camera",
+            "photo"
         ]
 
         for pattern in skipPatterns {
@@ -238,42 +252,60 @@ final class OCRService {
             }
         }
 
-        // Look for wine-like patterns
-        let wineIndicators = [
-            // Vintage year patterns
-            #"(19|20)\d{2}"#,
-            #"'\d{2}"#,
-            // Price patterns
-            #"\$\d+"#,
-            #"\d+\.\d{2}"#,
-            // Common wine terms
+        // STRICT: Must contain at least one wine-specific indicator
+        var matchCount = 0
+
+        // Wine grape varieties (must match)
+        let grapeVarieties = [
             "cabernet", "merlot", "pinot", "chardonnay", "sauvignon",
             "shiraz", "syrah", "riesling", "zinfandel", "malbec",
-            "champagne", "prosecco", "chablis", "barolo", "chianti",
-            "rioja", "bordeaux", "burgundy", "napa", "sonoma",
-            "chateau", "domaine", "estate", "vineyard", "reserve"
+            "sangiovese", "tempranillo", "grenache", "mourvedre",
+            "viognier", "gewurztraminer", "gruner", "albarino",
+            "nero", "primitivo", "nebbiolo", "barbera"
         ]
 
-        for indicator in wineIndicators {
-            if indicator.hasPrefix("#") {
-                // Regex pattern
-                if let regex = try? NSRegularExpression(pattern: indicator, options: .caseInsensitive) {
-                    let range = NSRange(text.startIndex..., in: text)
-                    if regex.firstMatch(in: text, range: range) != nil {
-                        return true
-                    }
-                }
-            } else {
-                // Simple string contains
-                if text.contains(indicator) {
-                    return true
-                }
+        for grape in grapeVarieties {
+            if text.contains(grape) {
+                matchCount += 2  // Strong indicator
             }
         }
 
-        // If text is long enough and has multiple words, might be a wine
-        let wordCount = text.split(separator: " ").count
-        return wordCount >= 3 && candidate.fullText.count >= 15
+        // Wine regions
+        let regions = [
+            "bordeaux", "burgundy", "champagne", "napa", "sonoma",
+            "barolo", "chianti", "rioja", "tuscany", "piedmont",
+            "willamette", "paso robles", "mendoza", "marlborough"
+        ]
+
+        for region in regions {
+            if text.contains(region) {
+                matchCount += 2
+            }
+        }
+
+        // Producer terms
+        let producerTerms = [
+            "chateau", "domaine", "estate", "vineyard", "reserve",
+            "winery", "cellars", "cru", "grand"
+        ]
+
+        for term in producerTerms {
+            if text.contains(term) {
+                matchCount += 1
+            }
+        }
+
+        // Vintage year pattern (19xx or 20xx)
+        let vintagePattern = #"\b(19[5-9]\d|20[0-2]\d)\b"#
+        if let regex = try? NSRegularExpression(pattern: vintagePattern, options: .caseInsensitive) {
+            let range = NSRange(text.startIndex..., in: text)
+            if regex.firstMatch(in: text, range: range) != nil {
+                matchCount += 1
+            }
+        }
+
+        // Must have at least 2 match points to be considered a wine
+        return matchCount >= 2
     }
 
     // MARK: - Errors

@@ -2,19 +2,26 @@ import SwiftUI
 import AVFoundation
 
 struct CameraPreviewView: UIViewRepresentable {
-    let cameraService: CameraService
+    @ObservedObject var cameraService: CameraService
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
-        // CRITICAL: Connect the camera session to the preview layer
+        // Connect the camera session to the preview layer
         view.previewLayer.session = cameraService.captureSession
+        view.previewLayer.videoGravity = .resizeAspectFill
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
-        // Ensure session is connected (in case it gets reset)
+        // Always ensure session is connected and update when camera state changes
         if uiView.previewLayer.session !== cameraService.captureSession {
             uiView.previewLayer.session = cameraService.captureSession
+        }
+
+        // Force layout update when running state changes
+        if cameraService.isRunning {
+            uiView.setNeedsLayout()
+            uiView.layoutIfNeeded()
         }
     }
 }
