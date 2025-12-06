@@ -27,43 +27,64 @@ struct WineLensBadge: View {
         }
     }
 
-    // MARK: - Light Style (for dark backgrounds like scanner)
+    // MARK: - Light Style (for dark backgrounds like scanner) - PREMIUM SIZE
 
     private var lightStyleBadge: some View {
-        HStack(spacing: 8) {
-            // WineLens logo image
+        HStack(spacing: 10) {
+            // WineLens logo image - MUCH LARGER
             if let _ = UIImage(named: "WineLensText") {
                 Image("WineLensText")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 24)
+                    .frame(height: 42) // Increased from 24 to 42
             } else {
                 // Fallback to text if image not available
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Image(systemName: "wineglass.fill")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Theme.secondaryColor)
 
                     Text("WINE")
-                        .font(.system(size: 13, weight: .bold, design: .default))
+                        .font(.system(size: 22, weight: .bold, design: .default))
                         .foregroundColor(.white)
                     +
                     Text("LENS")
-                        .font(.system(size: 13, weight: .bold, design: .default))
+                        .font(.system(size: 22, weight: .bold, design: .default))
                         .foregroundColor(Theme.secondaryColor)
                 }
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
         .background(
             Capsule()
-                .fill(Color.black.opacity(0.7))
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.85),
+                            Color.black.opacity(0.75)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     Capsule()
-                        .stroke(Theme.secondaryColor.opacity(0.4), lineWidth: 1)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Theme.secondaryColor.opacity(0.6),
+                                    Theme.secondaryColor.opacity(0.3)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
                 )
         )
+        .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 6)
+        .shadow(color: Theme.secondaryColor.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 
     // MARK: - Dark Style (for light backgrounds)

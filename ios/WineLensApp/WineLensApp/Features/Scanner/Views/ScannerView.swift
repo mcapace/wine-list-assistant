@@ -32,8 +32,8 @@ struct ScannerView: View {
                     )
                 }
 
-                // Top Controls with branding - better spacing
-                VStack {
+                // Top Controls with branding - PREMIUM spacing and layout
+                VStack(spacing: 0) {
                     ScannerTopBar(
                         torchEnabled: $viewModel.torchEnabled,
                         scansRemaining: subscriptionService.remainingFreeScans(),
@@ -43,7 +43,7 @@ struct ScannerView: View {
 
                     Spacer()
                 }
-                .padding(.top, geometry.safeAreaInsets.top + 8)
+                .padding(.top, geometry.safeAreaInsets.top + 4)
                 .padding(.horizontal, 0)
 
                 // Center instruction hint (when no matched wines found) - perfectly centered
@@ -126,106 +126,25 @@ struct ScannerTopBar: View {
     let onHelpTapped: () -> Void
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            // Left: Torch button - elevated design
-            Button(action: { torchEnabled.toggle() }) {
-                Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
-                    .background(
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color.black.opacity(0.7),
-                                        Color.black.opacity(0.5)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .overlay(
-                                Circle()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color.white.opacity(0.3),
-                                                Color.white.opacity(0.1)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                            )
-                    )
-                    .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 4)
-                    .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
-            }
-
-            Spacer()
-
-            // Center branding - use WineLensBadge component
-            WineLensBadge(style: .light)
-                .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 3)
-
-            Spacer()
-
-            // Right side - scan count or help - elevated design
-            HStack(spacing: 10) {
-                if !isPremium {
-                    HStack(spacing: 6) {
-                        Image(systemName: "camera.viewfinder")
-                            .font(.system(size: 12, weight: .semibold))
-                        Text("\(scansRemaining)")
-                            .font(.system(size: 15, weight: .bold))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color.black.opacity(0.7),
-                                        Color.black.opacity(0.5)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .overlay(
-                                Capsule()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color.white.opacity(0.3),
-                                                Color.white.opacity(0.1)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                            )
-                    )
-                    .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 3)
-                }
-
-                Button(action: onHelpTapped) {
-                    Image(systemName: "questionmark.circle.fill")
-                        .font(.system(size: 20, weight: .medium))
+        VStack(spacing: 0) {
+            // Premium top bar with larger branding
+            HStack(alignment: .center, spacing: 16) {
+                // Left: Torch button - premium design
+                Button(action: { torchEnabled.toggle() }) {
+                    Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
+                        .font(.system(size: 22, weight: .semibold))
                         .foregroundColor(.white)
-                        .frame(width: 50, height: 50)
+                        .frame(width: 56, height: 56)
                         .background(
                             Circle()
                                 .fill(
                                     LinearGradient(
-                                        colors: [
-                                            Color.black.opacity(0.7),
-                                            Color.black.opacity(0.5)
+                                        colors: torchEnabled ? [
+                                            Theme.secondaryColor.opacity(0.3),
+                                            Theme.secondaryColor.opacity(0.15)
+                                        ] : [
+                                            Color.black.opacity(0.8),
+                                            Color.black.opacity(0.6)
                                         ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
@@ -236,23 +155,113 @@ struct ScannerTopBar: View {
                                         .stroke(
                                             LinearGradient(
                                                 colors: [
+                                                    Color.white.opacity(0.25),
+                                                    Color.white.opacity(0.1)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 2
+                                        )
+                                )
+                        )
+                        .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                        .shadow(color: torchEnabled ? Theme.secondaryColor.opacity(0.3) : .clear, radius: 8, x: 0, y: 4)
+                }
+
+                Spacer()
+
+                // Center: PREMIUM LARGE BRANDING - The star of the show
+                WineLensBadge(style: .light)
+                    .scaleEffect(1.1) // Make it even more prominent
+                    .shadow(color: .black.opacity(0.6), radius: 16, x: 0, y: 8)
+                    .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 12, x: 0, y: 6)
+
+                Spacer()
+
+                // Right side - scan count or help - premium design
+                HStack(spacing: 12) {
+                    if !isPremium {
+                        HStack(spacing: 8) {
+                            Image(systemName: "camera.viewfinder")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text("\(scansRemaining)")
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.black.opacity(0.8),
+                                            Color.black.opacity(0.6)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [
                                                     Color.white.opacity(0.3),
                                                     Color.white.opacity(0.1)
                                                 ],
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
                                             ),
-                                            lineWidth: 1.5
+                                            lineWidth: 2
                                         )
                                 )
                         )
-                        .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 4)
-                        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                        .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
+                    }
+
+                    Button(action: onHelpTapped) {
+                        Image(systemName: "questionmark.circle.fill")
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color.black.opacity(0.8),
+                                                Color.black.opacity(0.6)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .overlay(
+                                        Circle()
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color.white.opacity(0.25),
+                                                        Color.white.opacity(0.1)
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 2
+                                            )
+                                    )
+                            )
+                            .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                    }
                 }
             }
+            .padding(.horizontal, 24)
+            .padding(.top, 12)
+            .padding(.bottom, 16)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
     }
 }
 
