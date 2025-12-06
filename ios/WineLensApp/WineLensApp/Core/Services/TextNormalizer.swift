@@ -45,13 +45,13 @@ final class TextNormalizer {
         // Common OCR substitutions (context-aware where possible)
         let ocrCorrections: [(pattern: String, replacement: String, options: NSRegularExpression.Options)] = [
             // Numbers that look like letters (in word context)
-            (#"\b0([a-z])", "O$1", []),  // "0pus" -> "Opus"
-            (#"\b1([a-z])", "I$1", []),  // "1nst" -> "Inst"
-            (#"([a-z])0([a-z])", "$1O$2", []),  // "w0rd" -> "wOrd" (less aggressive)
-            (#"([a-z])1([a-z])", "$1I$2", []),  // "w1ne" -> "wIne"
+            ("\\b0([a-z])", "O$1", []),  // "0pus" -> "Opus"
+            ("\\b1([a-z])", "I$1", []),  // "1nst" -> "Inst"
+            ("([a-z])0([a-z])", "$1O$2", []),  // "w0rd" -> "wOrd" (less aggressive)
+            ("([a-z])1([a-z])", "$1I$2", []),  // "w1ne" -> "wIne"
             
             // Letters that look like numbers (in word context)
-            (#"\bO(\d)", "0$1", []),  // "O2019" -> "02019" (but we'll extract vintage separately)
+            ("\\bO(\\d)", "0$1", []),  // "O2019" -> "02019" (but we'll extract vintage separately)
             
             // Common single-character OCR errors
             ("5", "S", []),  // "5auvignon" -> "Sauvignon" (but only in certain contexts)
@@ -223,10 +223,10 @@ final class TextNormalizer {
         // Common producer name patterns
         let producerPatterns: [(pattern: String, replacement: String)] = [
             // Remove common suffixes that don't affect matching
-            (#"\s+estate\s*$", ""),
-            (#"\s+vineyards?\s*$", ""),
-            (#"\s+winery\s*$", ""),
-            (#"\s+cellars?\s*$", ""),
+            ("\\s+estate\\s*$", ""),
+            ("\\s+vineyards?\\s*$", ""),
+            ("\\s+winery\\s*$", ""),
+            ("\\s+cellars?\\s*$", ""),
             
             // Normalize "and" variations
             (" & ", " and "),
