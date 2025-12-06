@@ -77,7 +77,12 @@ final class WineAPIClient {
         }
     }
 
-    func batchMatch(queries: [String]) async throws -> [String: Wine?] {
+    struct BatchMatchResult {
+        let wine: Wine?
+        let confidence: Double
+    }
+    
+    func batchMatch(queries: [String]) async throws -> [String: BatchMatchResult] {
         let url = baseURL.appendingPathComponent("wines/batch-match")
 
         var request = try authorizedRequest(url: url)
@@ -92,9 +97,12 @@ final class WineAPIClient {
 
         let apiResponse = try decoder.decode(BatchMatchResponse.self, from: data)
 
-        var results: [String: Wine?] = [:]
+        var results: [String: BatchMatchResult] = [:]
         for match in apiResponse.data.matches {
-            results[match.query] = match.matched ? match.wine : nil
+            results[match.query] = BatchMatchResult(
+                wine: match.matched ? match.wine : nil,
+                confidence: match.confidence
+            )
         }
 
         return results
@@ -285,6 +293,7 @@ private struct BatchMatchResponse: Codable {
         let query: String
         let matched: Bool
         let wine: Wine?
+        let confidence: Double
     }
 }
 

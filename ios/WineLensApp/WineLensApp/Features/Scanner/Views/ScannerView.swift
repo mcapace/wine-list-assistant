@@ -7,6 +7,7 @@ struct ScannerView: View {
     @State private var showFilters = false
     @State private var showPaywall = false
     @State private var showInstructions = false
+    @State private var showMatchedWinesList = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
     // Computed properties
@@ -69,28 +70,50 @@ struct ScannerView: View {
 
                     // Scan status - show when we have ANY recognized wines (matched or unmatched)
                     let matchedCount = matchedWines.count
+                    let partialMatchCount = allRecognizedWines.filter { $0.isPartialMatch }.count
                     
                     if allRecognizedWines.count > 0 {
                         VStack(spacing: 16) {
-                            // Show indicator with matched count
+                            // Show indicator with matched count and status
+                            ScanningIndicator(
+                                winesFound: matchedCount,
+                                partialMatches: partialMatchCount,
+                                totalDetected: allRecognizedWines.count,
+                                isProcessing: viewModel.isProcessing
+                            )
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            
+                            // View List button - appears when we have matches
                             if matchedCount > 0 {
-                                ScanningIndicator(winesFound: matchedCount)
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                            } else {
-                                // Show that OCR is working but no matches found
-                                HStack(spacing: 8) {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .orange))
-                                    Text("\(allRecognizedWines.count) detected, matching...")
-                                        .font(.system(size: 14, weight: .medium, design: .rounded))
-                                        .foregroundColor(.white.opacity(0.9))
+                                Button(action: {
+                                    showMatchedWinesList = true
+                                }) {
+                                    HStack(spacing: 10) {
+                                        Image(systemName: "list.bullet.rectangle")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        
+                                        Text("View \(matchedCount) Wine\(matchedCount == 1 ? "" : "s")")
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    }
+                                    .foregroundColor(.black)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        Capsule()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Theme.secondaryColor,
+                                                        Theme.secondaryColor.opacity(0.9)
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                    )
+                                    .shadow(color: Theme.secondaryColor.opacity(0.4), radius: 12, x: 0, y: 6)
+                                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 3)
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .background(
-                                    Capsule()
-                                        .fill(Color.black.opacity(0.7))
-                                )
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                             }
                             
@@ -135,6 +158,23 @@ struct ScannerView: View {
         }
         .sheet(isPresented: $showPaywall) {
             SubscriptionView()
+        }
+        .sheet(isPresented: $showMatchedWinesList) {
+            MatchedWinesListView(
+                matchedWines: matchedWines.sorted { wine1, wine2 in
+                    // Sort by score (highest first), then by confidence
+                    let score1 = wine1.matchedWine?.score ?? 0
+                    let score2 = wine2.matchedWine?.score ?? 0
+                    if score1 != score2 {
+                        return score1 > score2
+                    }
+                    return wine1.matchConfidence > wine2.matchConfidence
+                },
+                onWineTapped: { wine in
+                    showMatchedWinesList = false
+                    selectedWine = wine
+                }
+            )
         }
         .task {
             await viewModel.startScanning()
@@ -726,26 +766,53 @@ struct FilterChip: View {
 
 struct ScanningIndicator: View {
     let winesFound: Int
+    let partialMatches: Int
+    let totalDetected: Int
+    let isProcessing: Bool
 
     var body: some View {
         HStack(spacing: 12) {
-            // Animated progress indicator
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 2.5)
-                    .frame(width: 20, height: 20)
-                
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.secondaryColor))
-                    .scaleEffect(0.8)
+            // Animated progress indicator (only show when processing)
+            if isProcessing {
+                ZStack {
+                    Circle()
+                        .stroke(Color.white.opacity(0.2), lineWidth: 2.5)
+                        .frame(width: 20, height: 20)
+                    
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Theme.secondaryColor))
+                        .scaleEffect(0.8)
+                }
             }
 
-            if winesFound > 0 {
-                Text("\(winesFound) wine\(winesFound == 1 ? "" : "s") found")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-            } else {
-                Text("Scanning...")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+            // Status text with detailed information
+            VStack(alignment: .leading, spacing: 2) {
+                if winesFound > 0 {
+                    Text("\(winesFound) wine\(winesFound == 1 ? "" : "s") matched")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    
+                    if totalDetected > winesFound {
+                        Text("\(totalDetected - winesFound) detected, searching...")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                } else if partialMatches > 0 {
+                    Text("\(partialMatches) possible match\(partialMatches == 1 ? "" : "es")")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.yellow.opacity(0.9))
+                    
+                    if totalDetected > partialMatches {
+                        Text("\(totalDetected) detected, matching...")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                } else if totalDetected > 0 {
+                    Text("\(totalDetected) detected, matching...")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                } else {
+                    Text("Scanning...")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                }
             }
         }
         .foregroundColor(.white)

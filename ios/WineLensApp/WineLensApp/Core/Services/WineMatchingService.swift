@@ -23,12 +23,14 @@ final class WineMatchingService {
 
     private let apiClient: WineAPIClient
     private let localCache: LocalWineCache
+    private let textNormalizer: TextNormalizer
 
     // MARK: - Initialization
 
-    init(apiClient: WineAPIClient = .shared, localCache: LocalWineCache = .shared) {
+    init(apiClient: WineAPIClient = .shared, localCache: LocalWineCache = .shared, textNormalizer: TextNormalizer = .shared) {
         self.apiClient = apiClient
         self.localCache = localCache
+        self.textNormalizer = textNormalizer
     }
 
     // MARK: - Public Methods
@@ -108,53 +110,8 @@ final class WineMatchingService {
     // MARK: - Text Normalization
 
     private func normalizeText(_ text: String) -> String {
-        var normalized = text
-            .lowercased()
-            .folding(options: .diacriticInsensitive, locale: .current)
-
-        // Expand common abbreviations
-        let abbreviations: [String: String] = [
-            "ch.": "chateau",
-            "ch ": "chateau ",
-            "cht.": "chateau",
-            "dom.": "domaine",
-            "dom ": "domaine ",
-            "cab": "cabernet",
-            "sauv": "sauvignon",
-            "chard": "chardonnay",
-            "sb": "sauvignon blanc",
-            "cs": "cabernet sauvignon",
-            "pn": "pinot noir",
-            "pg": "pinot grigio",
-            "zin": "zinfandel",
-            "rsv": "reserve",
-            "res": "reserve",
-            "res.": "reserve",
-            "vyd": "vineyard",
-            "vnyd": "vineyard",
-            "v'yd": "vineyard",
-            "est": "estate",
-            "est.": "estate",
-            "btl": "bottle",
-            "gls": "glass",
-            "nv": "non-vintage",
-            "n.v.": "non-vintage",
-            "gsm": "grenache syrah mourvedre",
-            "bdx": "bordeaux",
-            "burg": "burgundy",
-            "brut": "brut"
-        ]
-
-        for (abbrev, full) in abbreviations {
-            normalized = normalized.replacingOccurrences(of: abbrev, with: full)
-        }
-
-        // Standardize spacing
-        normalized = normalized
-            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespaces)
-
-        return normalized
+        // Use the enhanced text normalizer
+        return textNormalizer.normalize(text)
     }
 
     private func extractVintage(from text: String) -> Int? {
@@ -272,11 +229,11 @@ final class WineMatchingService {
 
             for (original, parsed) in parsedTexts {
                 if let apiResult = apiResults[parsed.normalizedText],
-                   let wine = apiResult,
-                   apiResult != nil {
+                   let wine = apiResult.wine,
+                   apiResult.confidence >= AppConfiguration.partialMatchThreshold {
                     results[original] = MatchResult(
                         wine: wine,
-                        confidence: 0.85,  // Batch matches have slightly lower confidence
+                        confidence: apiResult.confidence,
                         matchedVintage: parsed.vintage ?? wine.vintage,
                         matchType: .fuzzyName
                     )

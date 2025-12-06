@@ -134,62 +134,16 @@ actor LocalWineCache {
     }
 
     private func normalizeForSearch(_ text: String) -> String {
-        text
-            .lowercased()
-            .folding(options: .diacriticInsensitive, locale: .current)
-            .replacingOccurrences(of: #"[^\w\s]"#, with: "", options: .regularExpression)
-            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespaces)
+        // Use the enhanced text normalizer for consistent normalization
+        TextNormalizer.shared.normalize(text)
     }
 
     // MARK: - Similarity Scoring
 
     private func calculateSimilarity(_ s1: String, _ s2: String) -> Double {
-        // Use a combination of token overlap and edit distance
-
-        let tokens1 = Set(s1.split(separator: " ").map(String.init))
-        let tokens2 = Set(s2.split(separator: " ").map(String.init))
-
-        // Jaccard similarity for tokens
-        let intersection = tokens1.intersection(tokens2).count
-        let union = tokens1.union(tokens2).count
-        let tokenSimilarity = union > 0 ? Double(intersection) / Double(union) : 0
-
-        // Normalized edit distance for full strings
-        let editDistance = levenshteinDistance(s1, s2)
-        let maxLength = max(s1.count, s2.count)
-        let editSimilarity = maxLength > 0 ? 1.0 - (Double(editDistance) / Double(maxLength)) : 0
-
-        // Weighted combination
-        return (tokenSimilarity * 0.6) + (editSimilarity * 0.4)
-    }
-
-    private func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
-        let s1Array = Array(s1)
-        let s2Array = Array(s2)
-        let m = s1Array.count
-        let n = s2Array.count
-
-        if m == 0 { return n }
-        if n == 0 { return m }
-
-        var matrix = [[Int]](repeating: [Int](repeating: 0, count: n + 1), count: m + 1)
-
-        for i in 0...m { matrix[i][0] = i }
-        for j in 0...n { matrix[0][j] = j }
-
-        for i in 1...m {
-            for j in 1...n {
-                let cost = s1Array[i - 1] == s2Array[j - 1] ? 0 : 1
-                matrix[i][j] = min(
-                    matrix[i - 1][j] + 1,      // deletion
-                    matrix[i][j - 1] + 1,      // insertion
-                    matrix[i - 1][j - 1] + cost // substitution
-                )
-            }
-        }
-
-        return matrix[m][n]
+        // Use the enhanced text normalizer's similarity function
+        // This includes token overlap, edit distance, and phonetic matching
+        return TextNormalizer.shared.similarity(s1, s2)
     }
 
     // MARK: - Persistence

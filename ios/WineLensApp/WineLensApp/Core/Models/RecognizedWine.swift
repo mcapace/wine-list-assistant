@@ -25,6 +25,10 @@ struct RecognizedWine: Identifiable {
     var isMatched: Bool {
         matchedWine != nil && matchConfidence >= AppConfiguration.matchConfidenceThreshold
     }
+    
+    var isPartialMatch: Bool {
+        matchedWine != nil && matchConfidence >= AppConfiguration.partialMatchThreshold && matchConfidence < AppConfiguration.matchConfidenceThreshold
+    }
 
     var hasLowConfidence: Bool {
         matchConfidence < 0.85 && matchConfidence >= AppConfiguration.matchConfidenceThreshold

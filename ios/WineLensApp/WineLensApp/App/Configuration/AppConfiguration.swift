@@ -63,7 +63,8 @@ enum AppConfiguration {
 
     static let apiTimeoutSeconds: TimeInterval = 10
     static let ocrProcessingIntervalSeconds: TimeInterval = 0.5
-    static let matchConfidenceThreshold: Double = 0.7
+    static let matchConfidenceThreshold: Double = 0.6  // Lowered from 0.7 to show more matches
+    static let partialMatchThreshold: Double = 0.5  // Show partial matches with different style
     
     // MARK: - OCR Configuration
     

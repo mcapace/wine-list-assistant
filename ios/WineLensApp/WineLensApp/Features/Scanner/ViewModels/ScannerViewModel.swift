@@ -140,13 +140,17 @@ final class ScannerViewModel: ObservableObject {
             let candidates = ocrService.groupIntoWineEntries(ocrResults)
             guard !Task.isCancelled else { return }
 
-            // Step 3: Match each candidate against our wine database
+            // Step 3: Match candidates against our wine database (use batch matching for better performance)
             var matchedWines: [RecognizedWine] = []
-
+            
+            // Use batch matching for better performance
+            let candidateTexts = candidates.map { $0.fullText }
+            let batchResults = await matchingService.batchMatch(texts: candidateTexts)
+            
             for candidate in candidates {
                 guard !Task.isCancelled else { return }
-
-                let matchResult = await matchingService.matchWine(from: candidate.fullText)
+                
+                let matchResult = batchResults[candidate.fullText] ?? nil
 
                 let recognized = RecognizedWine(
                     id: UUID(),

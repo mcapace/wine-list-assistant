@@ -44,6 +44,13 @@ struct ScoreBadgeOverlay: View {
                     confidence: wine.matchConfidence,
                     vintage: wine.matchedVintage
                 )
+            } else if wine.isPartialMatch {
+                // Partial match - show with different style (lower confidence but still a match)
+                PartialMatchBadge(
+                    wine: wine.matchedWine,
+                    confidence: wine.matchConfidence,
+                    text: wine.originalText
+                )
             } else {
                 // Unmatched text - show subtle indicator so user knows OCR is working
                 UnmatchedBadge(text: wine.originalText)
@@ -53,7 +60,7 @@ struct ScoreBadgeOverlay: View {
         .scaleEffect(isAppearing ? (isPressed ? 0.9 : 1.0) : 0.5)
         .opacity(isAppearing ? 1.0 : 0.0)
         .onTapGesture {
-            if wine.isMatched {
+            if wine.isMatched || wine.isPartialMatch {
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
                 }
@@ -73,6 +80,55 @@ struct ScoreBadgeOverlay: View {
         .onDisappear {
             isAppearing = false
         }
+    }
+}
+
+struct PartialMatchBadge: View {
+    let wine: Wine?
+    let confidence: Double
+    let text: String
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            // Show score if available
+            if let score = wine?.score {
+                Text("\(score)")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+            }
+            
+            // Show wine name or detected text
+            Text(wine?.name ?? text.prefix(15) + (text.count > 15 ? "..." : ""))
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+                .lineLimit(1)
+                .padding(.horizontal, 6)
+            
+            // Partial match indicator (dashed border)
+            Circle()
+                .strokeBorder(Color.yellow.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [3, 3]))
+                .frame(width: 18, height: 18)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.yellow.opacity(0.3),
+                            Color.orange.opacity(0.2)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.yellow.opacity(0.6), lineWidth: 1.5)
+                )
+        )
+        .badgeShadow()
     }
 }
 
