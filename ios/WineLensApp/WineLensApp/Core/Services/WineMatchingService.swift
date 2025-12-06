@@ -213,7 +213,10 @@ final class WineMatchingService {
                 matchType: .fuzzyName
             )
         } catch {
-            print("API match failed: \(error)")
+            // Don't log cancellation errors - they're expected when new frames arrive
+            if (error as NSError).code != NSURLErrorCancelled {
+                print("API match failed: \(error)")
+            }
             return nil
         }
     }
@@ -247,7 +250,10 @@ final class WineMatchingService {
 
             return results
         } catch {
-            print("Batch API match failed: \(error)")
+            // Don't log cancellation errors - they're expected when new frames arrive
+            if (error as NSError).code != NSURLErrorCancelled {
+                print("Batch API match failed: \(error)")
+            }
             return Dictionary(uniqueKeysWithValues: texts.map { ($0, nil as MatchResult?) })
         }
     }

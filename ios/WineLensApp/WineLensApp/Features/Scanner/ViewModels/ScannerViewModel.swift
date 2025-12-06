@@ -174,7 +174,10 @@ final class ScannerViewModel: ObservableObject {
             }
 
         } catch {
-            print("Frame processing error: \(error)")
+            // Don't log cancellation errors - they're expected when new frames arrive
+            if (error as NSError).code != NSURLErrorCancelled {
+                print("Frame processing error: \(error)")
+            }
         }
     }
 
