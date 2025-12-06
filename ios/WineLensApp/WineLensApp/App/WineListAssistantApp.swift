@@ -12,8 +12,13 @@ struct WineLensApp: App {
                 .environmentObject(appState)
                 .environmentObject(subscriptionService)
                 .task {
-                    await subscriptionService.loadProducts()
-                    await subscriptionService.updateSubscriptionStatus()
+                    // Load subscription data asynchronously with proper cancellation handling
+                    async let productsTask = subscriptionService.loadProducts()
+                    async let statusTask = subscriptionService.updateSubscriptionStatus()
+                    
+                    // Wait for both tasks to complete (or be cancelled)
+                    await productsTask
+                    await statusTask
                 }
         }
     }

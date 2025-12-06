@@ -68,6 +68,9 @@ final class SubscriptionService: ObservableObject {
     // MARK: - Public Methods
 
     func loadProducts() async {
+        // Check for cancellation
+        try? await Task.checkCancellation()
+        
         isLoading = true
         defer { isLoading = false }
 
@@ -76,8 +79,11 @@ final class SubscriptionService: ObservableObject {
             products = try await Product.products(for: productIDs)
                 .sorted { $0.price < $1.price }
         } catch {
-            self.error = .failedToLoadProducts
-            print("Failed to load products: \(error)")
+            // Don't set error if task was cancelled
+            if !Task.isCancelled {
+                self.error = .failedToLoadProducts
+                print("Failed to load products: \(error)")
+            }
         }
     }
 
@@ -133,9 +139,17 @@ final class SubscriptionService: ObservableObject {
     }
 
     func updateSubscriptionStatus() async {
+        // Check for cancellation
+        try? await Task.checkCancellation()
+        
         var foundSubscription = false
 
         for await result in Transaction.currentEntitlements {
+            // Check for cancellation in the loop
+            if Task.isCancelled {
+                return
+            }
+            
             guard case .verified(let transaction) = result else {
                 continue
             }
@@ -152,7 +166,7 @@ final class SubscriptionService: ObservableObject {
             }
         }
 
-        if !foundSubscription {
+        if !Task.isCancelled && !foundSubscription {
             subscriptionStatus = .notSubscribed
         }
 
