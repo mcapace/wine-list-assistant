@@ -122,49 +122,120 @@ struct WineLensBadge: View {
         )
     }
 
-    // MARK: - Onboarding Style (larger)
+    // MARK: - Onboarding Style (MASSIVE with animations)
 
     private var onboardingStyleBadge: some View {
-        VStack(spacing: 24) {
-            // Wine Spectator logo - much larger
-            if let _ = UIImage(named: "WSLogoBlack") {
-                Image("WSLogoBlack")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 60)
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-            } else {
-                // Fallback to text if image not available
-                Text("Wine Spectator")
-                    .font(.system(size: 42, weight: .bold, design: .serif))
-                    .foregroundColor(.primary)
+        OnboardingLogoView()
+    }
+}
+
+// MARK: - Animated Onboarding Logo View
+
+struct OnboardingLogoView: View {
+    @State private var wineSpectatorScale: CGFloat = 0.5
+    @State private var wineSpectatorOpacity: Double = 0
+    @State private var wineLensScale: CGFloat = 0.5
+    @State private var wineLensOpacity: Double = 0
+    @State private var glowIntensity: Double = 0.3
+    @State private var isGlowing = false
+    
+    var body: some View {
+        VStack(spacing: 40) {
+            // Wine Spectator logo - MASSIVE with entrance animation
+            ZStack {
+                // Glow effect
+                if let _ = UIImage(named: "WSLogoBlack") {
+                    Image("WSLogoBlack")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120)
+                        .blur(radius: 15)
+                        .opacity(glowIntensity)
+                        .scaleEffect(isGlowing ? 1.05 : 1.0)
+                }
+                
+                // Main logo
+                if let _ = UIImage(named: "WSLogoBlack") {
+                    Image("WSLogoBlack")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120) // Increased from 60 to 120 - MASSIVE
+                        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+                        .shadow(color: Theme.secondaryColor.opacity(0.1), radius: 8, x: 0, y: 4)
+                } else {
+                    // Fallback to text if image not available
+                    Text("Wine Spectator")
+                        .font(.system(size: 64, weight: .bold, design: .serif))
+                        .foregroundColor(.primary)
+                }
+            }
+            .scaleEffect(wineSpectatorScale)
+            .opacity(wineSpectatorOpacity)
+            .onAppear {
+                // Entrance animation for Wine Spectator logo
+                withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
+                    wineSpectatorScale = 1.0
+                    wineSpectatorOpacity = 1.0
+                }
+                
+                // Continuous glow animation
+                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                    isGlowing = true
+                    glowIntensity = 0.6
+                }
             }
 
-            // Wine Lens logo - much larger
-            if let _ = UIImage(named: "WineLensText") {
-                Image("WineLensText")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 80)
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-            } else {
-                // Fallback to text if image not available
-                HStack(spacing: 12) {
-                    Image(systemName: "wineglass.fill")
-                        .font(.system(size: 32, weight: .medium))
-                        .foregroundColor(Theme.secondaryColor)
+            // Wine Lens logo - MASSIVE with entrance animation
+            ZStack {
+                // Glow effect
+                if let _ = UIImage(named: "WineLensText") {
+                    Image("WineLensText")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 140)
+                        .blur(radius: 20)
+                        .opacity(glowIntensity * 0.8)
+                        .scaleEffect(isGlowing ? 1.05 : 1.0)
+                }
+                
+                // Main logo
+                if let _ = UIImage(named: "WineLensText") {
+                    Image("WineLensText")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 140) // Increased from 80 to 140 - MASSIVE
+                        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+                        .shadow(color: Theme.secondaryColor.opacity(0.2), radius: 10, x: 0, y: 5)
+                } else {
+                    // Fallback to text if image not available
+                    HStack(spacing: 16) {
+                        Image(systemName: "wineglass.fill")
+                            .font(.system(size: 48, weight: .medium))
+                            .foregroundColor(Theme.secondaryColor)
 
-                    Text("WINE")
-                        .font(.system(size: 36, weight: .bold))
-                        .foregroundColor(.primary)
-                    +
-                    Text("LENS")
-                        .font(.system(size: 36, weight: .bold))
-                        .foregroundColor(Theme.secondaryColor)
+                        Text("WINE")
+                            .font(.system(size: 52, weight: .bold))
+                            .foregroundColor(.primary)
+                        +
+                        Text("LENS")
+                            .font(.system(size: 52, weight: .bold))
+                            .foregroundColor(Theme.secondaryColor)
+                    }
+                }
+            }
+            .scaleEffect(wineLensScale)
+            .opacity(wineLensOpacity)
+            .onAppear {
+                // Delayed entrance animation for Wine Lens logo
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
+                        wineLensScale = 1.0
+                        wineLensOpacity = 1.0
+                    }
                 }
             }
         }
-        .padding(.vertical, 20)
+        .padding(.vertical, 40)
     }
 }
 

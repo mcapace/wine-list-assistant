@@ -92,14 +92,35 @@ struct OnboardingPage {
 
 struct OnboardingPageView: View {
     let page: OnboardingPage
+    @State private var showContent = false
 
     var body: some View {
         VStack(spacing: Theme.Spacing.xl) {
             Spacer()
 
             if page.isLogo {
-                // Logo page - use WineLensBadge component with actual logos
-                WineLensBadge(style: .onboarding)
+                // Logo page - use WineLensBadge component with actual logos and enhanced animations
+                VStack(spacing: 0) {
+                    WineLensBadge(style: .onboarding)
+                        .opacity(showContent ? 1.0 : 0.0)
+                        .scaleEffect(showContent ? 1.0 : 0.8)
+                        .animation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2), value: showContent)
+                    
+                    // Subtitle with fade-in animation
+                    Text(page.subtitle)
+                        .font(.system(size: 18, weight: .medium, design: .default))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(6)
+                        .padding(.horizontal, Theme.Spacing.xl)
+                        .padding(.top, 40)
+                        .opacity(showContent ? 1.0 : 0.0)
+                        .offset(y: showContent ? 0 : 20)
+                        .animation(.easeOut(duration: 0.8).delay(0.6), value: showContent)
+                }
+                .onAppear {
+                    showContent = true
+                }
             } else {
                 // Standard icon page - elevated design with gradients and shadows
                 ZStack {
@@ -162,24 +183,24 @@ struct OnboardingPageView: View {
                 }
             }
 
-            // Text - elevated typography
-            VStack(spacing: Theme.Spacing.md) {
-                if !page.isLogo {
+            // Text - elevated typography (only for non-logo pages)
+            if !page.isLogo {
+                VStack(spacing: Theme.Spacing.md) {
                     Text(page.title)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
                         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-                }
 
-                Text(page.subtitle)
-                    .font(.system(size: 17, weight: .regular))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .padding(.horizontal, Theme.Spacing.xl)
+                    Text(page.subtitle)
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, Theme.Spacing.xl)
+                }
+                .padding(.top, Theme.Spacing.lg)
             }
-            .padding(.top, Theme.Spacing.lg)
 
             Spacer()
             Spacer()
