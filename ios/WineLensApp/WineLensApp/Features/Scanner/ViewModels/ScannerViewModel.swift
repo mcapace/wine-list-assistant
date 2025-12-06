@@ -179,30 +179,49 @@ final class ScannerViewModel: ObservableObject {
     }
 
     private func mergeResults(_ newResults: [RecognizedWine]) {
-        // Simple strategy: replace if positions overlap significantly
-        // More sophisticated merging could track wines across frames
+        // Improved merging strategy: replace if positions overlap significantly
+        // Track wines and remove stale ones to prevent accumulation
 
         var merged = recognizedWines
+        var seenInThisFrame: Set<UUID> = []
 
         for newWine in newResults {
             // Check if this overlaps with an existing wine
             let existingIndex = merged.firstIndex { existing in
-                boxesOverlap(existing.boundingBox, newWine.boundingBox, threshold: 0.5)
+                boxesOverlap(existing.boundingBox, newWine.boundingBox, threshold: 0.6)
             }
 
             if let index = existingIndex {
-                // Update existing if new has higher confidence
-                if newWine.matchConfidence > merged[index].matchConfidence {
+                // Update existing if new has higher confidence or is a better match
+                if newWine.matchConfidence > merged[index].matchConfidence || 
+                   (newWine.isMatched && !merged[index].isMatched) {
                     merged[index] = newWine
                 }
+                seenInThisFrame.insert(merged[index].id)
             } else {
                 // Add new wine
                 merged.append(newWine)
+                seenInThisFrame.insert(newWine.id)
             }
         }
 
-        // Remove wines not seen in recent frames (they scrolled out of view)
-        // This is simplified - production would track frame counts
+        // Remove wines not seen in this frame (they're no longer visible)
+        // This prevents accumulation of stale bubbles
+        merged = merged.filter { seenInThisFrame.contains($0.id) }
+        
+        // Limit total wines to prevent overwhelming the UI
+        // Keep the best matches (highest confidence, matched wines first)
+        if merged.count > 20 {
+            merged = merged.sorted { wine1, wine2 in
+                // Prioritize matched wines
+                if wine1.isMatched != wine2.isMatched {
+                    return wine1.isMatched
+                }
+                // Then by confidence
+                return wine1.matchConfidence > wine2.matchConfidence
+            }.prefix(20).map { $0 }
+        }
+
         recognizedWines = merged
     }
 
@@ -265,3 +284,4 @@ final class ScannerViewModel: ObservableObject {
         }
     }
 }
+

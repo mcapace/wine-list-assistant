@@ -26,21 +26,19 @@ struct ScannerView: View {
                 CameraPreviewView(cameraService: viewModel.cameraService)
                     .ignoresSafeArea()
 
-                // AR Overlay - show ALL recognized wines (matched and unmatched for visibility)
-                // This helps users see that OCR is working even if matching fails
-                if !allRecognizedWines.isEmpty {
+                // AR Overlay - ONLY show matched wines to reduce clutter
+                // Unmatched wines are shown in the list view instead
+                if !matchedWines.isEmpty {
                     AROverlayView(
-                        recognizedWines: allRecognizedWines,
+                        recognizedWines: matchedWines.prefix(10), // Limit to 10 bubbles max
                         viewSize: geometry.size,
                         onWineTapped: { wine in
-                            if wine.isMatched {
-                                selectedWine = wine
-                            }
+                            selectedWine = wine
                         }
                     )
                 }
 
-                // Top Controls with branding - PREMIUM spacing and layout
+                // Top Controls - Clean Professional Design
                 VStack(spacing: 0) {
                     ScannerTopBar(
                         torchEnabled: $viewModel.torchEnabled,
@@ -51,7 +49,7 @@ struct ScannerView: View {
 
                     Spacer()
                 }
-                .padding(.top, geometry.safeAreaInsets.top + 4)
+                .padding(.top, geometry.safeAreaInsets.top + 8)
                 .padding(.horizontal, 0)
 
                 // Center instruction hint (when no wines detected at all) - perfectly centered
@@ -68,70 +66,71 @@ struct ScannerView: View {
                 VStack(spacing: 0) {
                     Spacer()
 
-                    // Scan status - show when we have ANY recognized wines (matched or unmatched)
-                    let matchedCount = matchedWines.count
-                    let partialMatchCount = allRecognizedWines.filter { $0.isPartialMatch }.count
-                    
-                    if allRecognizedWines.count > 0 {
-                        VStack(spacing: 16) {
-                            // Show indicator with matched count and status
+                    // Bottom Controls - Professional Design
+                    VStack(spacing: 12) {
+                        // Primary Action: View Results List (always visible when matches exist)
+                        if matchedWines.count > 0 {
+                            Button(action: {
+                                showMatchedWinesList = true
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "list.bullet.rectangle.fill")
+                                        .font(.system(size: 20, weight: .bold))
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("View Results")
+                                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        Text("\(matchedWines.count) wine\(matchedWines.count == 1 ? "" : "s") found")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .opacity(0.9)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 18)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    Theme.secondaryColor,
+                                                    Theme.secondaryColor.opacity(0.95)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                )
+                                .shadow(color: Theme.secondaryColor.opacity(0.5), radius: 16, x: 0, y: 8)
+                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
+                        // Status indicator (only show when processing or no matches yet)
+                        if viewModel.isProcessing && matchedWines.isEmpty {
                             ScanningIndicator(
-                                winesFound: matchedCount,
-                                partialMatches: partialMatchCount,
+                                winesFound: 0,
+                                partialMatches: 0,
                                 totalDetected: allRecognizedWines.count,
-                                isProcessing: viewModel.isProcessing
+                                isProcessing: true
                             )
                             .transition(.move(edge: .bottom).combined(with: .opacity))
-                            
-                            // View List button - appears when we have matches
-                            if matchedCount > 0 {
-                                Button(action: {
-                                    showMatchedWinesList = true
-                                }) {
-                                    HStack(spacing: 10) {
-                                        Image(systemName: "list.bullet.rectangle")
-                                            .font(.system(size: 18, weight: .semibold))
-                                        
-                                        Text("View \(matchedCount) Wine\(matchedCount == 1 ? "" : "s")")
-                                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                                    }
-                                    .foregroundColor(.black)
-                                    .padding(.horizontal, 24)
-                                    .padding(.vertical, 14)
-                                    .background(
-                                        Capsule()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [
-                                                        Theme.secondaryColor,
-                                                        Theme.secondaryColor.opacity(0.9)
-                                                    ],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                    )
-                                    .shadow(color: Theme.secondaryColor.opacity(0.4), radius: 12, x: 0, y: 6)
-                                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 3)
-                                }
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                            }
-                            
-                            FilterBar(
-                                filters: $viewModel.filters,
-                                isExpanded: $showFilters
-                            )
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, geometry.safeAreaInsets.bottom + 20)
-                    } else {
+                        
+                        // Filter bar (always visible)
                         FilterBar(
                             filters: $viewModel.filters,
                             isExpanded: $showFilters
                         )
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, geometry.safeAreaInsets.bottom + 20)
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 20)
                 }
 
                 // Permission denied overlay
@@ -771,48 +770,24 @@ struct ScanningIndicator: View {
     let isProcessing: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             // Animated progress indicator (only show when processing)
             if isProcessing {
-                ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.2), lineWidth: 2.5)
-                        .frame(width: 20, height: 20)
-                    
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Theme.secondaryColor))
-                        .scaleEffect(0.8)
-                }
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.secondaryColor))
+                    .scaleEffect(0.9)
             }
 
-            // Status text with detailed information
-            VStack(alignment: .leading, spacing: 2) {
-                if winesFound > 0 {
-                    Text("\(winesFound) wine\(winesFound == 1 ? "" : "s") matched")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    
-                    if totalDetected > winesFound {
-                        Text("\(totalDetected - winesFound) detected, searching...")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                } else if partialMatches > 0 {
-                    Text("\(partialMatches) possible match\(partialMatches == 1 ? "" : "es")")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(.yellow.opacity(0.9))
-                    
-                    if totalDetected > partialMatches {
-                        Text("\(totalDetected) detected, matching...")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                } else if totalDetected > 0 {
-                    Text("\(totalDetected) detected, matching...")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                } else {
-                    Text("Scanning...")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                }
+            // Simplified status text
+            if winesFound > 0 {
+                Text("Found \(winesFound) wine\(winesFound == 1 ? "" : "s")")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+            } else if isProcessing {
+                Text("Scanning...")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+            } else {
+                Text("Point at wine list")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
             }
         }
         .foregroundColor(.white)
