@@ -24,8 +24,18 @@ final class OCRService {
             self.googleCloudProvider = GoogleCloudOCRService(apiKey: apiKey)
         }
         
-        // Set provider based on preference
-        setProvider(AppConfiguration.preferredOCRProvider)
+        // Initialize currentProvider first (must be initialized before calling setProvider)
+        let preferredProvider = AppConfiguration.preferredOCRProvider
+        switch preferredProvider.lowercased() {
+        case "google", "googlecloud", "google cloud":
+            if let googleCloud = googleCloudProvider {
+                self.currentProvider = googleCloud
+            } else {
+                self.currentProvider = appleVisionProvider
+            }
+        default:
+            self.currentProvider = appleVisionProvider
+        }
     }
     
     // MARK: - Provider Management
