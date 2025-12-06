@@ -3,7 +3,7 @@
 ## App ID Registration (Apple Developer Portal)
 
 ### Bundle ID
-**Enter**: `com.winespectator.WineLensApp`
+**Enter**: `com.winespectator.WineLens2026`
 
 ### Description
 **Enter**: `Wine Lens - Wine Spectator's smart wine list scanner`
@@ -59,7 +59,7 @@ Based on your app's features, enable these capabilities:
 - Primary: **Food & Drink**
 - Secondary: **Lifestyle** (optional)
 
-**Bundle ID**: `com.winespectator.WineLensApp`
+**Bundle ID**: `com.winespectator.WineLens2026`
 
 **SKU**: `wine-lens-app` (unique identifier, can be anything)
 
@@ -191,7 +191,7 @@ Create a subscription group:
 
 - [ ] App ID registered with In-App Purchase enabled
 - [ ] App created in App Store Connect
-- [ ] Bundle ID matches: `com.winespectator.WineLensApp`
+- [ ] Bundle ID matches: `com.winespectator.WineLens2026`
 - [ ] App icon (1024x1024) uploaded
 - [ ] Screenshots uploaded (at least 6.7" iPhone)
 - [ ] Description and keywords filled in
@@ -214,7 +214,7 @@ Create a subscription group:
 
 **"Invalid Bundle ID"**
 - Make sure Bundle ID in Xcode matches App Store Connect exactly
-- Check for typos: `com.winespectator.WineLensApp`
+- Check for typos: `com.winespectator.WineLens2026`
 
 **"Missing Capability"**
 - Enable In-App Purchase in App ID settings
