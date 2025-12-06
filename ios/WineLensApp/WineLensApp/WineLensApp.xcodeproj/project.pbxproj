@@ -46,6 +46,8 @@
 		CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */; };
 		CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */; };
 		CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */; };
+		CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */; };
+		CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,8 @@
 		CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCloudOCRService.swift; sourceTree = "<group>"; };
 		CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRProviderProtocol.swift; sourceTree = "<group>"; };
 		CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRServiceManager.swift; sourceTree = "<group>"; };
+		CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNormalizer.swift; sourceTree = "<group>"; };
+		CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchedWinesListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -233,6 +237,7 @@
 				CEB4BADF2EE37EBA00014979 /* AuthenticationService.swift */,
 				CEB4BAE02EE37EBA00014979 /* SubscriptionService.swift */,
 				CEB4BAE12EE37EBA00014979 /* WineMatchingService.swift */,
+				CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -325,6 +330,7 @@
 				CEB4BAF42EE37EBA00014979 /* AROverlayView.swift */,
 				CEB4BAF52EE37EBA00014979 /* CameraPreviewView.swift */,
 				CEB4BAF62EE37EBA00014979 /* ScannerView.swift */,
+				CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -589,6 +595,8 @@
 				CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */,
 				CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */,
 				CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */,
+				CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */,
+				CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
