@@ -30,7 +30,7 @@ struct ScannerView: View {
                 // Unmatched wines are shown in the list view instead
                 if !matchedWines.isEmpty {
                     AROverlayView(
-                        recognizedWines: matchedWines.prefix(10), // Limit to 10 bubbles max
+                        recognizedWines: Array(matchedWines.prefix(10)), // Limit to 10 bubbles max
                         viewSize: geometry.size,
                         onWineTapped: { wine in
                             selectedWine = wine
