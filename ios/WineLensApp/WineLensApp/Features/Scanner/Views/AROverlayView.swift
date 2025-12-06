@@ -38,14 +38,15 @@ struct ScoreBadgeOverlay: View {
     var body: some View {
         Group {
             if wine.isMatched {
+                // Matched wine - show score badge
                 ScoreBadge(
                     score: wine.matchedWine?.score,
                     confidence: wine.matchConfidence,
                     vintage: wine.matchedVintage
                 )
             } else {
-                // Unmatched indicator
-                UnmatchedBadge()
+                // Unmatched text - show subtle indicator so user knows OCR is working
+                UnmatchedBadge(text: wine.originalText)
             }
         }
         .position(position)
@@ -76,17 +77,37 @@ struct ScoreBadgeOverlay: View {
 }
 
 struct UnmatchedBadge: View {
+    let text: String
+    
     var body: some View {
-        Text("?")
-            .font(.system(size: 14, weight: .bold, design: .rounded))
-            .foregroundColor(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.gray.opacity(0.7))
-            )
-            .badgeShadow()
+        VStack(spacing: 2) {
+            // Show first few words of detected text so user knows OCR is working
+            Text(text.prefix(20) + (text.count > 20 ? "..." : ""))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+                .lineLimit(1)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+            
+            // Question mark indicator
+            Text("?")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .frame(width: 20, height: 20)
+                .background(
+                    Circle()
+                        .fill(Color.orange.opacity(0.8))
+                )
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.6))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.orange.opacity(0.5), lineWidth: 1)
+                )
+        )
+        .badgeShadow()
     }
 }
 

@@ -27,42 +27,42 @@ struct WineLensBadge: View {
         }
     }
 
-    // MARK: - Light Style (for dark backgrounds like scanner) - PREMIUM SIZE
+    // MARK: - Light Style (for dark backgrounds like scanner) - MASSIVE PREMIUM SIZE
 
     private var lightStyleBadge: some View {
-        HStack(spacing: 10) {
-            // WineLens logo image - MUCH LARGER
+        HStack(spacing: 12) {
+            // WineLens logo image - MASSIVE for maximum impact
             if let _ = UIImage(named: "WineLensText") {
                 Image("WineLensText")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 42) // Increased from 24 to 42
+                    .frame(height: 56) // Increased to 56pt - truly prominent
             } else {
                 // Fallback to text if image not available
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: "wineglass.fill")
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 24, weight: .medium))
                         .foregroundColor(Theme.secondaryColor)
 
                     Text("WINE")
-                        .font(.system(size: 22, weight: .bold, design: .default))
+                        .font(.system(size: 28, weight: .bold, design: .default))
                         .foregroundColor(.white)
                     +
                     Text("LENS")
-                        .font(.system(size: 22, weight: .bold, design: .default))
+                        .font(.system(size: 28, weight: .bold, design: .default))
                         .foregroundColor(Theme.secondaryColor)
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 16)
         .background(
             Capsule()
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.85),
-                            Color.black.opacity(0.75)
+                            Color.black.opacity(0.9),
+                            Color.black.opacity(0.8)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -73,18 +73,18 @@ struct WineLensBadge: View {
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    Theme.secondaryColor.opacity(0.6),
-                                    Theme.secondaryColor.opacity(0.3)
+                                    Theme.secondaryColor.opacity(0.7),
+                                    Theme.secondaryColor.opacity(0.4)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 1.5
+                            lineWidth: 2
                         )
                 )
         )
-        .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 6)
-        .shadow(color: Theme.secondaryColor.opacity(0.2), radius: 8, x: 0, y: 4)
+        .shadow(color: .black.opacity(0.6), radius: 16, x: 0, y: 8)
+        .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 12, x: 0, y: 6)
     }
 
     // MARK: - Dark Style (for light backgrounds)
