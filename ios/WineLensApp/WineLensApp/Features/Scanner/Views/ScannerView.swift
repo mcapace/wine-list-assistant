@@ -41,9 +41,21 @@ struct ScannerView: View {
                 CameraPreviewView(cameraService: viewModel.cameraService)
                     .ignoresSafeArea()
 
+                // Error overlay - show when there's an error
+                if let error = viewModel.error {
+                    ScannerErrorView(error: error, onRetry: {
+                        viewModel.retry()
+                    }, onOpenSettings: {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    })
+                    .ignoresSafeArea()
+                }
+
                 // AR Overlay - shows wine recognition badges (only for matched wines)
                 let matchedWines = viewModel.filteredWines.filter { $0.matchedWine != nil }
-                if !matchedWines.isEmpty {
+                if !matchedWines.isEmpty && viewModel.error == nil {
                     AROverlayView(
                         recognizedWines: matchedWines,
                         viewSize: geometry.size,
