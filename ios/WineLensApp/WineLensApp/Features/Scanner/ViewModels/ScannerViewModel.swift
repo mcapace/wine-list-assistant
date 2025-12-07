@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import AVFoundation
+import UIKit
 
 @MainActor
 final class ScannerViewModel: ObservableObject {
@@ -186,6 +187,8 @@ final class ScannerViewModel: ObservableObject {
         do {
             // Step 1: OCR - recognize text in frame
             let ocrResults = try await ocrService.recognizeText(in: frame)
+            // Update recovery mode status
+            ocrRecoveryMode = ocrService.isInRecoveryMode
             guard !Task.isCancelled else { return }
 
             // Step 2: Group text into wine entry candidates

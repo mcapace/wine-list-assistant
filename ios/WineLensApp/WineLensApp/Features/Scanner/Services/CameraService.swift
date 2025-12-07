@@ -258,6 +258,7 @@ final class CameraService: NSObject, ObservableObject {
                 }
                 return
             }
+            return // Return after successful configuration
         }
 
         sessionQueue.async { [weak self] in
