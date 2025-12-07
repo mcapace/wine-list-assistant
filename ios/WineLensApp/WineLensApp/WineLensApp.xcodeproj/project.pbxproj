@@ -48,6 +48,9 @@
 		CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */; };
 		CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */; };
 		CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */; };
+		CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */; };
+		CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */; };
+		CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +114,9 @@
 		CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRServiceManager.swift; sourceTree = "<group>"; };
 		CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNormalizer.swift; sourceTree = "<group>"; };
 		CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchedWinesListView.swift; sourceTree = "<group>"; };
+		CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
+		CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -207,6 +213,7 @@
 				CEB4BAD32EE37EBA00014979 /* RecognizedWine.swift */,
 				CEB4BAD42EE37EBA00014979 /* SavedWine.swift */,
 				CEB4BAD52EE37EBA00014979 /* ScanResult.swift */,
+				CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */,
 				CEB4BAD62EE37EBA00014979 /* User.swift */,
 				CEB4BAD72EE37EBA00014979 /* Wine.swift */,
 				CEB4BAD82EE37EBA00014979 /* WineFilter.swift */,
@@ -227,6 +234,7 @@
 			children = (
 				CEB4BADC2EE37EBA00014979 /* KeychainManager.swift */,
 				CEB4BADD2EE37EBA00014979 /* LocalWineCache.swift */,
+				CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -331,6 +339,7 @@
 				CEB4BAF52EE37EBA00014979 /* CameraPreviewView.swift */,
 				CEB4BAF62EE37EBA00014979 /* ScannerView.swift */,
 				CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */,
+				CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -597,6 +606,9 @@
 				CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */,
 				CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */,
 				CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */,
+				CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */,
+				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
+				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
