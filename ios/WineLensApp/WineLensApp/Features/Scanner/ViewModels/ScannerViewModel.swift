@@ -210,6 +210,11 @@ final class ScannerViewModel: ObservableObject {
                     // Note: We don't check Task.isCancelled here because this is a
                     // detached task that should complete its API calls
                     let matchResult = await matchingService.matchWine(from: candidate.fullText)
+                    
+                    // Extract price before creating RecognizedWine to avoid MainActor isolation issues
+                    let price = await MainActor.run {
+                        self?.extractPrice(from: candidate.fullText)
+                    }
 
                     let recognized = RecognizedWine(
                         id: UUID(),
@@ -220,7 +225,7 @@ final class ScannerViewModel: ObservableObject {
                         matchConfidence: matchResult?.confidence ?? 0,
                         matchedVintage: matchResult?.matchedVintage,
                         matchType: matchResult?.matchType ?? .noMatch,
-                        listPrice: self?.extractPrice(from: candidate.fullText)
+                        listPrice: price
                     )
 
                     matchedWines.append(recognized)
