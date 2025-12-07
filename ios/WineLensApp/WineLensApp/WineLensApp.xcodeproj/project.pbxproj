@@ -51,6 +51,8 @@
 		CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */; };
 		CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */; };
 		CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */; };
+		CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */; };
+		CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +119,8 @@
 		CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
 		CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
+		CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -250,6 +254,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		CEB4B6C4F312EE37EBA00014979 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		CEB4BAE32EE37EBA00014979 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -257,6 +269,7 @@
 				CEB4BADB2EE37EBA00014979 /* Networking */,
 				CEB4BADE2EE37EBA00014979 /* Persistence */,
 				CEB4BAE22EE37EBA00014979 /* Services */,
+				CEB4B6C4F312EE37EBA00014979 /* Utilities */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -266,6 +279,7 @@
 			children = (
 				CEB4BAE42EE37EBA00014979 /* ScoreBadge.swift */,
 				CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */,
+				CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -609,6 +623,8 @@
 				CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */,
 				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
 				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
+				CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */,
+				CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
