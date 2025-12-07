@@ -56,28 +56,42 @@ struct OnboardingView: View {
             // Bottom buttons
             VStack(spacing: Theme.Spacing.md) {
                 if currentPage < pages.count - 1 {
-                    Button("Next") {
+                    Button(action: {
                         withAnimation {
                             currentPage += 1
                         }
+                    }) {
+                        Text("Next")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Theme.primaryColor)
+                            .cornerRadius(12)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
 
-                    Button("Skip") {
+                    Button(action: {
                         appState.completeOnboarding()
+                    }) {
+                        Text("Skip")
+                            .foregroundColor(.secondary)
                     }
-                    .foregroundColor(.secondary)
                 } else {
-                    Button("Get Started") {
+                    Button(action: {
                         appState.completeOnboarding()
+                    }) {
+                        Text("Get Started")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Theme.primaryColor)
+                            .cornerRadius(12)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
                 }
             }
             .padding(.horizontal, Theme.Spacing.xl)
-            .padding(.bottom, Theme.Spacing.xl)
+            .padding(.bottom, Theme.Spacing.xl + 20)
         }
     }
 }
