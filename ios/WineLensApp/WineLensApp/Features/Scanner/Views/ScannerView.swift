@@ -277,7 +277,10 @@ struct ScannerView: View {
         }
             .task {
                 // Wait a moment to ensure view is fully rendered
-                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                
+                // Check if camera is already running to avoid duplicate starts
+                guard !viewModel.cameraService.isRunning else { return }
                 
                 // Always request authorization and start camera
                 // This will show permission dialog if needed
