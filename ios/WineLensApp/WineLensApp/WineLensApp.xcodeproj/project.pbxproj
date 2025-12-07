@@ -31,7 +31,6 @@
 		CEB4BB1B2EE37EBA00014979 /* WineFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAD82EE37EBA00014979 /* WineFilter.swift */; };
 		CEB4BB1C2EE37EBA00014979 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAF62EE37EBA00014979 /* ScannerView.swift */; };
 		CEB4BB1D2EE37EBA00014979 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BACE2EE37EBA00014979 /* Constants.swift */; };
-		CEB4BB1E2EE37EBA00014979 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAF02EE37EBA00014979 /* OCRService.swift */; };
 		CEB4BB1F2EE37EBA00014979 /* MyWinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAEA2EE37EBA00014979 /* MyWinesView.swift */; };
 		CEB4BB202EE37EBA00014979 /* MyWinesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAE82EE37EBA00014979 /* MyWinesViewModel.swift */; };
 		CEB4BB212EE37EBA00014979 /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAF22EE37EBA00014979 /* ScannerViewModel.swift */; };
@@ -99,7 +98,6 @@
 		CEB4BAEA2EE37EBA00014979 /* MyWinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWinesView.swift; sourceTree = "<group>"; };
 		CEB4BAED2EE37EBA00014979 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		CEB4BAEF2EE37EBA00014979 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
-		CEB4BAF02EE37EBA00014979 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		CEB4BAF22EE37EBA00014979 /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
 		CEB4BAF42EE37EBA00014979 /* AROverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AROverlayView.swift; sourceTree = "<group>"; };
 		CEB4BAF52EE37EBA00014979 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
