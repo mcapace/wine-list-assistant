@@ -972,7 +972,6 @@ struct ProcessingIndicator: View {
                             Theme.secondaryColor.opacity(0),
                             Theme.secondaryColor.opacity(0.8),
                             Theme.secondaryColor.opacity(0)
-<<<<<<< HEAD
                         ],
                         startPoint: .leading,
                         endPoint: .trailing
@@ -1057,14 +1056,11 @@ struct FirstMatchCelebrationToast: View {
                         colors: [
                             Color.black.opacity(0.85),
                             Color.black.opacity(0.75)
-=======
->>>>>>> 14049b2 (Copy new files to WineLensApp folder for Xcode project)
                         ],
-                        startPoint: .leading,
-                        endPoint: .trailing
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
                 )
-<<<<<<< HEAD
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Theme.secondaryColor.opacity(0.4), lineWidth: 1.5)
@@ -1095,42 +1091,6 @@ struct FirstMatchCelebrationToast: View {
             width: cos(angle) * distance,
             height: sin(angle) * distance
         )
-=======
-                .frame(width: 200, height: 3)
-                .offset(y: scanLineOffset)
-                .blur(radius: 2)
-            
-            HStack(spacing: 8) {
-                // Pulsing dots animation
-                ForEach(0..<3) { index in
-                    Circle()
-                        .fill(Theme.secondaryColor)
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(pulseScale)
-                        .animation(
-                            .easeInOut(duration: 0.6)
-                            .repeatForever()
-                            .delay(Double(index) * 0.2),
-                            value: pulseScale
-                        )
-                }
-            }
-            .padding(.top, 4)
-            
-            Text("Analyzing...")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.white.opacity(0.9))
-        }
-        .frame(width: 200, height: 200)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
-                scanLineOffset = 100
-            }
-            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
-                pulseScale = 0.5
-            }
-        }
->>>>>>> 14049b2 (Copy new files to WineLensApp folder for Xcode project)
     }
 }
 
