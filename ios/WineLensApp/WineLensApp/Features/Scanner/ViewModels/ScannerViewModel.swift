@@ -290,7 +290,9 @@ final class ScannerViewModel: ObservableObject {
                 persistentMatches.append(newWine)
                 
                 // Trigger haptic feedback for new match
-                HapticManager.shared.lightImpact()
+                // Using UIImpactFeedbackGenerator directly to avoid indexing issues with HapticManager
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
                 
                 // Auto-save session
                 saveSession()
