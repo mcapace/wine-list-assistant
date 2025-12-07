@@ -1014,6 +1014,86 @@ struct ProcessingIndicator: View {
     }
 }
 
+// MARK: - First Match Celebration Toast
+
+struct FirstMatchCelebrationToast: View {
+    @State private var confettiScale: CGFloat = 0.5
+    @State private var confettiOpacity: Double = 1.0
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                // Confetti burst effect
+                ForEach(0..<8) { index in
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 16))
+                        .foregroundColor(confettiColor(for: index))
+                        .offset(confettiOffset(for: index))
+                        .scaleEffect(confettiScale)
+                        .opacity(confettiOpacity)
+                }
+
+                // Main icon
+                Image(systemName: "party.popper.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+
+            Text("Found one!")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+
+            Text("Tap to see details")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.85),
+                            Color.black.opacity(0.75)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Theme.secondaryColor.opacity(0.4), lineWidth: 1.5)
+                )
+        )
+        .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 20, x: 0, y: 10)
+        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        .onAppear {
+            // Confetti animation
+            withAnimation(.easeOut(duration: 0.5)) {
+                confettiScale = 1.2
+            }
+            withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
+                confettiOpacity = 0
+            }
+        }
+    }
+
+    private func confettiColor(for index: Int) -> Color {
+        let colors: [Color] = [.yellow, .orange, .pink, .purple, .blue, .green, .red, Theme.secondaryColor]
+        return colors[index % colors.count]
+    }
+
+    private func confettiOffset(for index: Int) -> CGSize {
+        let angle = Double(index) * .pi / 4
+        let distance: CGFloat = 35
+        return CGSize(
+            width: cos(angle) * distance,
+            height: sin(angle) * distance
+        )
+    }
+}
+
 // MARK: - Permission & Paywall Views
 
 struct CameraPermissionView: View {
