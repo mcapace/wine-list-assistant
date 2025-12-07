@@ -6,7 +6,8 @@ import AVFoundation
 final class ScannerViewModel: ObservableObject {
     // MARK: - Published Properties
 
-    @Published var recognizedWines: [RecognizedWine] = []
+    @Published var recognizedWines: [RecognizedWine] = [] // Current frame wines for AR overlay
+    @Published var persistentMatches: [RecognizedWine] = [] // All matched wines from session (never clears automatically)
     @Published var filters = FilterSet()
     @Published var isProcessing = false
     @Published var error: ScannerError?
@@ -15,6 +16,11 @@ final class ScannerViewModel: ObservableObject {
             cameraService.torchEnabled = torchEnabled
         }
     }
+    
+    // MARK: - Session Management
+    
+    private var currentSession: ScanSession?
+    private let sessionManager = SessionManager.shared
 
     // MARK: - Services
 
@@ -36,6 +42,14 @@ final class ScannerViewModel: ObservableObject {
     var filteredWines: [RecognizedWine] {
         filters.apply(to: recognizedWines)
     }
+    
+    var sessionMatchCount: Int {
+        persistentMatches.count
+    }
+    
+    var matchedPersistentWines: [RecognizedWine] {
+        persistentMatches.filter { $0.isMatched }
+    }
 
     // MARK: - Initialization
 
@@ -44,6 +58,15 @@ final class ScannerViewModel: ObservableObject {
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
 
         setupFrameProcessing()
+        
+        // Load incomplete session if exists
+        if let session = sessionManager.loadCurrentSession() {
+            currentSession = session
+            persistentMatches = session.wines
+        } else {
+            // Start new session
+            currentSession = ScanSession()
+        }
     }
 
     // MARK: - Public Methods
@@ -95,6 +118,32 @@ final class ScannerViewModel: ObservableObject {
             await startScanning()
         }
     }
+    
+    func clearSession() {
+        persistentMatches.removeAll()
+        recognizedWines.removeAll()
+        currentSession = ScanSession()
+        sessionManager.clearCurrentSession()
+    }
+    
+    func updateSessionLocation(_ location: String?) {
+        currentSession?.location = location
+        saveSession()
+    }
+    
+    func saveSessionToHistory() {
+        guard var session = currentSession else { return }
+        session.wines = persistentMatches
+        sessionManager.saveSession(session)
+        sessionManager.clearCurrentSession()
+        currentSession = ScanSession()
+    }
+    
+    private func saveSession() {
+        guard var session = currentSession else { return }
+        session.wines = persistentMatches
+        sessionManager.saveCurrentSession(session)
+    }
 
     func focusAt(_ point: CGPoint) {
         cameraService.focus(at: point)
@@ -113,7 +162,8 @@ final class ScannerViewModel: ObservableObject {
 
     private func processFrameIfNeeded(_ frame: CVPixelBuffer) {
         let now = Date()
-        guard now.timeIntervalSince(lastProcessedTime) >= processingInterval else {
+        // Debounce: Don't process frames faster than every 0.5 seconds
+        guard now.timeIntervalSince(lastProcessedTime) >= max(processingInterval, 0.5) else {
             return
         }
         lastProcessedTime = now
@@ -189,13 +239,12 @@ final class ScannerViewModel: ObservableObject {
     }
 
     private func mergeResults(_ newResults: [RecognizedWine]) {
-        // Simple strategy: replace if positions overlap significantly
-        // More sophisticated merging could track wines across frames
-
+        // Update recognizedWines for current frame (AR overlay bubbles)
+        // This uses bounding box overlap to track wines in current view
         var merged = recognizedWines
 
         for newWine in newResults {
-            // Check if this overlaps with an existing wine
+            // Check if this overlaps with an existing wine in current frame
             let existingIndex = merged.firstIndex { existing in
                 boxesOverlap(existing.boundingBox, newWine.boundingBox, threshold: 0.5)
             }
@@ -206,14 +255,46 @@ final class ScannerViewModel: ObservableObject {
                     merged[index] = newWine
                 }
             } else {
-                // Add new wine
+                // Add new wine to current frame
                 merged.append(newWine)
             }
         }
 
-        // Remove wines not seen in recent frames (they scrolled out of view)
-        // This is simplified - production would track frame counts
+        // Update current frame wines (may clear when camera moves)
         recognizedWines = merged
+        
+        // Add newly matched wines to persistentMatches (deduplicated by wine ID)
+        for newWine in newResults {
+            // Only add if matched and not already in persistentMatches
+            guard newWine.isMatched,
+                  let wineId = newWine.matchedWine?.id else {
+                continue
+            }
+            
+            // Check if this wine ID already exists in persistentMatches
+            let alreadyExists = persistentMatches.contains { existing in
+                existing.matchedWine?.id == wineId
+            }
+            
+            if !alreadyExists {
+                // New match! Add to persistent list
+                persistentMatches.append(newWine)
+                
+                // Trigger haptic feedback for new match
+                HapticManager.shared.lightImpact()
+                
+                // Auto-save session
+                saveSession()
+            } else {
+                // Update existing match if confidence is higher
+                if let existingIndex = persistentMatches.firstIndex(where: { $0.matchedWine?.id == wineId }) {
+                    if newWine.matchConfidence > persistentMatches[existingIndex].matchConfidence {
+                        persistentMatches[existingIndex] = newWine
+                        saveSession()
+                    }
+                }
+            }
+        }
     }
 
     private func boxesOverlap(_ box1: CGRect, _ box2: CGRect, threshold: Double) -> Bool {

@@ -7,11 +7,28 @@ struct ScannerView: View {
     @State private var showFilters = false
     @State private var showPaywall = false
     @State private var showInstructions = false
+    @State private var showMatchedWinesList = false
+    @State private var showClearConfirmation = false
+    @State private var newMatchPulse = false
+    @State private var showNewMatchBadge = false
+    @State private var previousMatchCount = 0
+    @State private var showNameSessionDialog = false
+    @State private var sessionLocation = ""
+    @State private var showSessionHistory = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
-    // Count only wines that have been matched from the database
+    // Count only wines that have been matched from the database (current frame)
     private var matchedWineCount: Int {
         viewModel.filteredWines.filter { $0.matchedWine != nil }.count
+    }
+    
+    // Session match count (persistent)
+    private var sessionMatchCount: Int {
+        viewModel.sessionMatchCount
+    }
+    
+    private var outstandingCount: Int {
+        viewModel.matchedPersistentWines.filter { ($0.matchedWine?.score ?? 0) >= 95 }.count
     }
 
     var body: some View {
@@ -40,7 +57,9 @@ struct ScannerView: View {
                         torchEnabled: $viewModel.torchEnabled,
                         scansRemaining: subscriptionService.remainingFreeScans(),
                         isPremium: subscriptionService.subscriptionStatus.isActive,
-                        onHelpTapped: { showInstructions = true }
+                        onHelpTapped: { showInstructions = true },
+                        onHistoryTapped: { showSessionHistory = true },
+                        onClearTapped: { showClearConfirmation = true }
                     )
                     .padding(.horizontal)
                     .padding(.top, geometry.safeAreaInsets.top + 8)
@@ -48,19 +67,63 @@ struct ScannerView: View {
                     Spacer()
 
                     // Center instruction hint (when camera is ready but no matched wines yet)
-                    if matchedWineCount == 0 && viewModel.cameraService.isRunning {
+                    if sessionMatchCount == 0 && viewModel.cameraService.isRunning && !viewModel.isProcessing {
                         ScannerHintView()
                             .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    }
+                    
+                    // Processing indicator
+                    if viewModel.isProcessing && sessionMatchCount == 0 {
+                        ProcessingIndicator()
+                            .transition(.opacity)
                     }
 
                     Spacer()
 
                     // Bottom section - status and filters
                     VStack(spacing: 12) {
-                        // Scan status - only show when we have MATCHED wines (not just detected text)
-                        if matchedWineCount > 0 {
-                            ScanningIndicator(winesFound: matchedWineCount)
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        // Session stats chip (persistent)
+                        if sessionMatchCount > 0 {
+                            SessionStatsChip(
+                                wineCount: sessionMatchCount,
+                                outstandingCount: outstandingCount,
+                                onTap: { showMatchedWinesList = true }
+                            )
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
+                        // Action buttons row
+                        if sessionMatchCount > 0 {
+                            HStack(spacing: 12) {
+                                ViewResultsButton(
+                                    count: sessionMatchCount,
+                                    pulse: newMatchPulse,
+                                    showNewBadge: showNewMatchBadge,
+                                    onTap: { showMatchedWinesList = true }
+                                )
+                                
+                                // Save & Exit button
+                                Button(action: {
+                                    HapticManager.shared.mediumImpact()
+                                    showNameSessionDialog = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "square.and.arrow.down.fill")
+                                            .font(.system(size: 14, weight: .semibold))
+                                        Text("Save")
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.white.opacity(0.2))
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
 
                         FilterBar(
@@ -99,11 +162,74 @@ struct ScannerView: View {
         .sheet(isPresented: $showPaywall) {
             SubscriptionView()
         }
+        .sheet(isPresented: $showMatchedWinesList) {
+            MatchedWinesListView(
+                matchedWines: viewModel.matchedPersistentWines,
+                onWineTapped: { wine in
+                    selectedWine = wine
+                    showMatchedWinesList = false
+                }
+            )
+        }
+        .sheet(isPresented: $showSessionHistory) {
+            SessionHistoryView()
+        }
+        .alert("Name This Session", isPresented: $showNameSessionDialog) {
+            TextField("Restaurant name (optional)", text: $sessionLocation)
+            Button("Cancel", role: .cancel) {
+                sessionLocation = ""
+            }
+            Button("Save & Exit") {
+                viewModel.updateSessionLocation(sessionLocation.isEmpty ? nil : sessionLocation)
+                viewModel.saveSessionToHistory()
+                sessionLocation = ""
+                // Navigate back or dismiss scanner
+            }
+        } message: {
+            Text("Give this scan session a name (e.g., restaurant name) for easy reference later.")
+        }
+        .confirmationDialog("Clear Session", isPresented: $showClearConfirmation) {
+            Button("Clear All", role: .destructive) {
+                viewModel.clearSession()
+                previousMatchCount = 0
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will clear all wines found in this session. Continue?")
+        }
         .task {
             await viewModel.startScanning()
         }
         .onDisappear {
             viewModel.stopScanning()
+        }
+        .onChange(of: sessionMatchCount) { oldValue, newValue in
+            // Detect new match added
+            if newValue > previousMatchCount {
+                // Haptic feedback (already triggered in mergeResults, but ensure it happens)
+                HapticManager.shared.lightImpact()
+                
+                // Show pulse animation
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    newMatchPulse = true
+                    showNewMatchBadge = true
+                }
+                
+                // Reset pulse
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        newMatchPulse = false
+                    }
+                }
+                
+                // Hide badge after delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showNewMatchBadge = false
+                    }
+                }
+            }
+            previousMatchCount = newValue
         }
     }
 }
@@ -115,14 +241,24 @@ struct ScannerTopBar: View {
     let scansRemaining: Int
     let isPremium: Bool
     let onHelpTapped: () -> Void
+    let onHistoryTapped: () -> Void
+    let onClearTapped: () -> Void
 
     var body: some View {
         HStack(alignment: .center) {
-            // Torch button
-            Button(action: { torchEnabled.toggle() }) {
-                Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
+            // Left side - menu button
+            Menu {
+                Button(action: onHistoryTapped) {
+                    Label("View History", systemImage: "clock.arrow.circlepath")
+                }
+                
+                Button(role: .destructive, action: onClearTapped) {
+                    Label("Clear Session", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(torchEnabled ? Theme.secondaryColor : .white)
+                    .foregroundColor(.white)
                     .frame(width: 44, height: 44)
                     .background(
                         Circle()
@@ -137,25 +273,40 @@ struct ScannerTopBar: View {
 
             Spacer()
 
-            // Right side - scan count only (removed confusing help button)
-            if !isPremium {
-                HStack(spacing: 4) {
-                    Image(systemName: "camera.viewfinder")
-                        .font(.system(size: 12))
-                    Text("\(scansRemaining)")
-                        .font(.system(size: 14, weight: .semibold))
+            // Right side
+            HStack(spacing: 8) {
+                // Torch button
+                Button(action: { torchEnabled.toggle() }) {
+                    Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(torchEnabled ? Theme.secondaryColor : .white)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(Color.black.opacity(0.6))
+                        )
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(Color.black.opacity(0.6))
-                )
-            } else {
-                // Empty spacer to balance layout for premium users
-                Color.clear
-                    .frame(width: 44, height: 44)
+                
+                // Scan count (free users only)
+                if !isPremium {
+                    HStack(spacing: 4) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 12))
+                        Text("\(scansRemaining)")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.6))
+                    )
+                } else {
+                    // Empty spacer to balance layout for premium users
+                    Color.clear
+                        .frame(width: 44, height: 44)
+                }
             }
         }
     }
@@ -166,9 +317,23 @@ struct ScannerTopBar: View {
 struct ScannerHintView: View {
     @State private var isAnimating = false
     @State private var scanLineOffset: CGFloat = -60
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 24) {
+            // Animated wine glass icon
+            ZStack {
+                // Pulse animation background
+                Circle()
+                    .fill(Theme.secondaryColor.opacity(0.1))
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(pulseScale)
+                
+                Image(systemName: "wineglass.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+
             // Animated scan frame with pulse effect
             ZStack {
                 // Pulse animation
@@ -198,24 +363,34 @@ struct ScannerHintView: View {
             }
             .frame(width: 200, height: 200)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 Text("Point at a wine list")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
 
                 Text("Hold steady to scan wine names")
-                    .font(.system(size: 14, weight: .regular))
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundColor(.white.opacity(0.7))
+                
+                // Example hint
+                HStack(spacing: 8) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: 12))
+                    Text("Ensure good lighting and move closer to text")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundColor(.white.opacity(0.6))
+                .padding(.top, 4)
             }
             .multilineTextAlignment(.center)
         }
         .padding(.horizontal, 32)
-        .padding(.vertical, 28)
+        .padding(.vertical, 32)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 24)
                 .fill(Color.black.opacity(0.75))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 24)
                         .stroke(Theme.secondaryColor.opacity(0.2), lineWidth: 1)
                 )
         )
@@ -226,6 +401,11 @@ struct ScannerHintView: View {
             // Animate scan line
             withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
                 scanLineOffset = 60
+            }
+            
+            // Pulse animation
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                pulseScale = 1.2
             }
         }
     }
@@ -595,6 +775,165 @@ struct ScanningIndicator: View {
                 )
         )
         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+    }
+}
+
+// MARK: - Session Stats Chip
+
+struct SessionStatsChip: View {
+    let wineCount: Int
+    let outstandingCount: Int
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            HapticManager.shared.buttonTap()
+            onTap()
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(Theme.secondaryColor)
+                
+                Text("\(wineCount) wine\(wineCount == 1 ? "" : "s")")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                
+                if outstandingCount > 0 {
+                    Text("• \(outstandingCount) outstanding")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.7))
+                    .overlay(
+                        Capsule()
+                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                    )
+            )
+        }
+    }
+}
+
+// MARK: - View Results Button
+
+struct ViewResultsButton: View {
+    let count: Int
+    var pulse: Bool = false
+    var showNewBadge: Bool = false
+    let onTap: () -> Void
+    
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            HapticManager.shared.mediumImpact()
+            onTap()
+        }) {
+            HStack(spacing: 12) {
+                ZStack {
+                    if showNewBadge {
+                        Text("+1")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule()
+                                    .fill(Color.green)
+                            )
+                            .offset(x: -20, y: -20)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    
+                    Image(systemName: "list.bullet.rectangle")
+                        .font(.system(size: 18, weight: .semibold))
+                }
+                
+                Text("View Results")
+                    .font(.system(size: 16, weight: .semibold))
+                
+                Text("(\(count))")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Theme.secondaryColor.opacity(0.9),
+                                Theme.secondaryColor.opacity(0.7)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+            )
+            .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 12, x: 0, y: 6)
+            .scaleEffect(isPressed ? 0.95 : (pulse ? 1.05 : 1.0))
+            .animation(.easeInOut(duration: 0.2), value: isPressed)
+            .animation(.easeInOut(duration: 0.3), value: pulse)
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    isPressed = false
+                }
+        )
+    }
+}
+
+// MARK: - Processing Indicator
+
+struct ProcessingIndicator: View {
+    @State private var scanLineOffset: CGFloat = -100
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Scanning line animation
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Theme.secondaryColor.opacity(0),
+                            Theme.secondaryColor.opacity(0.8),
+                            Theme.secondaryColor.opacity(0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 200, height: 3)
+                .offset(y: scanLineOffset)
+                .blur(radius: 2)
+            
+            Text("Analyzing...")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+        }
+        .frame(width: 200, height: 200)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
+                scanLineOffset = 100
+            }
+        }
     }
 }
 

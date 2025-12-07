@@ -35,6 +35,7 @@ struct ScoreBadgeOverlay: View {
     @State private var isAppearing = false
     @State private var isPressed = false
     @State private var showScoreReveal = false
+    @State private var floatOffset: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -57,8 +58,11 @@ struct ScoreBadgeOverlay: View {
                 }
             }
         }
-        .position(position)
-        .scaleEffect(isAppearing ? (isPressed ? 0.9 : 1.0) : 0.5)
+        .position(
+            x: position.x,
+            y: position.y + floatOffset
+        )
+        .scaleEffect(isAppearing ? (isPressed ? 0.85 : 1.0) : 0.5)
         .opacity(isAppearing ? 1.0 : 0.0)
         .onTapGesture {
             if wine.isMatched {
@@ -75,26 +79,34 @@ struct ScoreBadgeOverlay: View {
             }
         }
         .onAppear {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            // Smooth fade-in animation
+            withAnimation(.easeInOut(duration: 0.3)) {
                 isAppearing = true
             }
+            
+            // Gentle floating animation
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                floatOffset = -4
+            }
 
-            // Haptic feedback when wine is found
+            // Haptic feedback when wine is found (only once on first appear)
             if wine.isMatched {
+                // Note: Haptic is now handled in mergeResults to avoid duplicates
                 if (wine.matchedWine?.score ?? 0) >= 95 {
-                    HapticManager.shared.highScoreWine()
                     showScoreReveal = true
                     // Hide animation after it plays
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        showScoreReveal = false
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showScoreReveal = false
+                        }
                     }
-                } else {
-                    HapticManager.shared.wineFound()
                 }
             }
         }
         .onDisappear {
-            isAppearing = false
+            withAnimation(.easeInOut(duration: 0.25)) {
+                isAppearing = false
+            }
         }
     }
 }

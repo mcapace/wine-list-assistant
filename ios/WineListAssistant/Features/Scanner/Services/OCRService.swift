@@ -154,8 +154,8 @@ final class OCRService {
                     return nil
                 }
 
-                // Filter out very low confidence results
-                guard candidate.confidence > 0.5 else {
+                // Stricter confidence threshold - only pass high confidence results
+                guard candidate.confidence > 0.7 else {
                     return nil
                 }
 
@@ -185,8 +185,8 @@ final class OCRService {
         // Combine text from all lines
         let fullText = results.map(\.text).joined(separator: " ")
 
-        // Skip very short text (likely not a wine entry)
-        guard fullText.count >= 5 else { return nil }
+        // Skip very short text (likely not a wine entry) - increased threshold
+        guard fullText.count >= 10 else { return nil }
 
         // Compute combined bounding box
         let minX = results.map(\.boundingBox.minX).min() ?? 0
@@ -215,10 +215,13 @@ final class OCRService {
     private func isLikelyWineEntry(_ candidate: WineTextCandidate) -> Bool {
         let text = candidate.fullText.lowercased()
 
-        // Must have minimum length
-        guard text.count >= 10 else { return false }
+        // Must have minimum length - increased from 10 to 15
+        guard text.count >= 15 else { return false }
+        
+        // Check OCR confidence threshold
+        guard candidate.confidence > 0.7 else { return false }
 
-        // Skip common non-wine patterns
+        // Skip common non-wine patterns (expanded list)
         let skipPatterns = [
             "wine list",
             "by the glass",
@@ -235,15 +238,15 @@ final class OCRService {
             "reserve list",
             "menu",
             "restaurant",
-            "price",
-            "selection",
-            "our ",
-            "the ",
             "welcome",
-            "thank you",
+            "please",
+            "thank",
             "scan",
             "camera",
-            "photo"
+            "photo",
+            "selection",
+            "our ",
+            "the "
         ]
 
         for pattern in skipPatterns {
@@ -251,61 +254,68 @@ final class OCRService {
                 return false
             }
         }
+        
+        // Reject all caps headers (likely menu section titles)
+        if candidate.fullText == candidate.fullText.uppercased() && candidate.fullText.count > 3 {
+            return false
+        }
+        
+        // Reject text that's mostly numbers (prices without wine names)
+        let numericChars = candidate.fullText.filter { $0.isNumber || $0 == "$" || $0 == "," || $0 == "." }
+        if Double(numericChars.count) / Double(candidate.fullText.count) > 0.6 {
+            return false
+        }
 
-        // STRICT: Must contain at least one wine-specific indicator
-        var matchCount = 0
+        // STRICT: Must contain at least one wine-specific indicator (grape, region, or vintage)
+        var hasGrape = false
+        var hasRegion = false
+        var hasVintage = false
 
-        // Wine grape varieties (must match)
+        // Wine grape varieties
         let grapeVarieties = [
             "cabernet", "merlot", "pinot", "chardonnay", "sauvignon",
             "shiraz", "syrah", "riesling", "zinfandel", "malbec",
             "sangiovese", "tempranillo", "grenache", "mourvedre",
             "viognier", "gewurztraminer", "gruner", "albarino",
-            "nero", "primitivo", "nebbiolo", "barbera"
+            "nero", "primitivo", "nebbiolo", "barbera", "chardonay",
+            "cab", "pinot noir", "pinot grigio", "sauvignon blanc",
+            "cabernet sauvignon", "petit verdot", "cabernet franc"
         ]
 
         for grape in grapeVarieties {
             if text.contains(grape) {
-                matchCount += 2  // Strong indicator
+                hasGrape = true
+                break
             }
         }
 
-        // Wine regions
+        // Wine regions (expanded list)
         let regions = [
             "bordeaux", "burgundy", "champagne", "napa", "sonoma",
             "barolo", "chianti", "rioja", "tuscany", "piedmont",
-            "willamette", "paso robles", "mendoza", "marlborough"
+            "willamette", "paso robles", "mendoza", "marlborough",
+            "barossa", "russian river", "saint-emilion", "pomerol",
+            "cotes du rhone", "loire", "alsace", "mosel", "rhine"
         ]
 
         for region in regions {
             if text.contains(region) {
-                matchCount += 2
+                hasRegion = true
+                break
             }
         }
 
-        // Producer terms
-        let producerTerms = [
-            "chateau", "domaine", "estate", "vineyard", "reserve",
-            "winery", "cellars", "cru", "grand"
-        ]
-
-        for term in producerTerms {
-            if text.contains(term) {
-                matchCount += 1
-            }
-        }
-
-        // Vintage year pattern (19xx or 20xx)
-        let vintagePattern = #"\b(19[5-9]\d|20[0-2]\d)\b"#
+        // Vintage year pattern (1970-2025)
+        let vintagePattern = #"\b(19[7-9]\d|20[0-2][0-5])\b"#
         if let regex = try? NSRegularExpression(pattern: vintagePattern, options: .caseInsensitive) {
             let range = NSRange(text.startIndex..., in: text)
             if regex.firstMatch(in: text, range: range) != nil {
-                matchCount += 1
+                hasVintage = true
             }
         }
 
-        // Must have at least 2 match points to be considered a wine
-        return matchCount >= 2
+        // REQUIRE at least one of: grape variety, wine region, or vintage year
+        return hasGrape || hasRegion || hasVintage
     }
 
     // MARK: - Errors
