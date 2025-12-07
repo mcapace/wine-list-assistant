@@ -331,40 +331,4 @@ final class ScannerViewModel: ObservableObject {
         return Decimal(string: String(priceString))
     }
 
-    // MARK: - Error Types
-
-    enum ScannerError: Error, Identifiable {
-        case cameraNotAuthorized
-        case cameraConfigurationFailed
-        case processingFailed
-        case scanLimitReached
-
-        var id: String { String(describing: self) }
-
-        var title: String {
-            switch self {
-            case .cameraNotAuthorized:
-                return "Camera Access Required"
-            case .cameraConfigurationFailed:
-                return "Camera Error"
-            case .processingFailed:
-                return "Processing Error"
-            case .scanLimitReached:
-                return "Scan Limit Reached"
-            }
-        }
-
-        var message: String {
-            switch self {
-            case .cameraNotAuthorized:
-                return "Please enable camera access in Settings to scan wine lists."
-            case .cameraConfigurationFailed:
-                return "Unable to configure the camera. Please restart the app."
-            case .processingFailed:
-                return "Something went wrong. Please try again."
-            case .scanLimitReached:
-                return "You've used all your free scans this month. Upgrade to Premium for unlimited scanning."
-            }
-        }
-    }
 }

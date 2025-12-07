@@ -60,60 +60,6 @@ struct ScannerErrorView: View {
     }
 }
 
-// MARK: - Scanner Error Extension
-
-extension ScannerError {
-    var errorTitle: String {
-        switch self {
-        case .cameraNotAuthorized:
-            return "Camera Access Required"
-        case .cameraConfigurationFailed:
-            return "Camera Error"
-        case .processingFailed:
-            return "Processing Error"
-        case .scanLimitReached:
-            return "Scan Limit Reached"
-        }
-    }
-
-    var errorMessage: String {
-        switch self {
-        case .cameraNotAuthorized:
-            return "Wine Lens needs camera access to scan wine lists. Please enable camera access in Settings."
-        case .cameraConfigurationFailed:
-            return "Unable to start the camera. Please try again or restart the app."
-        case .processingFailed:
-            return "Unable to process the image. Please try again."
-        case .scanLimitReached:
-            return "You've reached your free scan limit for this month. Upgrade to Premium for unlimited scans."
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .cameraNotAuthorized:
-            return "camera.fill"
-        case .cameraConfigurationFailed:
-            return "exclamationmark.camera.fill"
-        case .processingFailed:
-            return "doc.text.magnifyingglass"
-        case .scanLimitReached:
-            return "lock.fill"
-        }
-    }
-
-    var iconColor: Color {
-        switch self {
-        case .cameraNotAuthorized, .cameraConfigurationFailed:
-            return .orange
-        case .processingFailed:
-            return .yellow
-        case .scanLimitReached:
-            return Theme.secondaryColor
-        }
-    }
-}
-
 #Preview {
     ScannerErrorView(
         error: .cameraNotAuthorized,
