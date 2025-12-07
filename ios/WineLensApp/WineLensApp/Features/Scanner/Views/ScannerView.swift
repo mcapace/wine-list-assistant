@@ -275,13 +275,23 @@ struct ScannerView: View {
         } message: {
             Text("This will clear all wines found in this session. Continue?")
         }
-            .task {
-                // Add delay to allow view transition to complete and UI to stabilize
-                // This prevents the app from appearing frozen when switching from onboarding
-                try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+            .task(id: viewModel.cameraService.isRunning) {
+                // Only start camera if not already running and view is ready
+                guard !viewModel.cameraService.isRunning else { return }
                 
-                // Start camera scanning asynchronously
-                await viewModel.startScanning()
+                // Longer delay to ensure onboarding transition is completely finished
+                // This prevents freeze when system authorization dialog appears
+                try? await Task.sleep(nanoseconds: 1500_000_000) // 1.5 seconds
+                
+                // Check if already authorized to avoid blocking alert during transition
+                if viewModel.cameraService.checkAuthorization() {
+                    // Already authorized - start immediately
+                    await viewModel.startScanning()
+                } else {
+                    // Not authorized - wait a bit more then request (shows alert)
+                    try? await Task.sleep(nanoseconds: 500_000_000) // Additional 0.5s
+                    await viewModel.startScanning()
+                }
             }
         .onDisappear {
             viewModel.stopScanning()
