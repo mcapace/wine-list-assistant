@@ -275,12 +275,18 @@ struct ScannerView: View {
         } message: {
             Text("This will clear all wines found in this session. Continue?")
         }
-        .task {
-            // Add a small delay to allow the view transition to complete smoothly
-            // This prevents the app from appearing frozen when switching from onboarding
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-            await viewModel.startScanning()
-        }
+            .task {
+                // Add delay to allow view transition to complete and UI to stabilize
+                // This prevents the app from appearing frozen when switching from onboarding
+                try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+                
+                // Start camera scanning asynchronously without blocking
+                await MainActor.run {
+                    Task.detached { @MainActor [weak viewModel] in
+                        await viewModel?.startScanning()
+                    }
+                }
+            }
         .onDisappear {
             viewModel.stopScanning()
         }

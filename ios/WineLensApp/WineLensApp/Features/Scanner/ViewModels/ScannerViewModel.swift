@@ -59,7 +59,11 @@ final class ScannerViewModel: ObservableObject {
         self.matchingService = WineMatchingService()
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
 
-        setupFrameProcessing()
+        // Defer frame processing setup to avoid blocking initialization
+        // This prevents freeze when ScannerView is created during onboarding transition
+        Task { @MainActor in
+            self.setupFrameProcessing()
+        }
         
         // Load incomplete session if exists
         if let session = sessionManager.loadCurrentSession() {
