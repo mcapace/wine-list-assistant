@@ -311,211 +311,214 @@ struct MatchedWineCard: View {
         return String(note[..<index]) + "..."
     }
     
+    @ViewBuilder
+    private var scoreBadge: some View {
+        if let wine = wine {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Theme.scoreColor(for: wine.score).opacity(0.25),
+                                Theme.scoreColor(for: wine.score).opacity(0.15)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 70, height: 70)
+                    .overlay(
+                        Circle()
+                            .stroke(Theme.scoreColor(for: wine.score).opacity(0.4), lineWidth: 2)
+                    )
+                
+                VStack(spacing: 2) {
+                    Text("\(wine.score)")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundColor(Theme.scoreColor(for: wine.score))
+                    
+                    Text(wine.reviewer.initials)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Theme.scoreColor(for: wine.score).opacity(0.8))
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var wineInfoSection: some View {
+        if let wine = wine {
+            VStack(alignment: .leading, spacing: 8) {
+                // Producer
+                Text(wine.producer)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(1)
+                
+                // Wine name
+                Text(wine.name)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                
+                // Vintage and region
+                HStack(spacing: 12) {
+                    if let vintage = wine.vintage {
+                        Label("\(vintage)", systemImage: "calendar")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                    
+                    Label(wine.region, systemImage: "mappin.circle.fill")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.6))
+                        .lineLimit(1)
+                }
+                
+                // Tasting note preview (2 lines max)
+                if !isExpanded && !tastingNotePreview.isEmpty {
+                    Text(tastingNotePreview)
+                        .font(.system(size: 14, style: .italic))
+                        .foregroundColor(.white.opacity(0.75))
+                        .lineLimit(2)
+                        .padding(.top, 4)
+                }
+                
+                // Price and value indicators
+                HStack(spacing: 12) {
+                    if let listPrice = recognizedWine.listPrice {
+                        Text(formatPrice(listPrice))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(Theme.secondaryColor)
+                    }
+                    
+                    if recognizedWine.isBestValue {
+                        HStack(spacing: 4) {
+                            Image(systemName: "tag.fill")
+                                .font(.system(size: 10))
+                            Text("Best Value")
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.green.opacity(0.8))
+                        )
+                    }
+                    
+                    if let ratio = recognizedWine.valueRatio {
+                        ValueIndicatorBadge(ratio: ratio)
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var expandedContent: some View {
+        if isExpanded, let wine = wine {
+            VStack(alignment: .leading, spacing: 16) {
+                Divider()
+                    .background(Color.white.opacity(0.2))
+                
+                // Full tasting note
+                if !wine.tastingNote.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Tasting Notes")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        Text(wine.tastingNote)
+                            .font(.system(size: 14))
+                            .foregroundColor(.white.opacity(0.8))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                
+                // Drink window
+                if wine.drinkWindowStart != nil || wine.drinkWindowEnd != nil {
+                    HStack(spacing: 8) {
+                        Image(systemName: wine.drinkWindowStatus.iconName)
+                            .font(.system(size: 14))
+                        Text("Drink Window: \(wine.drinkWindowDisplay)")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundColor(.white.opacity(0.8))
+                }
+                
+                // Grape varieties
+                if !wine.grapeVarieties.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Grape Varieties")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        HStack {
+                            ForEach(wine.grapeVarieties, id: \.name) { variety in
+                                Text(variety.name)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.white.opacity(0.15))
+                                    )
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
+    }
+    
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.1),
+                        Color.white.opacity(0.05)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.2),
+                                Color.white.opacity(0.05)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+    }
+    
     var body: some View {
         Group {
             if let wine = wine {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 16) {
-                        // Score badge - prominent
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Theme.scoreColor(for: wine.score).opacity(0.25),
-                                            Theme.scoreColor(for: wine.score).opacity(0.15)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 70, height: 70)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Theme.scoreColor(for: wine.score).opacity(0.4), lineWidth: 2)
-                                )
-                            
-                            VStack(spacing: 2) {
-                                Text("\(wine.score)")
-                                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                                    .foregroundColor(Theme.scoreColor(for: wine.score))
-                                
-                                Text(wine.reviewer.initials)
-                                    .font(.system(size: 10, weight: .semibold))
-                                    .foregroundColor(Theme.scoreColor(for: wine.score).opacity(0.8))
-                            }
-                        }
-                        
-                        // Wine information
-                        VStack(alignment: .leading, spacing: 8) {
-                            // Producer
-                            Text(wine.producer)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.white.opacity(0.7))
-                                .lineLimit(1)
-                            
-                            // Wine name
-                            Text(wine.name)
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(.white)
-                                .lineLimit(2)
-                            
-                            // Vintage and region
-                            HStack(spacing: 12) {
-                                if let vintage = wine.vintage {
-                                    Label("\(vintage)", systemImage: "calendar")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundColor(.white.opacity(0.6))
-                                }
-                                
-                                Label(wine.region, systemImage: "mappin.circle.fill")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.6))
-                                    .lineLimit(1)
-                            }
-                            
-                            // Tasting note preview (2 lines max)
-                            if !isExpanded && !tastingNotePreview.isEmpty {
-                                Text(tastingNotePreview)
-                                    .font(.system(size: 14, style: .italic))
-                                    .foregroundColor(.white.opacity(0.75))
-                                    .lineLimit(2)
-                                    .padding(.top, 4)
-                            }
-                            
-                            // Price and value indicators
-                            HStack(spacing: 12) {
-                                if let listPrice = recognizedWine.listPrice {
-                                    Text(formatPrice(listPrice))
-                                        .font(.system(size: 16, weight: .semibold))
-                                        .foregroundColor(Theme.secondaryColor)
-                                }
-                                
-                                if recognizedWine.isBestValue {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "tag.fill")
-                                            .font(.system(size: 10))
-                                        Text("Best Value")
-                                            .font(.system(size: 11, weight: .semibold))
-                                    }
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.green.opacity(0.8))
-                                    )
-                                }
-                                
-                                if let ratio = recognizedWine.valueRatio {
-                                    ValueIndicatorBadge(ratio: ratio)
-                                }
-                            }
-                        }
-                        
+                        scoreBadge
+                        wineInfoSection
                         Spacer()
-                        
-                        // Confidence indicator and chevron
-                        VStack(spacing: 8) {
-                            if recognizedWine.hasLowConfidence {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.orange)
-                            }
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.4))
-                                .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                        }
+                        confidenceIndicator
                     }
                     .padding(20)
                     
-                    // Expanded content (peek)
-                    if isExpanded {
-                        VStack(alignment: .leading, spacing: 16) {
-                            Divider()
-                                .background(Color.white.opacity(0.2))
-                            
-                            // Full tasting note
-                            if !wine.tastingNote.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Tasting Notes")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.white.opacity(0.9))
-                                    
-                                    Text(wine.tastingNote)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.white.opacity(0.8))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                            
-                            // Drink window
-                            if wine.drinkWindowStart != nil || wine.drinkWindowEnd != nil {
-                                HStack(spacing: 8) {
-                                    Image(systemName: wine.drinkWindowStatus.iconName)
-                                        .font(.system(size: 14))
-                                    Text("Drink Window: \(wine.drinkWindowDisplay)")
-                                        .font(.system(size: 14, weight: .medium))
-                                }
-                                .foregroundColor(.white.opacity(0.8))
-                            }
-                            
-                            // Grape varieties
-                            if !wine.grapeVarieties.isEmpty {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Grape Varieties")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.white.opacity(0.9))
-                                    
-                                    HStack {
-                                        ForEach(wine.grapeVarieties, id: \.name) { variety in
-                                            Text(variety.name)
-                                                .font(.system(size: 12))
-                                                .foregroundColor(.white.opacity(0.7))
-                                                .padding(.horizontal, 8)
-                                                .padding(.vertical, 4)
-                                                .background(
-                                                    Capsule()
-                                                        .fill(Color.white.opacity(0.15))
-                                                )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
-                    }
+                    expandedContent
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.1),
-                                    Color.white.opacity(0.05)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(0.2),
-                                            Color.white.opacity(0.05)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1
-                                )
-                        )
-                )
+                .background(cardBackground)
                 .shadow(color: .black.opacity(0.3), radius: 12, x: 0, y: 6)
                 .shadow(color: Theme.secondaryColor.opacity(0.1), radius: 8, x: 0, y: 4)
                 .scaleEffect(isPressed ? 0.98 : 1.0)
