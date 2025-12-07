@@ -1,26 +1,40 @@
 import Vision
 import CoreImage
 import UIKit
+import CoreVideo
 
-/// Apple Vision framework OCR implementation (fallback when Google Cloud unavailable)
+/// Apple Vision framework OCR provider (fallback when Google Cloud unavailable)
 final class AppleVisionOCRService: OCRProvider {
+    // MARK: - OCRProvider Protocol
+
     let name = "Apple Vision"
     let requiresInternet = false
-    
+
+    // MARK: - Properties
+
     private let requestHandler = VNSequenceRequestHandler()
+
+    /// Languages to recognize (prioritized)
     private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
-    
-    /// Track if using fast mode due to ANE issues
+
+    /// Track if we should use fast mode due to ANE issues
     private(set) var useFastRecognition = false
-    
-    var isInRecoveryMode: Bool { useFastRecognition }
-    
+
+    /// Public property to check if OCR is in recovery/fast mode
+    var isInRecoveryMode: Bool {
+        useFastRecognition
+    }
+
+    // MARK: - OCRProvider Methods
+
+    /// Recognize text in a pixel buffer (real-time camera frame)
     func recognizeText(in pixelBuffer: CVPixelBuffer) async throws -> [OCRService.OCRResult] {
         do {
             return try await withCheckedThrowingContinuation { continuation in
                 let request = self.createTextRecognitionRequest { result in
                     continuation.resume(with: result)
                 }
+
                 do {
                     try self.requestHandler.perform([request], on: pixelBuffer)
                 } catch {
@@ -28,24 +42,34 @@ final class AppleVisionOCRService: OCRProvider {
                 }
             }
         } catch {
+            // Handle Vision/ANE errors gracefully
+            // These errors (numANECores, fopen data file) are internal to Apple's
+            // Vision framework and are recoverable - just return empty results
             let nsError = error as NSError
-            if nsError.domain == "com.apple.Vision" || nsError.domain.contains("VN") || nsError.localizedDescription.contains("ANE") {
+            if nsError.domain == "com.apple.Vision" ||
+               nsError.domain.contains("VN") ||
+               nsError.localizedDescription.contains("ANE") {
+                // Try switching to fast mode for subsequent requests
                 useFastRecognition = true
                 return []
             }
             throw error
         }
     }
-    
+
+    /// Recognize text in a UIImage (captured photo)
     func recognizeText(in image: UIImage) async throws -> [OCRService.OCRResult] {
         guard let cgImage = image.cgImage else {
-            throw NSError(domain: "AppleVisionOCR", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image"])
+            throw OCRError.invalidImage
         }
+
         return try await withCheckedThrowingContinuation { continuation in
             let request = self.createTextRecognitionRequest { result in
                 continuation.resume(with: result)
             }
+
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+
             do {
                 try handler.perform([request])
             } catch {
@@ -53,39 +77,66 @@ final class AppleVisionOCRService: OCRProvider {
             }
         }
     }
-    
-    private func createTextRecognitionRequest(completion: @escaping (Result<[OCRService.OCRResult], Error>) -> Void) -> VNRecognizeTextRequest {
+
+    // MARK: - Private Methods
+
+    private func createTextRecognitionRequest(
+        completion: @escaping (Result<[OCRService.OCRResult], Error>) -> Void
+    ) -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { request, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-            
+
             guard let observations = request.results as? [VNRecognizedTextObservation] else {
                 completion(.success([]))
                 return
             }
-            
+
             let results = observations.compactMap { observation -> OCRService.OCRResult? in
-                guard let candidate = observation.topCandidates(1).first, candidate.confidence > 0.5 else {
+                guard let candidate = observation.topCandidates(1).first else {
                     return nil
                 }
-                
+
+                // Stricter confidence threshold - only pass high confidence results
+                guard candidate.confidence > 0.7 else {
+                    return nil
+                }
+
                 return OCRService.OCRResult(
                     text: candidate.string,
                     boundingBox: observation.boundingBox,
                     confidence: candidate.confidence
                 )
             }
-            
+
             completion(.success(results))
         }
-        
+
+        // Configure for text recognition
+        // Use fast mode if we've encountered ANE issues, otherwise use accurate mode
         request.recognitionLevel = useFastRecognition ? .fast : .accurate
         request.recognitionLanguages = recognitionLanguages
-        request.usesLanguageCorrection = !useFastRecognition
-        
+        request.usesLanguageCorrection = !useFastRecognition  // Disable for fast mode
+        request.revision = VNRecognizeTextRequestRevision3
+
         return request
     }
-}
 
+    // MARK: - Errors
+
+    enum OCRError: Error, LocalizedError {
+        case invalidImage
+        case recognitionFailed
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidImage:
+                return "Invalid image format"
+            case .recognitionFailed:
+                return "Text recognition failed"
+            }
+        }
+    }
+}
