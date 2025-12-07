@@ -34,33 +34,39 @@ struct ScoreBadgeOverlay: View {
 
     @State private var isAppearing = false
     @State private var isPressed = false
+    @State private var showScoreReveal = false
+    @State private var floatOffset: CGFloat = 0
 
     var body: some View {
-        Group {
-            if wine.isMatched {
-                // Matched wine - show score badge
-                ScoreBadge(
-                    score: wine.matchedWine?.score,
-                    confidence: wine.matchConfidence,
-                    vintage: wine.matchedVintage
-                )
-            } else if wine.isPartialMatch {
-                // Partial match - show with different style (lower confidence but still a match)
-                PartialMatchBadge(
-                    wine: wine.matchedWine,
-                    confidence: wine.matchConfidence,
-                    text: wine.originalText
-                )
-            } else {
-                // Unmatched text - show subtle indicator so user knows OCR is working
-                UnmatchedBadge(text: wine.originalText)
+        ZStack {
+            // Score reveal animation (for high scores)
+            if showScoreReveal && (wine.matchedWine?.score ?? 0) >= 95 {
+                ScoreRevealAnimation()
+                    .opacity(0.8)
+            }
+
+            Group {
+                if wine.isMatched {
+                    ScoreBadge(
+                        score: wine.matchedWine?.score,
+                        confidence: wine.matchConfidence,
+                        vintage: wine.matchedVintage
+                    )
+                } else {
+                    // Unmatched indicator
+                    UnmatchedBadge()
+                }
             }
         }
-        .position(position)
-        .scaleEffect(isAppearing ? (isPressed ? 0.9 : 1.0) : 0.5)
+        .position(
+            x: position.x,
+            y: position.y + floatOffset
+        )
+        .scaleEffect(isAppearing ? (isPressed ? 0.85 : 1.0) : 0.5)
         .opacity(isAppearing ? 1.0 : 0.0)
         .onTapGesture {
-            if wine.isMatched || wine.isPartialMatch {
+            if wine.isMatched {
+                HapticManager.shared.mediumImpact()
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
                 }
@@ -73,97 +79,50 @@ struct ScoreBadgeOverlay: View {
             }
         }
         .onAppear {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            // Smooth fade-in animation
+            withAnimation(.easeInOut(duration: 0.3)) {
                 isAppearing = true
+            }
+            
+            // Gentle floating animation - more subtle and smooth
+            withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+                floatOffset = -6
+            }
+
+            // Haptic feedback when wine is found (only once on first appear)
+            if wine.isMatched {
+                // Note: Haptic is now handled in mergeResults to avoid duplicates
+                if (wine.matchedWine?.score ?? 0) >= 95 {
+                    showScoreReveal = true
+                    // Hide animation after it plays
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showScoreReveal = false
+                        }
+                    }
+                }
             }
         }
         .onDisappear {
-            isAppearing = false
-        }
-    }
-}
-
-struct PartialMatchBadge: View {
-    let wine: Wine?
-    let confidence: Double
-    let text: String
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            // Show score if available
-            if let score = wine?.score {
-                Text("\(score)")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+            withAnimation(.easeInOut(duration: 0.25)) {
+                isAppearing = false
             }
-            
-            // Show wine name or detected text
-            Text(wine?.name ?? text.prefix(15) + (text.count > 15 ? "..." : ""))
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(.white.opacity(0.9))
-                .lineLimit(1)
-                .padding(.horizontal, 6)
-            
-            // Partial match indicator (dashed border)
-            Circle()
-                .strokeBorder(Color.yellow.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [3, 3]))
-                .frame(width: 18, height: 18)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.yellow.opacity(0.3),
-                            Color.orange.opacity(0.2)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.yellow.opacity(0.6), lineWidth: 1.5)
-                )
-        )
-        .badgeShadow()
     }
 }
 
 struct UnmatchedBadge: View {
-    let text: String
-    
     var body: some View {
-        VStack(spacing: 2) {
-            // Show first few words of detected text so user knows OCR is working
-            Text(text.prefix(20) + (text.count > 20 ? "..." : ""))
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(.white.opacity(0.9))
-                .lineLimit(1)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-            
-            // Question mark indicator
-            Text("?")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
-                .frame(width: 20, height: 20)
-                .background(
-                    Circle()
-                        .fill(Color.orange.opacity(0.8))
-                )
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.orange.opacity(0.5), lineWidth: 1)
-                )
-        )
-        .badgeShadow()
+        Text("?")
+            .font(.system(size: 14, weight: .bold, design: .rounded))
+            .foregroundColor(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.gray.opacity(0.7))
+            )
+            .badgeShadow()
     }
 }
 
@@ -227,7 +186,7 @@ struct DrinkWindowIndicatorOverlay: View {
                 RecognizedWine.previewNoMatch
             ],
             viewSize: CGSize(width: 390, height: 844),
-            onWineTapped: { wine in }
+            onWineTapped: { _ in }
         )
     }
 }

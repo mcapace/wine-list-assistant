@@ -8,29 +8,42 @@ struct ScannerView: View {
     @State private var showPaywall = false
     @State private var showInstructions = false
     @State private var showMatchedWinesList = false
+    @State private var showClearConfirmation = false
+    @State private var newMatchPulse = false
+    @State private var showNewMatchBadge = false
+    @State private var previousMatchCount = 0
+    @State private var showFirstMatchToast = false
+    @State private var showNameSessionDialog = false
+    @State private var sessionLocation = ""
+    @State private var showSessionHistory = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
-    // Computed properties
-    private var allRecognizedWines: [RecognizedWine] {
-        viewModel.filteredWines
+    // Count only wines that have been matched from the database (current frame)
+    private var matchedWineCount: Int {
+        viewModel.filteredWines.filter { $0.matchedWine != nil }.count
     }
     
-    private var matchedWines: [RecognizedWine] {
-        allRecognizedWines.filter { $0.isMatched }
+    // Session match count (persistent)
+    private var sessionMatchCount: Int {
+        viewModel.sessionMatchCount
+    }
+    
+    private var outstandingCount: Int {
+        viewModel.matchedPersistentWines.filter { ($0.matchedWine?.score ?? 0) >= 95 }.count
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Camera Preview
+                // Camera Preview - full screen background
                 CameraPreviewView(cameraService: viewModel.cameraService)
                     .ignoresSafeArea()
 
-                // AR Overlay - ONLY show matched wines to reduce clutter
-                // Unmatched wines are shown in the list view instead
+                // AR Overlay - shows wine recognition badges (only for matched wines)
+                let matchedWines = viewModel.filteredWines.filter { $0.matchedWine != nil }
                 if !matchedWines.isEmpty {
                     AROverlayView(
-                        recognizedWines: Array(matchedWines.prefix(10)), // Limit to 10 bubbles max
+                        recognizedWines: matchedWines,
                         viewSize: geometry.size,
                         onWineTapped: { wine in
                             selectedWine = wine
@@ -38,100 +51,105 @@ struct ScannerView: View {
                     )
                 }
 
-                // Top Controls - Clean Professional Design
+                // Main UI overlay
                 VStack(spacing: 0) {
+                    // Top Controls with branding
                     ScannerTopBar(
                         torchEnabled: $viewModel.torchEnabled,
                         scansRemaining: subscriptionService.remainingFreeScans(),
                         isPremium: subscriptionService.subscriptionStatus.isActive,
-                        onHelpTapped: { showInstructions = true }
+                        onHelpTapped: { showInstructions = true },
+                        onHistoryTapped: { showSessionHistory = true },
+                        onClearTapped: { showClearConfirmation = true }
                     )
+                    .padding(.horizontal)
+                    .padding(.top, geometry.safeAreaInsets.top + 8)
 
                     Spacer()
-                }
-                .padding(.top, geometry.safeAreaInsets.top + 8)
-                .padding(.horizontal, 0)
 
-                // Center instruction hint (when no wines detected at all) - perfectly centered
-                if allRecognizedWines.isEmpty && viewModel.cameraService.isRunning {
-                    VStack {
-                        Spacer()
+                    // Center instruction hint (when camera is ready but no matched wines yet)
+                    if sessionMatchCount == 0 && viewModel.cameraService.isRunning && !viewModel.isProcessing {
                         ScannerHintView()
-                            .padding(.horizontal, 32)
-                        Spacer()
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
-                }
+                    
+                    // Processing indicator - show when processing
+                    if viewModel.isProcessing {
+                        ProcessingIndicator()
+                            .transition(.opacity)
+                    }
+                    
+                    // OCR Recovery mode indicator
+                    if viewModel.ocrService.isInRecoveryMode && viewModel.isProcessing {
+                        OCRRecoveryIndicator()
+                            .transition(.opacity)
+                    }
+                    
+                    // First match celebration toast
+                    if showFirstMatchToast {
+                        FirstMatchCelebrationToast()
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .zIndex(1000)
+                    }
 
-                // Bottom Controls - better symmetry and spacing
-                VStack(spacing: 0) {
                     Spacer()
 
-                    // Bottom Controls - Professional Design
+                    // Bottom section - status and filters
                     VStack(spacing: 12) {
-                        // Primary Action: View Results List (always visible when matches exist)
-                        if matchedWines.count > 0 {
-                            Button(action: {
-                                showMatchedWinesList = true
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "list.bullet.rectangle.fill")
-                                        .font(.system(size: 20, weight: .bold))
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("View Results")
-                                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                                        Text("\(matchedWines.count) wine\(matchedWines.count == 1 ? "" : "s") found")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .opacity(0.9)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 16, weight: .semibold))
-                                }
-                                .foregroundColor(.black)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 18)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Theme.secondaryColor,
-                                                    Theme.secondaryColor.opacity(0.95)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                )
-                                .shadow(color: Theme.secondaryColor.opacity(0.5), radius: 16, x: 0, y: 8)
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                            }
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
-                        
-                        // Status indicator (only show when processing or no matches yet)
-                        if viewModel.isProcessing && matchedWines.isEmpty {
-                            ScanningIndicator(
-                                winesFound: 0,
-                                partialMatches: 0,
-                                totalDetected: allRecognizedWines.count,
-                                isProcessing: true
+                        // Session stats chip (persistent)
+                        if sessionMatchCount > 0 {
+                            SessionStatsChip(
+                                wineCount: sessionMatchCount,
+                                outstandingCount: outstandingCount,
+                                onTap: { showMatchedWinesList = true }
                             )
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
-                        // Filter bar (always visible)
+                        // Action buttons row
+                        if sessionMatchCount > 0 {
+                            HStack(spacing: 12) {
+                                ViewResultsButton(
+                                    count: sessionMatchCount,
+                                    pulse: newMatchPulse,
+                                    showNewBadge: showNewMatchBadge,
+                                    onTap: { showMatchedWinesList = true }
+                                )
+                                
+                                // Save & Exit button
+                                Button(action: {
+                                    HapticManager.shared.mediumImpact()
+                                    showNameSessionDialog = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "square.and.arrow.down.fill")
+                                            .font(.system(size: 14, weight: .semibold))
+                                        Text("Save")
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.white.opacity(0.2))
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+
                         FilterBar(
                             filters: $viewModel.filters,
                             isExpanded: $showFilters
                         )
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, geometry.safeAreaInsets.bottom + 20)
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 16)
                 }
+                .animation(.easeInOut(duration: 0.3), value: matchedWineCount)
+                .animation(.easeInOut(duration: 0.2), value: viewModel.isProcessing)
 
                 // Permission denied overlay
                 if viewModel.cameraService.error == .notAuthorized {
@@ -160,20 +178,38 @@ struct ScannerView: View {
         }
         .sheet(isPresented: $showMatchedWinesList) {
             MatchedWinesListView(
-                matchedWines: matchedWines.sorted { wine1, wine2 in
-                    // Sort by score (highest first), then by confidence
-                    let score1 = wine1.matchedWine?.score ?? 0
-                    let score2 = wine2.matchedWine?.score ?? 0
-                    if score1 != score2 {
-                        return score1 > score2
-                    }
-                    return wine1.matchConfidence > wine2.matchConfidence
-                },
+                matchedWines: viewModel.matchedPersistentWines,
                 onWineTapped: { wine in
-                    showMatchedWinesList = false
                     selectedWine = wine
+                    showMatchedWinesList = false
                 }
             )
+        }
+        .sheet(isPresented: $showSessionHistory) {
+            SessionHistoryView()
+        }
+        .alert("Name This Session", isPresented: $showNameSessionDialog) {
+            TextField("Restaurant name (optional)", text: $sessionLocation)
+            Button("Cancel", role: .cancel) {
+                sessionLocation = ""
+            }
+            Button("Save & Exit") {
+                viewModel.updateSessionLocation(sessionLocation.isEmpty ? nil : sessionLocation)
+                viewModel.saveSessionToHistory()
+                sessionLocation = ""
+                // Navigate back or dismiss scanner
+            }
+        } message: {
+            Text("Give this scan session a name (e.g., restaurant name) for easy reference later.")
+        }
+        .confirmationDialog("Clear Session", isPresented: $showClearConfirmation) {
+            Button("Clear All", role: .destructive) {
+                viewModel.clearSession()
+                previousMatchCount = 0
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will clear all wines found in this session. Continue?")
         }
         .task {
             await viewModel.startScanning()
@@ -181,6 +217,76 @@ struct ScannerView: View {
         .onDisappear {
             viewModel.stopScanning()
         }
+        .onChange(of: sessionMatchCount) { oldValue, newValue in
+            // First match celebration!
+            if newValue == 1 && oldValue == 0 {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    showFirstMatchToast = true
+                }
+                HapticManager.shared.success()
+                
+                // Hide toast after 2.5 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showFirstMatchToast = false
+                    }
+                }
+            }
+            
+            // Detect new match added
+            if newValue > previousMatchCount {
+                // Haptic feedback (already triggered in mergeResults, but ensure it happens)
+                HapticManager.shared.lightImpact()
+                
+                // Show pulse animation
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    newMatchPulse = true
+                    showNewMatchBadge = true
+                }
+                
+                // Reset pulse
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        newMatchPulse = false
+                    }
+                }
+                
+                // Hide badge after delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showNewMatchBadge = false
+                    }
+                }
+            }
+            previousMatchCount = newValue
+        }
+    }
+}
+
+// MARK: - OCR Recovery Indicator
+
+struct OCRRecoveryIndicator: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12))
+                .foregroundColor(.orange)
+            
+            Text("Using fast mode")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.7))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .padding(.top, 8)
     }
 }
 
@@ -191,76 +297,72 @@ struct ScannerTopBar: View {
     let scansRemaining: Int
     let isPremium: Bool
     let onHelpTapped: () -> Void
+    let onHistoryTapped: () -> Void
+    let onClearTapped: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Clean, elegant top bar with prominent branding
-            HStack(alignment: .center, spacing: 0) {
-                // Left: Torch button - minimal, elegant
+        HStack(alignment: .center) {
+            // Left side - menu button
+            Menu {
+                Button(action: onHistoryTapped) {
+                    Label("View History", systemImage: "clock.arrow.circlepath")
+                }
+                
+                Button(role: .destructive, action: onClearTapped) {
+                    Label("Clear Session", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        Circle()
+                            .fill(Color.black.opacity(0.6))
+                    )
+            }
+
+            Spacer()
+
+            // Center branding
+            WineLensBadge(style: .light)
+
+            Spacer()
+
+            // Right side
+            HStack(spacing: 8) {
+                // Torch button
                 Button(action: { torchEnabled.toggle() }) {
                     Image(systemName: torchEnabled ? "flashlight.on.fill" : "flashlight.off.fill")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.white)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(torchEnabled ? Theme.secondaryColor : .white)
                         .frame(width: 44, height: 44)
                         .background(
                             Circle()
-                                .fill(Color.black.opacity(0.5))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                                )
+                                .fill(Color.black.opacity(0.6))
                         )
-                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
                 }
-                .padding(.leading, 20)
-
-                Spacer()
-
-                // Center: MASSIVE PREMIUM BRANDING - The hero element
-                WineLensBadge(style: .light)
-                    .scaleEffect(1.25) // Even larger - this is the star
-                    .shadow(color: .black.opacity(0.7), radius: 20, x: 0, y: 10)
-                    .shadow(color: Theme.secondaryColor.opacity(0.4), radius: 16, x: 0, y: 8)
-
-                Spacer()
-
-                // Right: Help button only - clean and minimal
-                Button(action: onHelpTapped) {
-                    Image(systemName: "questionmark.circle")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.white)
+                
+                // Scan count (free users only)
+                if !isPremium {
+                    HStack(spacing: 4) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 12))
+                        Text("\(scansRemaining)")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.6))
+                    )
+                } else {
+                    // Empty spacer to balance layout for premium users
+                    Color.clear
                         .frame(width: 44, height: 44)
-                        .background(
-                            Circle()
-                                .fill(Color.black.opacity(0.5))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                                )
-                        )
-                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
                 }
-                .padding(.trailing, 20)
-            }
-            .padding(.top, 16)
-            .padding(.bottom, 20)
-            
-            // Scan count - subtle, below the main bar (only if not premium)
-            if !isPremium {
-                HStack {
-                    Spacer()
-                    Text("\(scansRemaining) scans remaining")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.black.opacity(0.4))
-                        )
-                    Spacer()
-                }
-                .padding(.top, -8)
             }
         }
     }
@@ -270,32 +372,34 @@ struct ScannerTopBar: View {
 
 struct ScannerHintView: View {
     @State private var isAnimating = false
+    @State private var scanLineOffset: CGFloat = -60
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
-        VStack(spacing: 20) {
-            // Animated scan frame - elevated design
+        VStack(spacing: 24) {
+            // Animated wine glass icon
             ZStack {
-                // Outer glow
-                ScanFrameCorners()
-                    .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 3)
-                    .frame(width: 240, height: 170)
-                    .blur(radius: 8)
+                // Pulse animation background
+                Circle()
+                    .fill(Theme.secondaryColor.opacity(0.1))
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(pulseScale)
                 
-                // Main corner brackets
+                Image(systemName: "wineglass.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+
+            // Animated scan frame with pulse effect
+            ZStack {
+                // Pulse animation
+                ScanPulseAnimation()
+                    .opacity(0.5)
+
+                // Corner brackets frame
                 ScanFrameCorners()
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Theme.secondaryColor,
-                                Theme.secondaryColor.opacity(0.8)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 2.5
-                    )
-                    .frame(width: 220, height: 150)
-                    .shadow(color: Theme.secondaryColor.opacity(0.5), radius: 12, x: 0, y: 0)
+                    .stroke(Theme.secondaryColor, lineWidth: 2)
+                    .frame(width: 200, height: 140)
 
                 // Scanning line animation
                 Rectangle()
@@ -303,64 +407,63 @@ struct ScannerHintView: View {
                         LinearGradient(
                             colors: [
                                 Theme.secondaryColor.opacity(0),
-                                Theme.secondaryColor.opacity(0.8),
+                                Theme.secondaryColor.opacity(0.6),
                                 Theme.secondaryColor.opacity(0)
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .frame(width: 200, height: 3)
-                    .offset(y: isAnimating ? 70 : -70)
-                    .animation(
-                        Animation.easeInOut(duration: 2).repeatForever(autoreverses: true),
-                        value: isAnimating
-                    )
-                    .shadow(color: Theme.secondaryColor.opacity(0.6), radius: 4, x: 0, y: 0)
+                    .frame(width: 180, height: 2)
+                    .offset(y: scanLineOffset)
             }
+            .frame(width: 200, height: 200)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 Text("Point at a wine list")
-                    .font(.system(size: 19, weight: .semibold, design: .rounded))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
 
                 Text("Hold steady to scan wine names")
                     .font(.system(size: 15, weight: .regular))
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(.white.opacity(0.7))
+                
+                // Example hint
+                HStack(spacing: 8) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: 12))
+                    Text("Ensure good lighting and move closer to text")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundColor(.white.opacity(0.6))
+                .padding(.top, 4)
             }
+            .multilineTextAlignment(.center)
         }
-        .padding(28)
+        .padding(.horizontal, 32)
+        .padding(.vertical, 32)
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.75),
-                            Color.black.opacity(0.65)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            RoundedRectangle(cornerRadius: 24)
+                .fill(Color.black.opacity(0.75))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.2),
-                                    Color.white.opacity(0.05)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(Theme.secondaryColor.opacity(0.2), lineWidth: 1)
                 )
         )
-        .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 10)
-        .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
-        .onAppear { isAnimating = true }
+        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
+        .onAppear {
+            HapticManager.shared.scanStarted()
+
+            // Animate scan line
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                scanLineOffset = 60
+            }
+            
+            // Pulse animation
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                pulseScale = 1.2
+            }
+        }
     }
 }
 
@@ -566,8 +669,8 @@ struct FilterBar: View {
     @Binding var isExpanded: Bool
 
     var body: some View {
-        VStack(spacing: 14) {
-            // Quick filters - elevated design
+        VStack(spacing: 12) {
+            // Quick filters
             HStack(spacing: 10) {
                 ForEach(WineFilter.quickFilters) { filter in
                     FilterButton(
@@ -579,40 +682,14 @@ struct FilterBar: View {
 
                 Spacer()
 
-                // Expand button - elevated design
+                // Expand button
                 Button(action: { withAnimation { isExpanded.toggle() } }) {
                     Image(systemName: isExpanded ? "chevron.down" : "slider.horizontal.3")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.body)
                         .foregroundColor(.white)
-                        .frame(width: 44, height: 44)
-                        .background(
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.black.opacity(0.7),
-                                            Color.black.opacity(0.5)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .overlay(
-                                    Circle()
-                                        .stroke(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color.white.opacity(0.3),
-                                                    Color.white.opacity(0.1)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 1.5
-                                        )
-                                )
-                        )
-                        .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 3)
+                        .padding(10)
+                        .background(Color.black.opacity(0.6))
+                        .clipShape(Circle())
                 }
             }
 
@@ -622,7 +699,7 @@ struct FilterBar: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: isExpanded)
+        .animation(.easeInOut(duration: 0.2), value: isExpanded)
     }
 }
 
@@ -632,60 +709,22 @@ struct FilterButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
+        Button(action: {
+            HapticManager.shared.filterChanged()
+            action()
+        }) {
+            HStack(spacing: 4) {
                 Image(systemName: filter.iconName)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.caption)
                 Text(filter.displayName)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(size: 13, weight: .semibold))
             }
             .foregroundColor(isActive ? .black : .white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
             .background(
                 Capsule()
-                    .fill(
-                        isActive
-                            ? LinearGradient(
-                                colors: [Color.white, Color.white.opacity(0.95)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            : LinearGradient(
-                                colors: [
-                                    Color.black.opacity(0.7),
-                                    Color.black.opacity(0.5)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                    )
-                    .overlay(
-                        Group {
-                            if !isActive {
-                                Capsule()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color.white.opacity(0.3),
-                                                Color.white.opacity(0.1)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                            }
-                        }
-                    )
-            )
-            .shadow(
-                color: isActive
-                    ? Color.white.opacity(0.3)
-                    : Color.black.opacity(0.4),
-                radius: isActive ? 8 : 6,
-                x: 0,
-                y: isActive ? 4 : 3
+                    .fill(isActive ? Color.white : Color.black.opacity(0.6))
             )
         }
     }
@@ -765,63 +804,293 @@ struct FilterChip: View {
 
 struct ScanningIndicator: View {
     let winesFound: Int
-    let partialMatches: Int
-    let totalDetected: Int
-    let isProcessing: Bool
 
     var body: some View {
         HStack(spacing: 10) {
-            // Animated progress indicator (only show when processing)
-            if isProcessing {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.secondaryColor))
-                    .scaleEffect(0.9)
-            }
+            // Wine glass icon with count
+            Image(systemName: "wineglass.fill")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(Theme.secondaryColor)
 
-            // Simplified status text
-            if winesFound > 0 {
-                Text("Found \(winesFound) wine\(winesFound == 1 ? "" : "s")")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-            } else if isProcessing {
-                Text("Scanning...")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-            } else {
-                Text("Point at wine list")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-            }
+            Text("\(winesFound)")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+
+            Text(winesFound == 1 ? "wine found" : "wines found")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
         }
-        .foregroundColor(.white)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
         .background(
             Capsule()
+                .fill(Color.black.opacity(0.8))
+                .overlay(
+                    Capsule()
+                        .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+    }
+}
+
+// MARK: - Session Stats Chip
+
+struct SessionStatsChip: View {
+    let wineCount: Int
+    let outstandingCount: Int
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            HapticManager.shared.buttonTap()
+            onTap()
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(Theme.secondaryColor)
+                
+                Text("\(wineCount) wine\(wineCount == 1 ? "" : "s")")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                
+                if outstandingCount > 0 {
+                    Text("• \(outstandingCount) outstanding")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.7))
+                    .overlay(
+                        Capsule()
+                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
+                    )
+            )
+        }
+    }
+}
+
+// MARK: - View Results Button
+
+struct ViewResultsButton: View {
+    let count: Int
+    var pulse: Bool = false
+    var showNewBadge: Bool = false
+    let onTap: () -> Void
+    
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            HapticManager.shared.mediumImpact()
+            onTap()
+        }) {
+            HStack(spacing: 12) {
+                ZStack {
+                    if showNewBadge {
+                        Text("+1")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule()
+                                    .fill(Color.green)
+                            )
+                            .offset(x: -20, y: -20)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    
+                    Image(systemName: "list.bullet.rectangle")
+                        .font(.system(size: 18, weight: .semibold))
+                }
+                
+                Text("View Results")
+                    .font(.system(size: 16, weight: .semibold))
+                
+                Text("(\(count))")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Theme.secondaryColor.opacity(0.9),
+                                Theme.secondaryColor.opacity(0.7)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+            )
+            .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 12, x: 0, y: 6)
+            .scaleEffect(isPressed ? 0.95 : (pulse ? 1.05 : 1.0))
+            .animation(.easeInOut(duration: 0.2), value: isPressed)
+            .animation(.easeInOut(duration: 0.3), value: pulse)
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    isPressed = false
+                }
+        )
+    }
+}
+
+// MARK: - Processing Indicator
+
+struct ProcessingIndicator: View {
+    @State private var scanLineOffset: CGFloat = -100
+    @State private var pulseScale: CGFloat = 1.0
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Scanning line animation
+            Rectangle()
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.8),
-                            Color.black.opacity(0.7)
+                            Theme.secondaryColor.opacity(0),
+                            Theme.secondaryColor.opacity(0.8),
+                            Theme.secondaryColor.opacity(0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 200, height: 3)
+                .offset(y: scanLineOffset)
+                .blur(radius: 2)
+            
+            HStack(spacing: 8) {
+                // Pulsing dots animation
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(Theme.secondaryColor)
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(pulseScale)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.2),
+                            value: pulseScale
+                        )
+                }
+            }
+            .padding(.top, 4)
+            
+            Text("Analyzing...")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+        }
+        .frame(width: 200, height: 200)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
+                scanLineOffset = 100
+            }
+            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
+                pulseScale = 0.5
+            }
+        }
+    }
+}
+
+// MARK: - First Match Celebration Toast
+
+struct FirstMatchCelebrationToast: View {
+    @State private var confettiScale: CGFloat = 0.5
+    @State private var confettiOpacity: Double = 1.0
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                // Confetti burst effect
+                ForEach(0..<8) { index in
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 16))
+                        .foregroundColor(confettiColor(for: index))
+                        .offset(confettiOffset(for: index))
+                        .scaleEffect(confettiScale)
+                        .opacity(confettiOpacity)
+                }
+
+                // Main icon
+                Image(systemName: "party.popper.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(Theme.secondaryColor)
+            }
+
+            Text("Found one!")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+
+            Text("Tap to see details")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.85),
+                            Color.black.opacity(0.75)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .overlay(
-                    Capsule()
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Theme.secondaryColor.opacity(0.4),
-                                    Theme.secondaryColor.opacity(0.2)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Theme.secondaryColor.opacity(0.4), lineWidth: 1.5)
                 )
         )
-        .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 6)
-        .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 8, x: 0, y: 4)
+        .shadow(color: Theme.secondaryColor.opacity(0.3), radius: 20, x: 0, y: 10)
+        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        .onAppear {
+            // Confetti animation
+            withAnimation(.easeOut(duration: 0.5)) {
+                confettiScale = 1.2
+            }
+            withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
+                confettiOpacity = 0
+            }
+        }
+    }
+
+    private func confettiColor(for index: Int) -> Color {
+        let colors: [Color] = [.yellow, .orange, .pink, .purple, .blue, .green, .red, Theme.secondaryColor]
+        return colors[index % colors.count]
+    }
+
+    private func confettiOffset(for index: Int) -> CGSize {
+        let angle = Double(index) * .pi / 4
+        let distance: CGFloat = 35
+        return CGSize(
+            width: cos(angle) * distance,
+            height: sin(angle) * distance
+        )
     }
 }
 

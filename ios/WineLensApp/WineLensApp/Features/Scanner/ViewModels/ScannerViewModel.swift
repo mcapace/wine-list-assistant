@@ -6,20 +6,27 @@ import AVFoundation
 final class ScannerViewModel: ObservableObject {
     // MARK: - Published Properties
 
-    @Published var recognizedWines: [RecognizedWine] = []
+    @Published var recognizedWines: [RecognizedWine] = [] // Current frame wines for AR overlay
+    @Published var persistentMatches: [RecognizedWine] = [] // All matched wines from session (never clears automatically)
     @Published var filters = FilterSet()
     @Published var isProcessing = false
     @Published var error: ScannerError?
+    @Published var ocrRecoveryMode = false // Track if OCR is in recovery/fast mode
     @Published var torchEnabled = false {
         didSet {
             cameraService.torchEnabled = torchEnabled
         }
     }
+    
+    // MARK: - Session Management
+    
+    private var currentSession: ScanSession?
+    private let sessionManager = SessionManager.shared
 
     // MARK: - Services
 
     let cameraService = CameraService()
-    private let ocrService = OCRService.shared
+    let ocrService = OCRService() // Made accessible to check recovery mode
     private let matchingService: WineMatchingService
     private let subscriptionService = SubscriptionService.shared
 
@@ -29,11 +36,20 @@ final class ScannerViewModel: ObservableObject {
     private var frameProcessingTask: Task<Void, Never>?
     private var lastProcessedTime = Date.distantPast
     private let processingInterval: TimeInterval
+    private var pendingMatchTasks: Set<UUID> = []
 
     // MARK: - Computed Properties
 
     var filteredWines: [RecognizedWine] {
         filters.apply(to: recognizedWines)
+    }
+    
+    var sessionMatchCount: Int {
+        persistentMatches.count
+    }
+    
+    var matchedPersistentWines: [RecognizedWine] {
+        persistentMatches.filter { $0.isMatched }
     }
 
     // MARK: - Initialization
@@ -43,6 +59,15 @@ final class ScannerViewModel: ObservableObject {
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
 
         setupFrameProcessing()
+        
+        // Load incomplete session if exists
+        if let session = sessionManager.loadCurrentSession() {
+            currentSession = session
+            persistentMatches = session.wines
+        } else {
+            // Start new session
+            currentSession = ScanSession()
+        }
     }
 
     // MARK: - Public Methods
@@ -94,6 +119,32 @@ final class ScannerViewModel: ObservableObject {
             await startScanning()
         }
     }
+    
+    func clearSession() {
+        persistentMatches.removeAll()
+        recognizedWines.removeAll()
+        currentSession = ScanSession()
+        sessionManager.clearCurrentSession()
+    }
+    
+    func updateSessionLocation(_ location: String?) {
+        currentSession?.location = location
+        saveSession()
+    }
+    
+    func saveSessionToHistory() {
+        guard var session = currentSession else { return }
+        session.wines = persistentMatches
+        sessionManager.saveSession(session)
+        sessionManager.clearCurrentSession()
+        currentSession = ScanSession()
+    }
+    
+    private func saveSession() {
+        guard var session = currentSession else { return }
+        session.wines = persistentMatches
+        sessionManager.saveCurrentSession(session)
+    }
 
     func focusAt(_ point: CGPoint) {
         cameraService.focus(at: point)
@@ -112,7 +163,8 @@ final class ScannerViewModel: ObservableObject {
 
     private func processFrameIfNeeded(_ frame: CVPixelBuffer) {
         let now = Date()
-        guard now.timeIntervalSince(lastProcessedTime) >= processingInterval else {
+        // Debounce: Don't process frames faster than every 0.5 seconds
+        guard now.timeIntervalSince(lastProcessedTime) >= max(processingInterval, 0.5) else {
             return
         }
         lastProcessedTime = now
@@ -140,92 +192,110 @@ final class ScannerViewModel: ObservableObject {
             let candidates = ocrService.groupIntoWineEntries(ocrResults)
             guard !Task.isCancelled else { return }
 
-            // Step 3: Match candidates against our wine database (use batch matching for better performance)
-            var matchedWines: [RecognizedWine] = []
-            
-            // Use batch matching for better performance
-            let candidateTexts = candidates.map { $0.fullText }
-            let batchResults = await matchingService.batchMatch(texts: candidateTexts)
-            
-            for candidate in candidates {
-                guard !Task.isCancelled else { return }
-                
-                let matchResult = batchResults[candidate.fullText] ?? nil
+            // Step 3: Match each candidate against our wine database
+            // Use detached tasks to prevent API request cancellation when new frames arrive
+            let taskId = UUID()
+            pendingMatchTasks.insert(taskId)
 
-                let recognized = RecognizedWine(
-                    id: UUID(),
-                    originalText: candidate.fullText,
-                    boundingBox: candidate.boundingBox,
-                    ocrConfidence: candidate.confidence,
-                    matchedWine: matchResult?.wine,
-                    matchConfidence: matchResult?.confidence ?? 0,
-                    matchedVintage: matchResult?.matchedVintage,
-                    matchType: matchResult?.matchType ?? .noMatch,
-                    listPrice: extractPrice(from: candidate.fullText)
-                )
+            // Capture what we need for the detached task
+            let matchingService = self.matchingService
 
-                matchedWines.append(recognized)
-            }
+            Task.detached { [weak self] in
+                var matchedWines: [RecognizedWine] = []
 
-            // Update UI on main thread
-            await MainActor.run {
-                // Merge with existing results to avoid flickering
-                self.mergeResults(matchedWines)
+                for candidate in candidates {
+                    // Note: We don't check Task.isCancelled here because this is a
+                    // detached task that should complete its API calls
+                    let matchResult = await matchingService.matchWine(from: candidate.fullText)
+
+                    let recognized = RecognizedWine(
+                        id: UUID(),
+                        originalText: candidate.fullText,
+                        boundingBox: candidate.boundingBox,
+                        ocrConfidence: candidate.confidence,
+                        matchedWine: matchResult?.wine,
+                        matchConfidence: matchResult?.confidence ?? 0,
+                        matchedVintage: matchResult?.matchedVintage,
+                        matchType: matchResult?.matchType ?? .noMatch,
+                        listPrice: self?.extractPrice(from: candidate.fullText)
+                    )
+
+                    matchedWines.append(recognized)
+                }
+
+                // Update UI on main thread
+                await MainActor.run {
+                    self?.pendingMatchTasks.remove(taskId)
+                    // Merge with existing results to avoid flickering
+                    self?.mergeResults(matchedWines)
+                }
             }
 
         } catch {
-            // Don't log cancellation errors - they're expected when new frames arrive
-            if (error as NSError).code != NSURLErrorCancelled {
+            // Don't log cancellation errors - they're expected during rapid frame processing
+            if !(error is CancellationError) {
                 print("Frame processing error: \(error)")
             }
         }
     }
 
     private func mergeResults(_ newResults: [RecognizedWine]) {
-        // Improved merging strategy: replace if positions overlap significantly
-        // Track wines and remove stale ones to prevent accumulation
-
+        // Update recognizedWines for current frame (AR overlay bubbles)
+        // This uses bounding box overlap to track wines in current view
         var merged = recognizedWines
-        var seenInThisFrame: Set<UUID> = []
 
         for newWine in newResults {
-            // Check if this overlaps with an existing wine
+            // Check if this overlaps with an existing wine in current frame
             let existingIndex = merged.firstIndex { existing in
-                boxesOverlap(existing.boundingBox, newWine.boundingBox, threshold: 0.6)
+                boxesOverlap(existing.boundingBox, newWine.boundingBox, threshold: 0.5)
             }
 
             if let index = existingIndex {
-                // Update existing if new has higher confidence or is a better match
-                if newWine.matchConfidence > merged[index].matchConfidence || 
-                   (newWine.isMatched && !merged[index].isMatched) {
+                // Update existing if new has higher confidence
+                if newWine.matchConfidence > merged[index].matchConfidence {
                     merged[index] = newWine
                 }
-                seenInThisFrame.insert(merged[index].id)
             } else {
-                // Add new wine
+                // Add new wine to current frame
                 merged.append(newWine)
-                seenInThisFrame.insert(newWine.id)
             }
         }
 
-        // Remove wines not seen in this frame (they're no longer visible)
-        // This prevents accumulation of stale bubbles
-        merged = merged.filter { seenInThisFrame.contains($0.id) }
-        
-        // Limit total wines to prevent overwhelming the UI
-        // Keep the best matches (highest confidence, matched wines first)
-        if merged.count > 20 {
-            merged = merged.sorted { wine1, wine2 in
-                // Prioritize matched wines
-                if wine1.isMatched != wine2.isMatched {
-                    return wine1.isMatched
-                }
-                // Then by confidence
-                return wine1.matchConfidence > wine2.matchConfidence
-            }.prefix(20).map { $0 }
-        }
-
+        // Update current frame wines (may clear when camera moves)
         recognizedWines = merged
+        
+        // Add newly matched wines to persistentMatches (deduplicated by wine ID)
+        for newWine in newResults {
+            // Only add if matched and not already in persistentMatches
+            guard newWine.isMatched,
+                  let wineId = newWine.matchedWine?.id else {
+                continue
+            }
+            
+            // Check if this wine ID already exists in persistentMatches
+            let alreadyExists = persistentMatches.contains { existing in
+                existing.matchedWine?.id == wineId
+            }
+            
+            if !alreadyExists {
+                // New match! Add to persistent list
+                persistentMatches.append(newWine)
+                
+                // Trigger haptic feedback for new match
+                HapticManager.shared.lightImpact()
+                
+                // Auto-save session
+                saveSession()
+            } else {
+                // Update existing match if confidence is higher
+                if let existingIndex = persistentMatches.firstIndex(where: { $0.matchedWine?.id == wineId }) {
+                    if newWine.matchConfidence > persistentMatches[existingIndex].matchConfidence {
+                        persistentMatches[existingIndex] = newWine
+                        saveSession()
+                    }
+                }
+            }
+        }
     }
 
     private func boxesOverlap(_ box1: CGRect, _ box2: CGRect, threshold: Double) -> Bool {
@@ -287,4 +357,3 @@ final class ScannerViewModel: ObservableObject {
         }
     }
 }
-
