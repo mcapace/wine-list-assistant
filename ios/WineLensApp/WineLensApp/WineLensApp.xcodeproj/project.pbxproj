@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */; };
+		CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */; };
+		CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */; };
 		CEB4BACC2EE37BB800014979 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = CEB4BACB2EE37BB800014979 /* Lottie */; };
 		CEB4BB072EE37EBA00014979 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BACD2EE37EBA00014979 /* AppConfiguration.swift */; };
 		CEB4BB082EE37EBA00014979 /* ScanResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BAD52EE37EBA00014979 /* ScanResult.swift */; };
@@ -43,7 +46,6 @@
 		CEB4BB282EE37EBA00014979 /* Scan_Pulse.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB022EE37EBA00014979 /* Scan_Pulse.json */; };
 		CEB4BB292EE37EBA00014979 /* WineLensBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */; };
 		CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */; };
-		CEB4BD3607E2EE37EBA00014979 /* AppleVisionOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B157B352EE37EBA00014979 /* AppleVisionOCRService.swift */; };
 		CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */; };
 		CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */; };
 		CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */; };
@@ -51,10 +53,8 @@
 		CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */; };
 		CEB4BC00E192EE37EBA00014980 /* ScannerErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */; };
 		CEB4BC02E192EE37EBA00014981 /* ScannerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BC03E192EE37EBA00014981 /* ScannerError.swift */; };
-		CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */; };
-		CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */; };
-		CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */; };
-		CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */; };
+		CEB4BD3607E2EE37EBA00014979 /* AppleVisionOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B157B352EE37EBA00014979 /* AppleVisionOCRService.swift */; };
+		CEB4BEE415E2EE37EBA00014979 /* Utilities in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B6C4F312EE37EBA00014979 /* Utilities */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +75,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		CEB4B157B352EE37EBA00014979 /* AppleVisionOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleVisionOCRService.swift; sourceTree = "<group>"; };
+		CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieView.swift; sourceTree = "<group>"; };
+		CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
 		CEB4BAA02EE37B9F00014979 /* WineLensApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineLensApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB4BAAD2EE37BA100014979 /* WineLensAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,18 +117,13 @@
 		CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Glass_Fill.json; sourceTree = "<group>"; };
 		CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WineLensBadge.swift; sourceTree = "<group>"; };
 		CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCloudOCRService.swift; sourceTree = "<group>"; };
-		CEB4B157B352EE37EBA00014979 /* AppleVisionOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleVisionOCRService.swift; sourceTree = "<group>"; };
 		CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRProviderProtocol.swift; sourceTree = "<group>"; };
 		CEB4BB302EE37EBA00014979 /* OCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRServiceManager.swift; sourceTree = "<group>"; };
 		CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNormalizer.swift; sourceTree = "<group>"; };
 		CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchedWinesListView.swift; sourceTree = "<group>"; };
-		CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
 		CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerErrorView.swift; sourceTree = "<group>"; };
 		CEB4BC03E192EE37EBA00014981 /* ScannerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerError.swift; sourceTree = "<group>"; };
-		CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
-		CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
-		CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
-		CEB4B23FE3F2EE37EBA00014979 /* LottieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieView.swift; sourceTree = "<group>"; };
+		CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -171,6 +170,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CEB4B6C4F312EE37EBA00014979 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		CEB4BA972EE37B9F00014979 = {
 			isa = PBXGroup;
 			children = (
@@ -258,14 +264,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		CEB4B6C4F312EE37EBA00014979 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */,
-			);
-			path = Utilities;
-			sourceTree = "<group>";
-		};
 		CEB4BAE32EE37EBA00014979 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -348,14 +346,6 @@
 				CEB4BAF22EE37EBA00014979 /* ScannerViewModel.swift */,
 			);
 			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		CEB4BC04E192EE37EBA00014982 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				CEB4BC03E192EE37EBA00014981 /* ScannerError.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		CEB4BAF72EE37EBA00014979 /* Views */ = {
@@ -444,6 +434,14 @@
 				CEB4BB052EE37EBA00014979 /* Animations */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		CEB4BC04E192EE37EBA00014982 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CEB4BC03E192EE37EBA00014981 /* ScannerError.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -639,7 +637,7 @@
 				CEB4BC02E192EE37EBA00014981 /* ScannerError.swift in Sources */,
 				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
 				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
-				CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */,
+				CEB4BEE415E2EE37EBA00014979 /* Utilities in Sources */,
 				CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
