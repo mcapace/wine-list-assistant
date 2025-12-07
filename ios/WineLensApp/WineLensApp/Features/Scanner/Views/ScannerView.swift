@@ -437,6 +437,55 @@ struct ScannerTopBar: View {
     }
 }
 
+// MARK: - Scanning Frame Overlay (Vivino-style)
+
+struct ScanningFrameOverlay: View {
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Subtle dashed scanning frame in center
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                    .foregroundColor(.white.opacity(0.5))
+                    .frame(width: geometry.size.width * 0.85, height: 220)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+// MARK: - Instructions Card (Vivino-style clean card)
+
+struct InstructionsCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "list.bullet.rectangle")
+                    .font(.system(size: 20))
+                    .foregroundColor(Theme.primaryColor)
+                    .frame(width: 32, height: 32)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Pick the right wine")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
+                    
+                    Text("Take a photo of wine list, aim for straight lines and clear text")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
+    }
+}
+
 // MARK: - Scanner Hint View
 
 struct ScannerHintView: View {
