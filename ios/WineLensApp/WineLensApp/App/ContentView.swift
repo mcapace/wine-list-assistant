@@ -53,9 +53,10 @@ struct MainTabView: View {
         }
         .tint(Theme.primaryColor)
         .onAppear {
-            // Delay ScannerView creation to ensure smooth transition
+            // Delay ScannerView creation slightly to ensure smooth transition
+            // But make it quick enough that user sees it
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds (reduced from 0.5s)
                 hasAppeared = true
             }
         }
