@@ -378,7 +378,8 @@ struct MatchedWineCard: View {
                 // Tasting note preview (2 lines max)
                 if !isExpanded && !tastingNotePreview.isEmpty {
                     Text(tastingNotePreview)
-                        .font(.system(size: 14, style: .italic))
+                        .font(.system(size: 14))
+                        .italic()
                         .foregroundColor(.white.opacity(0.75))
                         .lineLimit(2)
                         .padding(.top, 4)
@@ -413,6 +414,22 @@ struct MatchedWineCard: View {
                     }
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var confidenceIndicator: some View {
+        VStack(spacing: 8) {
+            if recognizedWine.hasLowConfidence {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(.orange)
+            }
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white.opacity(0.4))
+                .rotationEffect(.degrees(isExpanded ? 90 : 0))
         }
     }
     
