@@ -1096,8 +1096,8 @@ struct FirstMatchCelebrationToast: View {
         let angle = Double(index) * .pi / 4
         let distance: CGFloat = 35
         return CGSize(
-            width: cos(angle) * distance,
-            height: sin(angle) * distance
+            width: CGFloat(Foundation.cos(angle)) * distance,
+            height: CGFloat(Foundation.sin(angle)) * distance
         )
     }
 }
