@@ -2,7 +2,7 @@ import Vision
 import CoreImage
 import UIKit
 
-/// Apple Vision framework OCR implementation
+/// Apple Vision framework OCR implementation (fallback when Google Cloud unavailable)
 final class AppleVisionOCRService: OCRProvider {
     let name = "Apple Vision"
     let requiresInternet = false
@@ -18,7 +18,7 @@ final class AppleVisionOCRService: OCRProvider {
     func recognizeText(in pixelBuffer: CVPixelBuffer) async throws -> [OCRService.OCRResult] {
         do {
             return try await withCheckedThrowingContinuation { continuation in
-                let request = createTextRecognitionRequest { result in
+                let request = self.createTextRecognitionRequest { result in
                     continuation.resume(with: result)
                 }
                 do {
@@ -29,7 +29,7 @@ final class AppleVisionOCRService: OCRProvider {
             }
         } catch {
             let nsError = error as NSError
-            if nsError.domain == "com.apple.Vision" || nsError.domain.contains("VN") {
+            if nsError.domain == "com.apple.Vision" || nsError.domain.contains("VN") || nsError.localizedDescription.contains("ANE") {
                 useFastRecognition = true
                 return []
             }
@@ -39,10 +39,10 @@ final class AppleVisionOCRService: OCRProvider {
     
     func recognizeText(in image: UIImage) async throws -> [OCRService.OCRResult] {
         guard let cgImage = image.cgImage else {
-            throw NSError(domain: "OCR", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image"])
+            throw NSError(domain: "AppleVisionOCR", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image"])
         }
         return try await withCheckedThrowingContinuation { continuation in
-            let request = createTextRecognitionRequest { result in
+            let request = self.createTextRecognitionRequest { result in
                 continuation.resume(with: result)
             }
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])

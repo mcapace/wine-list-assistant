@@ -54,7 +54,7 @@ final class OCRService {
         return currentProvider
     }
     
-    /// Check if OCR is in recovery mode (using fast recognition due to ANE errors)
+    /// Whether OCR is in recovery/fast mode (only applies to Apple Vision)
     var isInRecoveryMode: Bool {
         (currentProvider as? AppleVisionOCRService)?.isInRecoveryMode ?? false
     }
