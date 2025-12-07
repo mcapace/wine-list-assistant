@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Beautiful scrollable list view showing all matched wines from the scan
 struct MatchedWinesListView: View {
@@ -169,7 +170,8 @@ struct SortOptionsView: View {
         HStack(spacing: 12) {
             ForEach(MatchedWinesListView.SortOption.allCases, id: \.self) { option in
                 Button(action: {
-                    HapticManager.shared.selectionChanged()
+                    let generator = UISelectionFeedbackGenerator()
+                    generator.selectionChanged()
                     withAnimation(.easeInOut(duration: 0.25)) {
                         selectedOption = option
                     }
@@ -522,7 +524,8 @@ struct MatchedWineCard: View {
             }
         }
         .onTapGesture {
-            HapticManager.shared.buttonTap()
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isPressed = true
             }
@@ -534,7 +537,8 @@ struct MatchedWineCard: View {
             }
         }
         .onLongPressGesture {
-            HapticManager.shared.mediumImpact()
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
             onLongPress()
         }
     }

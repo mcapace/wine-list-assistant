@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ScannerView: View {
     @StateObject private var viewModel = ScannerViewModel()
@@ -118,7 +119,8 @@ struct ScannerView: View {
                                 
                                 // Save & Exit button
                                 Button(action: {
-                                    HapticManager.shared.mediumImpact()
+                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                    generator.impactOccurred()
                                     showNameSessionDialog = true
                                 }) {
                                     HStack(spacing: 6) {
@@ -223,7 +225,8 @@ struct ScannerView: View {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     showFirstMatchToast = true
                 }
-                HapticManager.shared.success()
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.success)
                 
                 // Hide toast after 2.5 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
@@ -236,7 +239,8 @@ struct ScannerView: View {
             // Detect new match added
             if newValue > previousMatchCount {
                 // Haptic feedback (already triggered in mergeResults, but ensure it happens)
-                HapticManager.shared.lightImpact()
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
                 
                 // Show pulse animation
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -452,7 +456,8 @@ struct ScannerHintView: View {
         )
         .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
         .onAppear {
-            HapticManager.shared.scanStarted()
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
 
             // Animate scan line
             withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
@@ -710,7 +715,8 @@ struct FilterButton: View {
 
     var body: some View {
         Button(action: {
-            HapticManager.shared.filterChanged()
+            let generator = UISelectionFeedbackGenerator()
+            generator.selectionChanged()
             action()
         }) {
             HStack(spacing: 4) {
@@ -843,7 +849,8 @@ struct SessionStatsChip: View {
     
     var body: some View {
         Button(action: {
-            HapticManager.shared.buttonTap()
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
             onTap()
         }) {
             HStack(spacing: 8) {
@@ -887,7 +894,8 @@ struct ViewResultsButton: View {
     
     var body: some View {
         Button(action: {
-            HapticManager.shared.mediumImpact()
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
             onTap()
         }) {
             HStack(spacing: 12) {
