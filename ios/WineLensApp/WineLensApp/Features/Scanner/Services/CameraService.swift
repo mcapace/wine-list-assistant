@@ -104,52 +104,49 @@ final class CameraService: NSObject, ObservableObject {
 
     // MARK: - Configuration
 
-    func configure() throws {
+    func configure() async throws {
         // Skip if already configured to avoid FigCaptureSource errors
         guard !isConfigured else { return }
 
-        sessionQueue.sync {
-            do {
-                // Ensure session is fully stopped before configuration
-                // This prevents FigCaptureSource errors (err=-12710, err=-17281)
-                if captureSession.isRunning {
-                    captureSession.stopRunning()
-                    // Wait for session to fully stop before reconfiguring
-                    // This prevents race conditions that cause FigCaptureSource errors
-                    var attempts = 0
-                    while captureSession.isRunning && attempts < 10 {
-                        Thread.sleep(forTimeInterval: 0.05)
-                        attempts += 1
-                    }
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            sessionQueue.async { [weak self] in
+                guard let self = self else {
+                    continuation.resume()
+                    return
                 }
-                
-                // Clear any existing configuration
-                captureSession.beginConfiguration()
-                captureSession.inputs.forEach { captureSession.removeInput($0) }
-                captureSession.outputs.forEach { captureSession.removeOutput($0) }
-                captureSession.commitConfiguration()
-                
-                // Small delay to ensure cleanup is complete
-                Thread.sleep(forTimeInterval: 0.1)
-                
-                try configureSession()
-                isConfigured = true
-            } catch {
-                isConfigured = false
-                Task { @MainActor in
-                    self.error = error as? CameraError ?? .configurationFailed
+
+                do {
+                    // Ensure session is fully stopped before configuration
+                    if self.captureSession.isRunning {
+                        self.captureSession.stopRunning()
+                    }
+
+                    // Clear any existing configuration
+                    self.captureSession.beginConfiguration()
+                    self.captureSession.inputs.forEach { self.captureSession.removeInput($0) }
+                    self.captureSession.outputs.forEach { self.captureSession.removeOutput($0) }
+                    self.captureSession.commitConfiguration()
+
+                    try self.configureSessionSync()
+
+                    Task { @MainActor in
+                        self.isConfigured = true
+                    }
+                    continuation.resume()
+                } catch {
+                    Task { @MainActor in
+                        self.isConfigured = false
+                        self.error = error as? CameraError ?? .configurationFailed
+                    }
+                    continuation.resume(throwing: error)
                 }
             }
         }
     }
 
-    private func configureSession() throws {
+    private func configureSessionSync() throws {
         captureSession.beginConfiguration()
-        defer { 
-            captureSession.commitConfiguration()
-            // Small delay after commit to ensure configuration is fully applied
-            Thread.sleep(forTimeInterval: 0.05)
-        }
+        defer { captureSession.commitConfiguration() }
 
         // Set session preset for high quality
         if captureSession.canSetSessionPreset(.high) {
@@ -164,9 +161,9 @@ final class CameraService: NSObject, ObservableObject {
         currentDevice = device
 
         // Configure device for low light (must be done before adding input)
-        try configureDevice(device)
+        try configureDeviceSync(device)
 
-        // Add input - ensure device is unlocked before creating input
+        // Add input
         let input = try AVCaptureDeviceInput(device: device)
         guard captureSession.canAddInput(input) else {
             throw CameraError.configurationFailed
@@ -174,7 +171,7 @@ final class CameraService: NSObject, ObservableObject {
         captureSession.addInput(input)
 
         // Configure output
-        videoOutput.setSampleBufferDelegate(nil, queue: nil) // Clear delegate first
+        videoOutput.setSampleBufferDelegate(nil, queue: nil)
         videoOutput.setSampleBufferDelegate(self, queue: videoOutputQueue)
         videoOutput.alwaysDiscardsLateVideoFrames = true
         videoOutput.videoSettings = [
@@ -204,15 +201,9 @@ final class CameraService: NSObject, ObservableObject {
         return AVCaptureDevice.default(for: .video)
     }
 
-    private func configureDevice(_ device: AVCaptureDevice) throws {
-        // Try to lock device for configuration
-        // lockForConfiguration() will throw if device is already locked
+    private func configureDeviceSync(_ device: AVCaptureDevice) throws {
         try device.lockForConfiguration()
-        defer { 
-            device.unlockForConfiguration()
-            // Small delay after unlock to ensure changes are committed
-            Thread.sleep(forTimeInterval: 0.05)
-        }
+        defer { device.unlockForConfiguration() }
 
         // Enable auto-focus for text
         if device.isFocusModeSupported(.continuousAutoFocus) {
@@ -228,42 +219,16 @@ final class CameraService: NSObject, ObservableObject {
         if device.isLowLightBoostSupported {
             device.automaticallyEnablesLowLightBoostWhenAvailable = true
         }
-
-        // Set frame rate - use a more conservative rate to reduce FigCaptureSource errors
-        let desiredFrameRate = CMTimeMake(value: 1, timescale: Int32(Constants.Camera.defaultFrameRate))
-        if device.activeFormat.isVideoStabilizationModeSupported(.auto) {
-            // Only set frame rate if format supports it
-            do {
-                device.activeVideoMinFrameDuration = desiredFrameRate
-                device.activeVideoMaxFrameDuration = desiredFrameRate
-            } catch {
-                // Frame rate setting failed - continue without it
-                // This is non-fatal and helps avoid FigCaptureSource errors
-            }
-        }
     }
 
     // MARK: - Session Control
 
     func start() {
-        guard !isRunning else { return }
-        
-        // Ensure we're configured before starting
-        guard isConfigured else {
-            do {
-                try configure()
-            } catch {
-                Task { @MainActor in
-                    self.error = error as? CameraError ?? .configurationFailed
-                }
-                return
-            }
-            return // Return after successful configuration
-        }
+        guard !isRunning, isConfigured else { return }
 
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
-            
+
             // Only start if not already running
             guard !self.captureSession.isRunning else {
                 Task { @MainActor in
@@ -271,12 +236,9 @@ final class CameraService: NSObject, ObservableObject {
                 }
                 return
             }
-            
+
             self.captureSession.startRunning()
-            
-            // Wait a moment and verify it actually started
-            Thread.sleep(forTimeInterval: 0.1)
-            
+
             Task { @MainActor in
                 self.isRunning = self.captureSession.isRunning
             }
@@ -288,31 +250,17 @@ final class CameraService: NSObject, ObservableObject {
 
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
-            
-            // Clear frame first to stop processing before stopping session
-            Task { @MainActor in
-                self.currentFrame = nil
-            }
-            
-            // Remove delegate to prevent new frames during shutdown
+
+            // Remove delegate to prevent new frames
             self.videoOutput.setSampleBufferDelegate(nil, queue: nil)
-            
-            // Small delay to allow frame processing to complete
-            Thread.sleep(forTimeInterval: 0.1)
-            
+
             // Stop session
             if self.captureSession.isRunning {
                 self.captureSession.stopRunning()
-                
-                // Wait for session to fully stop
-                var attempts = 0
-                while self.captureSession.isRunning && attempts < 20 {
-                    Thread.sleep(forTimeInterval: 0.05)
-                    attempts += 1
-                }
             }
-            
+
             Task { @MainActor in
+                self.currentFrame = nil
                 self.isRunning = false
             }
         }

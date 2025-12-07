@@ -88,7 +88,7 @@ final class ScannerViewModel: ObservableObject {
 
         // Configure and start camera
         do {
-            try cameraService.configure()
+            try await cameraService.configure()
             cameraService.start()
 
             // Record the scan for free users
