@@ -18,18 +18,19 @@ SWIFT_FILES=$(find "$SWIFT_FILES_DIR" -name "*.swift" -type f | sort)
 MISSING_FILES=()
 ALL_PRESENT=true
 
-for swift_file in $SWIFT_FILES; do
+# Use while loop with process substitution to handle spaces in paths
+while IFS= read -r swift_file; do
     filename=$(basename "$swift_file")
     
-    # Check if file is referenced in project.pbxproj
-    if grep -q "$filename" "$XCODE_PROJECT"; then
+    # Check if file is referenced in project.pbxproj (exact filename match)
+    if grep -q "/$filename" "$XCODE_PROJECT" || grep -q "\"$filename\"" "$XCODE_PROJECT" || grep -q "$filename" "$XCODE_PROJECT"; then
         echo "✅ $filename"
     else
         echo "❌ MISSING: $filename"
         MISSING_FILES+=("$swift_file")
         ALL_PRESENT=false
     fi
-done
+done < <(printf '%s\n' $SWIFT_FILES)
 
 echo ""
 
