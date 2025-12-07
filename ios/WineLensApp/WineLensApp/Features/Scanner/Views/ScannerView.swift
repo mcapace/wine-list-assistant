@@ -17,6 +17,7 @@ struct ScannerView: View {
     @State private var showNameSessionDialog = false
     @State private var sessionLocation = ""
     @State private var showSessionHistory = false
+    @State private var hasStartedCamera = false
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
     // Count only wines that have been matched from the database (current frame)
@@ -275,20 +276,27 @@ struct ScannerView: View {
         } message: {
             Text("This will clear all wines found in this session. Continue?")
         }
-            .task {
-                // Wait a moment to ensure view is fully rendered
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            .onAppear {
+                // Start camera when view appears (more reliable than .task with lazy loading)
+                guard !hasStartedCamera else { return }
+                hasStartedCamera = true
                 
-                // Check if camera is already running to avoid duplicate starts
-                guard !viewModel.cameraService.isRunning else { return }
-                
-                // Always request authorization and start camera
-                // This will show permission dialog if needed
-                await viewModel.startScanning()
+                Task { @MainActor in
+                    // Small delay to ensure view is fully rendered
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                    
+                    // Check if camera is already running to avoid duplicate starts
+                    guard !viewModel.cameraService.isRunning else { return }
+                    
+                    // Always request authorization and start camera
+                    // This will show permission dialog if needed
+                    await viewModel.startScanning()
+                }
             }
-        .onDisappear {
-            viewModel.stopScanning()
-        }
+            .onDisappear {
+                viewModel.stopScanning()
+                hasStartedCamera = false // Reset so it can start again if view reappears
+            }
         .onChange(of: sessionMatchCount) { oldValue, newValue in
             // First match celebration!
             if newValue == 1 && oldValue == 0 {
