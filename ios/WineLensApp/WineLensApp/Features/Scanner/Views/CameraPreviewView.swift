@@ -17,8 +17,8 @@ struct CameraPreviewView: UIViewRepresentable {
         if uiView.previewLayer.session !== cameraService.captureSession {
             uiView.previewLayer.session = cameraService.captureSession
         }
-        
-        // Update preview layer when session starts/stops
+
+        // Force layout update when running state changes
         if cameraService.isRunning {
             uiView.setNeedsLayout()
             uiView.layoutIfNeeded()
