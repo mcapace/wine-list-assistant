@@ -54,36 +54,67 @@ struct ScannerView: View {
 
                 // Main UI overlay
                 VStack(spacing: 0) {
-                    // Top Controls with branding
-                    ScannerTopBar(
-                        torchEnabled: $viewModel.torchEnabled,
-                        scansRemaining: subscriptionService.remainingFreeScans(),
-                        isPremium: subscriptionService.subscriptionStatus.isActive,
-                        onHelpTapped: { showInstructions = true },
-                        onHistoryTapped: { showSessionHistory = true },
-                        onClearTapped: { showClearConfirmation = true }
-                    )
-                    .padding(.horizontal)
-                    .padding(.top, geometry.safeAreaInsets.top + 8)
+                    // Top Controls - minimal and clean (Vivino-style)
+                    HStack {
+                        // Close/Back button
+                        Button(action: {
+                            // Could navigate back or show settings
+                            showSessionHistory = true
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    Circle()
+                                        .fill(Color.black.opacity(0.4))
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        // Torch toggle
+                        Button(action: {
+                            viewModel.torchEnabled.toggle()
+                        }) {
+                            Image(systemName: viewModel.torchEnabled ? "bolt.fill" : "bolt.slash.fill")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    Circle()
+                                        .fill(Color.black.opacity(0.4))
+                                )
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, geometry.safeAreaInsets.top + 12)
 
-                    Spacer()
-
-                    // Center instruction hint (when camera is ready but no matched wines yet)
+                    // Scanning frame overlay (Vivino-style - subtle dashed frame)
                     if sessionMatchCount == 0 && viewModel.cameraService.isRunning && !viewModel.isProcessing {
-                        ScannerHintView()
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                        ScanningFrameOverlay()
+                            .transition(.opacity)
                     }
                     
-                    // Processing indicator - show when processing
+                    Spacer()
+                    
+                    // Processing indicator - minimal and clean
                     if viewModel.isProcessing {
-                        ProcessingIndicator()
-                            .transition(.opacity)
-                    }
-                    
-                    // OCR Recovery mode indicator
-                    if viewModel.ocrService.isInRecoveryMode && viewModel.isProcessing {
-                        OCRRecoveryIndicator()
-                            .transition(.opacity)
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .tint(.white)
+                            Text("Analyzing...")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 20)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.7))
+                        )
+                        .transition(.opacity)
+                        .padding(.bottom, 120)
                     }
                     
                     // First match celebration toast
@@ -95,60 +126,91 @@ struct ScannerView: View {
 
                     Spacer()
 
-                    // Bottom section - status and filters
+                    // Bottom section - cleaner Vivino-inspired design
                     VStack(spacing: 12) {
-                        // Session stats chip (persistent)
+                        // Clean results summary chip (if wines found)
                         if sessionMatchCount > 0 {
-                            SessionStatsChip(
-                                wineCount: sessionMatchCount,
-                                outstandingCount: outstandingCount,
-                                onTap: { showMatchedWinesList = true }
-                            )
+                            Button(action: {
+                                showMatchedWinesList = true
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "wineglass.fill")
+                                        .font(.system(size: 14))
+                                    Text("\(sessionMatchCount) wine\(sessionMatchCount == 1 ? "" : "s") found")
+                                        .font(.system(size: 15, weight: .semibold))
+                                    if outstandingCount > 0 {
+                                        Text("• \(outstandingCount) outstanding")
+                                            .font(.system(size: 14, weight: .medium))
+                                            .opacity(0.8)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .opacity(0.6)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 14)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.black.opacity(0.75))
+                                )
+                            }
+                            .padding(.horizontal)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
-                        // Action buttons row
+                        // Instructions card (Vivino-style) - when no wines found
+                        if sessionMatchCount == 0 && viewModel.cameraService.isRunning && !viewModel.isProcessing {
+                            InstructionsCard()
+                                .padding(.horizontal)
+                                .transition(.opacity)
+                        }
+                        
+                        // Action buttons row (when wines found)
                         if sessionMatchCount > 0 {
                             HStack(spacing: 12) {
-                                ViewResultsButton(
-                                    count: sessionMatchCount,
-                                    pulse: newMatchPulse,
-                                    showNewBadge: showNewMatchBadge,
-                                    onTap: { showMatchedWinesList = true }
-                                )
+                                // View Results button - full width primary
+                                Button(action: {
+                                    showMatchedWinesList = true
+                                }) {
+                                    Text("View Results")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 16)
+                                        .background(Theme.primaryColor)
+                                        .cornerRadius(12)
+                                }
                                 
-                                // Save & Exit button
+                                // Save button - secondary
                                 Button(action: {
                                     let generator = UIImpactFeedbackGenerator(style: .medium)
                                     generator.impactOccurred()
                                     showNameSessionDialog = true
                                 }) {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "square.and.arrow.down.fill")
-                                            .font(.system(size: 14, weight: .semibold))
-                                        Text("Save")
-                                            .font(.system(size: 14, weight: .semibold))
-                                    }
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 14)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.white.opacity(0.2))
-                                    )
+                                    Image(systemName: "square.and.arrow.down")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 50, height: 50)
+                                        .background(Color.white.opacity(0.2))
+                                        .cornerRadius(12)
                                 }
                             }
                             .padding(.horizontal)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
-
-                        FilterBar(
-                            filters: $viewModel.filters,
-                            isExpanded: $showFilters
-                        )
-                        .padding(.horizontal)
+                        
+                        // Filter bar (keep but make it less prominent when no wines)
+                        if sessionMatchCount > 0 {
+                            FilterBar(
+                                filters: $viewModel.filters,
+                                isExpanded: $showFilters
+                            )
+                            .padding(.horizontal)
+                        }
                     }
-                    .padding(.bottom, geometry.safeAreaInsets.bottom + 16)
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 20)
                 }
                 .animation(.easeInOut(duration: 0.3), value: matchedWineCount)
                 .animation(.easeInOut(duration: 0.2), value: viewModel.isProcessing)
