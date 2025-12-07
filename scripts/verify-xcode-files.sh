@@ -6,14 +6,23 @@
 set -e
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-XCODE_PROJECT="$PROJECT_ROOT/ios/WineLensApp/WineLensApp/WineLensApp.xcodeproj/project.pbxproj"
-SWIFT_FILES_DIR="$PROJECT_ROOT/ios/WineListAssistant"
+# Find the actual project.pbxproj file location
+if [ -f "$PROJECT_ROOT/ios/WineLensApp/WineLensApp/WineLensApp.xcodeproj/project.pbxproj" ]; then
+    XCODE_PROJECT="$PROJECT_ROOT/ios/WineLensApp/WineLensApp/WineLensApp.xcodeproj/project.pbxproj"
+elif [ -f "$PROJECT_ROOT/ios/WineLensApp/WineLensApp.xcodeproj/project.pbxproj" ]; then
+    XCODE_PROJECT="$PROJECT_ROOT/ios/WineLensApp/WineLensApp.xcodeproj/project.pbxproj"
+else
+    echo "❌ Error: Could not find project.pbxproj file"
+    exit 1
+fi
+# Source files live in ios/WineLensApp/WineLensApp/ (Xcode auto-syncs via PBXFileSystemSynchronizedRootGroup)
+SWIFT_FILES_DIR="$PROJECT_ROOT/ios/WineLensApp/WineLensApp"
 
 echo "🔍 Checking Xcode project file inclusion..."
 echo ""
 
-# Find all Swift files in WineListAssistant
-SWIFT_FILES=$(find "$SWIFT_FILES_DIR" -name "*.swift" -type f | sort)
+# Find all Swift files in WineLensApp (excluding test files - they're in separate targets)
+SWIFT_FILES=$(find "$SWIFT_FILES_DIR" -name "*.swift" -type f ! -path "*/Tests/*" ! -path "*/UITests/*" | sort)
 
 MISSING_FILES=()
 ALL_PRESENT=true

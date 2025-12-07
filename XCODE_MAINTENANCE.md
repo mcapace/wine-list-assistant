@@ -1,5 +1,12 @@
 # Xcode Project Maintenance Guide
 
+## Project Structure
+
+**Xcode Project File:** `ios/WineLensApp/WineLensApp/WineLensApp.xcodeproj`  
+**Source Files Location:** `ios/WineLensApp/WineLensApp/`
+
+The project uses `PBXFileSystemSynchronizedRootGroup`, which means Xcode automatically syncs files from the `WineLensApp` folder. **Work directly in `ios/WineLensApp/WineLensApp/`** - new files will be auto-detected.
+
 ## Automatic Verification
 
 We have scripts in place to ensure all Swift files are included in the Xcode project:
@@ -9,7 +16,7 @@ We have scripts in place to ensure all Swift files are included in the Xcode pro
 ./scripts/verify-xcode-files.sh
 ```
 
-This will verify all Swift files in `ios/WineListAssistant` are referenced in the Xcode project file.
+This will verify all Swift files in `ios/WineLensApp/WineLensApp/` are referenced in the Xcode project file.
 
 ### Pre-commit Hook
 
@@ -45,11 +52,11 @@ After making changes, always:
 
 ## Project Structure
 
-The Xcode project uses explicit file references (not file system synchronization) for source files:
+The Xcode project uses `PBXFileSystemSynchronizedRootGroup` pointing to `ios/WineLensApp/WineLensApp/`:
 - Core models: `Core/Models/`
 - Services: `Core/Services/`
 - Views: `Features/*/Views/`
 - ViewModels: `Features/*/ViewModels/`
 
-All Swift files must be explicitly referenced in `project.pbxproj`.
+**Important:** Work directly in `ios/WineLensApp/WineLensApp/` - Xcode will automatically detect new files. No need to manually add them to `project.pbxproj` when using file system synchronization.
 
