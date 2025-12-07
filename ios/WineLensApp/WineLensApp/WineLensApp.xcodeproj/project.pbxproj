@@ -49,6 +49,7 @@
 		CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */; };
 		CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */; };
 		CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */; };
+		CEB4BC00E192EE37EBA00014980 /* ScannerErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */; };
 		CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */; };
 		CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */; };
 		CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */; };
@@ -117,6 +118,7 @@
 		CEB4BB322EE37EBA00014979 /* TextNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextNormalizer.swift; sourceTree = "<group>"; };
 		CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchedWinesListView.swift; sourceTree = "<group>"; };
 		CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
+		CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerErrorView.swift; sourceTree = "<group>"; };
 		CEB4B08B1DB2EE37EBA00014979 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		CEB4B87CCC42EE37EBA00014979 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
 		CEB4B6C4F312EE37EBA00014979 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 				CEB4BAF42EE37EBA00014979 /* AROverlayView.swift */,
 				CEB4BAF52EE37EBA00014979 /* CameraPreviewView.swift */,
 				CEB4BAF62EE37EBA00014979 /* ScannerView.swift */,
+				CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */,
 				CEB4BB342EE37EBA00014979 /* MatchedWinesListView.swift */,
 				CEB4BEF3E432EE37EBA00014979 /* SessionHistoryView.swift */,
 			);
@@ -621,6 +624,7 @@
 				CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */,
 				CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */,
 				CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */,
+				CEB4BC00E192EE37EBA00014980 /* ScannerErrorView.swift in Sources */,
 				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
 				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
 				CEB4BEE415E2EE37EBA00014979 /* HapticManager.swift in Sources */,
