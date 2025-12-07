@@ -788,9 +788,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 346J27QJCB;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WineLensApp/Info.plist;
 				INFOPLIST_KEY_GOOGLE_CLOUD_VISION_API_KEY = "AIzaSyAcHGPG8m4qVPCJRy9-opQRlXayQCoqtks";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -822,9 +822,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 346J27QJCB;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WineLensApp/Info.plist;
 				INFOPLIST_KEY_GOOGLE_CLOUD_VISION_API_KEY = "AIzaSyAcHGPG8m4qVPCJRy9-opQRlXayQCoqtks";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
