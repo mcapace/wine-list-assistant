@@ -10,8 +10,10 @@ struct ContentView: View {
                 OnboardingView()
             } else {
                 MainTabView()
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: appState.isOnboardingComplete)
     }
 }
 

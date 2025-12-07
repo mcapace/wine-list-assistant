@@ -214,6 +214,9 @@ struct ScannerView: View {
             Text("This will clear all wines found in this session. Continue?")
         }
         .task {
+            // Add a small delay to allow the view transition to complete smoothly
+            // This prevents the app from appearing frozen when switching from onboarding
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
             await viewModel.startScanning()
         }
         .onDisappear {

@@ -40,7 +40,12 @@ final class AppState: ObservableObject {
     }
 
     func completeOnboarding() {
-        isOnboardingComplete = true
-        UserDefaults.standard.set(true, forKey: "onboarding_complete")
+        // Use async to ensure UI update happens smoothly
+        Task { @MainActor in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isOnboardingComplete = true
+            }
+            UserDefaults.standard.set(true, forKey: "onboarding_complete")
+        }
     }
 }
