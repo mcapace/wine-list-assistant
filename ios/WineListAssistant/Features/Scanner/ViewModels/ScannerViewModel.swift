@@ -11,6 +11,7 @@ final class ScannerViewModel: ObservableObject {
     @Published var filters = FilterSet()
     @Published var isProcessing = false
     @Published var error: ScannerError?
+    @Published var ocrRecoveryMode = false // Track if OCR is in recovery/fast mode
     @Published var torchEnabled = false {
         didSet {
             cameraService.torchEnabled = torchEnabled
@@ -25,7 +26,7 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Services
 
     let cameraService = CameraService()
-    private let ocrService = OCRService()
+    let ocrService = OCRService() // Made accessible to check recovery mode
     private let matchingService: WineMatchingService
     private let subscriptionService = SubscriptionService.shared
 

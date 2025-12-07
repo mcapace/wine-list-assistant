@@ -84,9 +84,9 @@ struct ScoreBadgeOverlay: View {
                 isAppearing = true
             }
             
-            // Gentle floating animation
-            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                floatOffset = -4
+            // Gentle floating animation - more subtle and smooth
+            withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+                floatOffset = -6
             }
 
             // Haptic feedback when wine is found (only once on first appear)

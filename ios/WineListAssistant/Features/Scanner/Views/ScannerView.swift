@@ -12,6 +12,7 @@ struct ScannerView: View {
     @State private var newMatchPulse = false
     @State private var showNewMatchBadge = false
     @State private var previousMatchCount = 0
+    @State private var showFirstMatchToast = false
     @State private var showNameSessionDialog = false
     @State private var sessionLocation = ""
     @State private var showSessionHistory = false
@@ -72,10 +73,23 @@ struct ScannerView: View {
                             .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
                     
-                    // Processing indicator
-                    if viewModel.isProcessing && sessionMatchCount == 0 {
+                    // Processing indicator - show when processing
+                    if viewModel.isProcessing {
                         ProcessingIndicator()
                             .transition(.opacity)
+                    }
+                    
+                    // OCR Recovery mode indicator
+                    if viewModel.ocrService.isInRecoveryMode && viewModel.isProcessing {
+                        OCRRecoveryIndicator()
+                            .transition(.opacity)
+                    }
+                    
+                    // First match celebration toast
+                    if showFirstMatchToast {
+                        FirstMatchCelebrationToast()
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .zIndex(1000)
                     }
 
                     Spacer()
@@ -204,6 +218,21 @@ struct ScannerView: View {
             viewModel.stopScanning()
         }
         .onChange(of: sessionMatchCount) { oldValue, newValue in
+            // First match celebration!
+            if newValue == 1 && oldValue == 0 {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    showFirstMatchToast = true
+                }
+                HapticManager.shared.success()
+                
+                // Hide toast after 2.5 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showFirstMatchToast = false
+                    }
+                }
+            }
+            
             // Detect new match added
             if newValue > previousMatchCount {
                 // Haptic feedback (already triggered in mergeResults, but ensure it happens)
@@ -231,6 +260,33 @@ struct ScannerView: View {
             }
             previousMatchCount = newValue
         }
+    }
+}
+
+// MARK: - OCR Recovery Indicator
+
+struct OCRRecoveryIndicator: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12))
+                .foregroundColor(.orange)
+            
+            Text("Using fast mode")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.7))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .padding(.top, 8)
     }
 }
 
@@ -904,6 +960,7 @@ struct ViewResultsButton: View {
 
 struct ProcessingIndicator: View {
     @State private var scanLineOffset: CGFloat = -100
+    @State private var pulseScale: CGFloat = 1.0
     
     var body: some View {
         VStack(spacing: 12) {
@@ -924,6 +981,23 @@ struct ProcessingIndicator: View {
                 .offset(y: scanLineOffset)
                 .blur(radius: 2)
             
+            HStack(spacing: 8) {
+                // Pulsing dots animation
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(Theme.secondaryColor)
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(pulseScale)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.2),
+                            value: pulseScale
+                        )
+                }
+            }
+            .padding(.top, 4)
+            
             Text("Analyzing...")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.white.opacity(0.9))
@@ -932,6 +1006,9 @@ struct ProcessingIndicator: View {
         .onAppear {
             withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
                 scanLineOffset = 100
+            }
+            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
+                pulseScale = 0.5
             }
         }
     }

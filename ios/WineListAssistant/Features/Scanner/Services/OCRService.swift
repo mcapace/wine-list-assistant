@@ -37,6 +37,11 @@ final class OCRService {
 
     /// Track if we should use fast mode due to ANE issues
     private var useFastRecognition = false
+    
+    /// Public property to check if OCR is in recovery/fast mode
+    var isInRecoveryMode: Bool {
+        useFastRecognition
+    }
 
     // MARK: - Public Methods
 
