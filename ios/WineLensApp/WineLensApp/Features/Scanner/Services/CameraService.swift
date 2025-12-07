@@ -205,15 +205,8 @@ final class CameraService: NSObject, ObservableObject {
     }
 
     private func configureDevice(_ device: AVCaptureDevice) throws {
-        // Ensure device is not already locked by another process
-        guard !device.isLocked else {
-            // If locked, wait briefly and try again
-            Thread.sleep(forTimeInterval: 0.1)
-            guard !device.isLocked else {
-                throw CameraError.configurationFailed
-            }
-        }
-        
+        // Try to lock device for configuration
+        // lockForConfiguration() will throw if device is already locked
         try device.lockForConfiguration()
         defer { 
             device.unlockForConfiguration()
@@ -339,15 +332,8 @@ final class CameraService: NSObject, ObservableObject {
             guard self.captureSession.isRunning else { return }
             
             do {
-                // Check if device is already locked
-                if device.isLocked {
-                    // Wait briefly and skip if still locked
-                    Thread.sleep(forTimeInterval: 0.1)
-                    if device.isLocked {
-                        return
-                    }
-                }
-                
+                // Try to lock device for configuration
+                // lockForConfiguration() will throw if device is already locked
                 try device.lockForConfiguration()
                 device.torchMode = self.torchEnabled ? .on : .off
                 device.unlockForConfiguration()
@@ -367,11 +353,6 @@ final class CameraService: NSObject, ObservableObject {
         guard captureSession.isRunning else { return }
 
         sessionQueue.async {
-            // Check if device is already locked
-            if device.isLocked {
-                return
-            }
-            
             do {
                 try device.lockForConfiguration()
 
