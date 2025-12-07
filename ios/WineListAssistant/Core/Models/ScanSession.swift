@@ -1,4 +1,5 @@
 import Foundation
+import CoreGraphics
 
 struct ScanSession: Identifiable, Codable {
     let id: UUID
