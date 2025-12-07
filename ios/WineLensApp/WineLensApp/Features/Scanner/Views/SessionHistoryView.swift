@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SessionHistoryView: View {
     @StateObject private var sessionManager = SessionManager.shared
@@ -37,7 +38,9 @@ struct SessionHistoryView: View {
                                             sessionManager.deleteSession(session.id)
                                             loadSessions()
                                         }
-                                        HapticManager.shared.selectionChanged()
+                                        // Use UISelectionFeedbackGenerator directly to avoid indexing issues with HapticManager
+                                        let generator = UISelectionFeedbackGenerator()
+                                        generator.selectionChanged()
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -86,7 +89,9 @@ struct SessionCard: View {
     
     var body: some View {
         Button(action: {
-            HapticManager.shared.buttonTap()
+            // Use UIImpactFeedbackGenerator directly to avoid indexing issues with HapticManager
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
             onTap()
         }) {
             VStack(alignment: .leading, spacing: 12) {
