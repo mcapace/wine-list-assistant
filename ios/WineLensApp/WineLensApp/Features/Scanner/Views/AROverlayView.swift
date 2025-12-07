@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct AROverlayView: View {
     let recognizedWines: [RecognizedWine]
@@ -66,7 +67,9 @@ struct ScoreBadgeOverlay: View {
         .opacity(isAppearing ? 1.0 : 0.0)
         .onTapGesture {
             if wine.isMatched {
-                HapticManager.shared.mediumImpact()
+                // Use UIImpactFeedbackGenerator directly to avoid indexing issues with HapticManager
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
                 }
