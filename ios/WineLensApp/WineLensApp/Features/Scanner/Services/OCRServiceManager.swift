@@ -54,6 +54,11 @@ final class OCRService {
         return currentProvider
     }
     
+    /// Check if OCR is in recovery mode (using fast recognition due to ANE errors)
+    var isInRecoveryMode: Bool {
+        (currentProvider as? AppleVisionOCRService)?.isInRecoveryMode ?? false
+    }
+    
     /// Switch to a different OCR provider
     func setProvider(_ providerName: String) {
         switch providerName.lowercased() {

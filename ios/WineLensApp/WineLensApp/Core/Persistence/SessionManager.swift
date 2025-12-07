@@ -1,6 +1,7 @@
 import Foundation
+import Combine
 
-final class SessionManager {
+final class SessionManager: ObservableObject {
     static let shared = SessionManager()
     
     private let userDefaults = UserDefaults.standard

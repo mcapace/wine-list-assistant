@@ -26,7 +26,7 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Services
 
     let cameraService = CameraService()
-    let ocrService = OCRService() // Made accessible to check recovery mode
+    let ocrService = OCRService.shared // Made accessible to check recovery mode
     private let matchingService: WineMatchingService
     private let subscriptionService = SubscriptionService.shared
 
