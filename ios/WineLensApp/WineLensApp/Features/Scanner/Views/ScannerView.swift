@@ -280,12 +280,8 @@ struct ScannerView: View {
                 // This prevents the app from appearing frozen when switching from onboarding
                 try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
                 
-                // Start camera scanning asynchronously without blocking
-                await MainActor.run {
-                    Task.detached { @MainActor [weak viewModel] in
-                        await viewModel?.startScanning()
-                    }
-                }
+                // Start camera scanning asynchronously
+                await viewModel.startScanning()
             }
         .onDisappear {
             viewModel.stopScanning()
