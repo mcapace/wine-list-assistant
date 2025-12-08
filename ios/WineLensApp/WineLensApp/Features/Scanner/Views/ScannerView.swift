@@ -7,10 +7,27 @@ struct ScannerView: View {
     
     init() {
         #if DEBUG
-        print("📷 ScannerView.init() - ScannerView is being initialized")
+        print("📷 ScannerView.init() - START")
+        print("📷 ScannerView.init() - About to create ScannerViewModel...")
         #endif
-        // Initialize viewModel after logging
-        _viewModel = StateObject(wrappedValue: ScannerViewModel())
+        
+        // Initialize viewModel - wrap in do-catch to catch any initialization errors
+        do {
+            _viewModel = StateObject(wrappedValue: ScannerViewModel())
+            #if DEBUG
+            print("📷 ScannerView.init() - ScannerViewModel created successfully")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ ScannerView.init() - ERROR creating ScannerViewModel: \(error)")
+            #endif
+            // Create a basic instance even if there's an error
+            _viewModel = StateObject(wrappedValue: ScannerViewModel())
+        }
+        
+        #if DEBUG
+        print("📷 ScannerView.init() - COMPLETE")
+        #endif
     }
     @State private var selectedWine: RecognizedWine?
     @State private var showFilters = false
