@@ -56,12 +56,29 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Initialization
 
     init() {
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - START")
+        #endif
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - creating WineMatchingService...")
+        #endif
         self.matchingService = WineMatchingService()
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - getting processingInterval...")
+        #endif
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
 
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - calling setupFrameProcessing...")
+        #endif
         // Setup frame processing immediately (non-blocking, just sets up Combine sink)
         setupFrameProcessing()
-        
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - loading session...")
+        #endif
         // Load incomplete session if exists
         if let session = sessionManager.loadCurrentSession() {
             currentSession = session
@@ -70,6 +87,10 @@ final class ScannerViewModel: ObservableObject {
             // Start new session
             currentSession = ScanSession()
         }
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - COMPLETE")
+        #endif
     }
 
     // MARK: - Public Methods
