@@ -136,7 +136,7 @@ struct Wine: Identifiable, Codable, Hashable {
         region: String?,
         subRegion: String?,
         appellation: String?,
-        country: String,
+        country: String?,
         color: WineColor,
         grapeVarieties: [GrapeVariety],
         alcohol: Double?,
@@ -185,8 +185,8 @@ struct Wine: Identifiable, Codable, Hashable {
         subRegion = try container.decodeIfPresent(String.self, forKey: .subRegion)
         appellation = try container.decodeIfPresent(String.self, forKey: .appellation)
         country = try container.decodeIfPresent(String.self, forKey: .country)
-        color = try container.decode(WineColor.self, forKey: .color)
-        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties) ?? [] ?? []
+        color = try container.decodeIfPresent(WineColor.self, forKey: .color) ?? .red
+        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties) ?? []
         alcohol = try container.decodeIfPresent(Double.self, forKey: .alcohol)
         score = try container.decodeIfPresent(Int.self, forKey: .score)
         tastingNote = try container.decodeIfPresent(String.self, forKey: .tastingNote)
