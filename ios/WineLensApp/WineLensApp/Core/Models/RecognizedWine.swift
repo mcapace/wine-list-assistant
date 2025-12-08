@@ -52,7 +52,7 @@ struct RecognizedWine: Identifiable {
             return false
         }
         // Best value: high score with reasonable markup (< 2.5x)
-        return wine.score >= 90 && ratio < 2.5
+        return (wine.score ?? 0) >= 90 && ratio < 2.5
     }
 
     var valueIndicator: ValueIndicator {
