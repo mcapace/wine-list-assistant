@@ -313,14 +313,14 @@ struct MatchedWineCard: View {
     
     @ViewBuilder
     private var scoreBadge: some View {
-        if let wine = wine {
+        if let wine = wine, let score = wine.score {
             ZStack {
                 Circle()
                     .fill(
                         LinearGradient(
                             colors: [
-                                Theme.scoreColor(for: wine.score).opacity(0.25),
-                                Theme.scoreColor(for: wine.score).opacity(0.15)
+                                Theme.scoreColor(for: score).opacity(0.25),
+                                Theme.scoreColor(for: score).opacity(0.15)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -329,17 +329,19 @@ struct MatchedWineCard: View {
                     .frame(width: 70, height: 70)
                     .overlay(
                         Circle()
-                            .stroke(Theme.scoreColor(for: wine.score).opacity(0.4), lineWidth: 2)
+                            .stroke(Theme.scoreColor(for: score).opacity(0.4), lineWidth: 2)
                     )
                 
                 VStack(spacing: 2) {
-                    Text("\(wine.score)")
+                    Text("\(score)")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.scoreColor(for: wine.score))
+                        .foregroundColor(Theme.scoreColor(for: score))
                     
-                    Text(wine.reviewer.initials)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Theme.scoreColor(for: wine.score).opacity(0.8))
+                    if let reviewer = wine.reviewer {
+                        Text(reviewer.initials)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(Theme.scoreColor(for: score).opacity(0.8))
+                    }
                 }
             }
         }
@@ -369,9 +371,11 @@ struct MatchedWineCard: View {
                             .foregroundColor(.white.opacity(0.6))
                     }
                     
-                    Label(wine.region, systemImage: "mappin.circle.fill")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.6))
+                    if let region = wine.region {
+                        Label(region, systemImage: "mappin.circle.fill")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
                         .lineLimit(1)
                 }
                 

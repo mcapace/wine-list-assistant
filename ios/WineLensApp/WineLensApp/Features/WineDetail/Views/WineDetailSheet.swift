@@ -91,7 +91,7 @@ struct WineDetailSheet: View {
     private func createShareText(_ wine: Wine) -> String {
         """
         \(wine.fullName)
-        Wine Spectator Score: \(wine.score)
+        Wine Spectator Score: \(wine.score?.description ?? "N/A")
 
         \(wine.tastingNote ?? "No tasting note available")
 

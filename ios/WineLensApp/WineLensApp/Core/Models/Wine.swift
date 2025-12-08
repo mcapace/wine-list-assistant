@@ -9,11 +9,11 @@ struct Wine: Identifiable, Codable, Hashable {
     let subRegion: String?
     let appellation: String?
     let country: String?
-    let color: WineColor?
-    let grapeVarieties: [GrapeVariety]?
+    let color: WineColor
+    let grapeVarieties: [GrapeVariety]
     let alcohol: Double?
     let score: Int?
-    let tastingNote: String?
+    let tastingNote: String? // Made optional - API sometimes returns null
     let reviewer: Reviewer?
     let reviewDate: Date?
     let issueDate: Date?
@@ -96,8 +96,9 @@ struct Wine: Identifiable, Codable, Hashable {
         return formatter.string(from: price as NSDecimalNumber)
     }
 
-    var scoreCategory: ScoreCategory {
-        ScoreCategory(score: score ?? 0)
+    var scoreCategory: ScoreCategory? {
+        guard let score = score else { return nil }
+        return ScoreCategory(score: score)
     }
 
     // MARK: - Coding Keys
@@ -135,9 +136,9 @@ struct Wine: Identifiable, Codable, Hashable {
         region: String?,
         subRegion: String?,
         appellation: String?,
-        country: String?,
-        color: WineColor?,
-        grapeVarieties: [GrapeVariety]?,
+        country: String,
+        color: WineColor,
+        grapeVarieties: [GrapeVariety],
         alcohol: Double?,
         score: Int?,
         tastingNote: String?,
@@ -184,8 +185,8 @@ struct Wine: Identifiable, Codable, Hashable {
         subRegion = try container.decodeIfPresent(String.self, forKey: .subRegion)
         appellation = try container.decodeIfPresent(String.self, forKey: .appellation)
         country = try container.decodeIfPresent(String.self, forKey: .country)
-        color = try container.decodeIfPresent(WineColor.self, forKey: .color)
-        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties)
+        color = try container.decode(WineColor.self, forKey: .color)
+        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties) ?? [] ?? []
         alcohol = try container.decodeIfPresent(Double.self, forKey: .alcohol)
         score = try container.decodeIfPresent(Int.self, forKey: .score)
         tastingNote = try container.decodeIfPresent(String.self, forKey: .tastingNote)
@@ -211,8 +212,8 @@ struct Wine: Identifiable, Codable, Hashable {
         try container.encodeIfPresent(subRegion, forKey: .subRegion)
         try container.encodeIfPresent(appellation, forKey: .appellation)
         try container.encodeIfPresent(country, forKey: .country)
-        try container.encodeIfPresent(color, forKey: .color)
-        try container.encodeIfPresent(grapeVarieties, forKey: .grapeVarieties)
+        try container.encode(color, forKey: .color)
+        try container.encode(grapeVarieties, forKey: .grapeVarieties)
         try container.encodeIfPresent(alcohol, forKey: .alcohol)
         try container.encodeIfPresent(score, forKey: .score)
         try container.encodeIfPresent(tastingNote, forKey: .tastingNote)
