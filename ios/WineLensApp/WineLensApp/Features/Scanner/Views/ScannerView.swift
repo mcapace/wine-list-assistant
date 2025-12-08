@@ -2,8 +2,16 @@ import SwiftUI
 import UIKit
 
 struct ScannerView: View {
-    @StateObject private var viewModel = ScannerViewModel()
+    @StateObject private var viewModel: ScannerViewModel
     @EnvironmentObject var subscriptionService: SubscriptionService
+    
+    init() {
+        #if DEBUG
+        print("📷 ScannerView.init() - ScannerView is being initialized")
+        #endif
+        // Initialize viewModel after logging
+        _viewModel = StateObject(wrappedValue: ScannerViewModel())
+    }
     @State private var selectedWine: RecognizedWine?
     @State private var showFilters = false
     @State private var showPaywall = false
@@ -334,6 +342,15 @@ struct ScannerView: View {
             .onAppear {
                 #if DEBUG
                 print("📷 ScannerView.onAppear: View appeared, hasStartedCamera=\(hasStartedCamera)")
+                print("📷 ScannerView.onAppear: viewModel.error = \(String(describing: viewModel.error))")
+                print("📷 ScannerView.onAppear: cameraService.isRunning = \(viewModel.cameraService.isRunning)")
+                #endif
+            }
+            .onChange(of: viewModel.error) { oldValue, newValue in
+                #if DEBUG
+                if let error = newValue {
+                    print("📷 ScannerView: ERROR DETECTED - \(error)")
+                }
                 #endif
             }
             .onDisappear {
