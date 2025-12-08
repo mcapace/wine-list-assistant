@@ -71,10 +71,16 @@ final class ScannerViewModel: ObservableObject {
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - calling setupFrameProcessing...")
+        print("🎬 ScannerViewModel.init() - deferring setupFrameProcessing to async task...")
         #endif
-        // Setup frame processing immediately (non-blocking, just sets up Combine sink)
-        setupFrameProcessing()
+        
+        // Defer frame processing setup to avoid blocking init
+        Task { @MainActor [weak self] in
+            #if DEBUG
+            print("🎬 ScannerViewModel.init() - async task: calling setupFrameProcessing...")
+            #endif
+            self?.setupFrameProcessing()
+        }
 
         #if DEBUG
         print("🎬 ScannerViewModel.init() - loading session...")
@@ -89,7 +95,7 @@ final class ScannerViewModel: ObservableObject {
         }
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - COMPLETE")
+        print("🎬 ScannerViewModel.init() - COMPLETE (non-blocking)")
         #endif
     }
 
