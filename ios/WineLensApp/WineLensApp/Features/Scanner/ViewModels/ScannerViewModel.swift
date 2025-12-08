@@ -271,8 +271,11 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Manual Photo Capture
     
     func capturePhoto() async {
-        guard !isAutoScanning else { return }
+        #if DEBUG
+        print("📸 capturePhoto: Called - isAutoScanning=\(isAutoScanning)")
+        #endif
         
+        // Allow manual capture even if auto-scanning is enabled (user can force a capture)
         guard let pixelBuffer = cameraService.currentFrame else {
             #if DEBUG
             print("📸 capturePhoto: No frame available")

@@ -225,8 +225,8 @@ struct ScannerView: View {
                                 .transition(.opacity)
                         }
                         
-                        // Manual capture button (when in manual mode)
-                        if !viewModel.isAutoScanning {
+                        // Manual capture button - always show when no results, or in manual mode
+                        if sessionMatchCount == 0 || !viewModel.isAutoScanning {
                             Button(action: {
                                 let generator = UIImpactFeedbackGenerator(style: .medium)
                                 generator.impactOccurred()
@@ -237,7 +237,7 @@ struct ScannerView: View {
                                 HStack(spacing: 12) {
                                     Image(systemName: "camera.fill")
                                         .font(.system(size: 18, weight: .semibold))
-                                    Text("Capture & Scan")
+                                    Text(viewModel.isAutoScanning ? "Capture Photo" : "Capture & Scan")
                                         .font(.system(size: 16, weight: .semibold))
                                 }
                                 .foregroundColor(.white)
