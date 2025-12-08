@@ -12,7 +12,7 @@ struct WineDetailSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
                     // Hero Score Header - Premium design
@@ -52,7 +52,7 @@ struct WineDetailSheet: View {
                         )
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, Theme.Spacing.xl)
+                    .padding(.bottom, Theme.Spacing.xl + 20) // Extra padding for safe area
                 }
             }
             .background(Color(.systemGroupedBackground))
