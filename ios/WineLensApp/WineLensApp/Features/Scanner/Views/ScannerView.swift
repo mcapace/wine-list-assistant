@@ -43,7 +43,12 @@ struct ScannerView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
+        let _ = {
+            #if DEBUG
+            print("📷 ScannerView.body evaluated - hasStartedCamera=\(hasStartedCamera)")
+            #endif
+        }()
+        return GeometryReader { geometry in
             ZStack {
                 // Camera Preview - full screen background
                 CameraPreviewView(cameraService: viewModel.cameraService)
