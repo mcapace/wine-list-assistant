@@ -293,6 +293,59 @@ final class WineMatchingService {
         )
         return cleaned.trimmingCharacters(in: .whitespaces)
     }
+    
+    /// Extract a clean, focused query from normalized text for API search
+    private func extractCleanQuery(from normalizedText: String) -> String {
+        let words = normalizedText.split(separator: " ").map(String.init)
+        
+        // Focus on key wine terms: producer names (Chateau, Domaine), regions, grapes
+        var keyTerms: [String] = []
+        var seenProducer = false
+        
+        for word in words {
+            let lowerWord = word.lowercased()
+            
+            // Producer indicators - take the next word as producer name
+            if ["chateau", "château", "domaine", "estate", "vineyard"].contains(lowerWord) {
+                seenProducer = true
+                keyTerms.append(word)
+                continue
+            }
+            
+            // After seeing a producer indicator, take producer name
+            if seenProducer && keyTerms.count <= 2 {
+                keyTerms.append(word)
+                seenProducer = false
+                continue
+            }
+            
+            // Regions
+            if ["margaux", "pauillac", "napa", "sonoma", "bordeaux", "burgundy", "rioja", "tuscany"].contains(lowerWord) {
+                keyTerms.append(word)
+                continue
+            }
+            
+            // Grape varieties
+            if ["cabernet", "merlot", "pinot", "chardonnay", "sauvignon", "syrah", "shiraz", "riesling"].contains(lowerWord) {
+                keyTerms.append(word)
+                continue
+            }
+        }
+        
+        // If we didn't find key terms, take first 4 words (likely producer + wine name)
+        if keyTerms.isEmpty {
+            keyTerms = Array(words.prefix(4))
+        }
+        
+        let cleanQuery = keyTerms.joined(separator: " ")
+        
+        // Limit query length to avoid corrupted long strings
+        if cleanQuery.count > 50 {
+            return String(cleanQuery.prefix(50)).trimmingCharacters(in: .whitespaces)
+        }
+        
+        return cleanQuery.isEmpty ? normalizedText : cleanQuery
+    }
 
     // MARK: - Matching Strategies
 
