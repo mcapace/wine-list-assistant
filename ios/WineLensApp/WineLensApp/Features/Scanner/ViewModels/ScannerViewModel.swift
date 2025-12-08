@@ -3,7 +3,8 @@ import Combine
 import AVFoundation
 import UIKit
 
-@MainActor
+// NOTE: Removed @MainActor to fix deadlock during SwiftUI view initialization
+// @Published handles thread safety, and SwiftUI always accesses from main thread
 final class ScannerViewModel: ObservableObject {
     // MARK: - Published Properties
 

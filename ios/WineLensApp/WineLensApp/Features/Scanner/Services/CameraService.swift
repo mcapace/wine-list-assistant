@@ -2,7 +2,8 @@ import AVFoundation
 import Combine
 import UIKit
 
-@MainActor
+// NOTE: Removed @MainActor to fix deadlock during SwiftUI view initialization
+// @Published handles thread safety, camera work happens on sessionQueue anyway
 final class CameraService: NSObject, ObservableObject {
     // MARK: - Published Properties
 
