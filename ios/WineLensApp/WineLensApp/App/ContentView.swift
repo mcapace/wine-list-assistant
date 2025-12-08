@@ -33,22 +33,18 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            // Always create ScannerView - don't use conditional that might prevent instantiation
-            // Use background instead of opacity to ensure view is actually rendered
-            ZStack {
-                if scannerReady {
-                    ScannerView()
-                        .transition(.opacity)
-                } else {
-                    Color.black
-                        .ignoresSafeArea()
+            // ALWAYS create ScannerView - it needs to exist for StateObject to initialize
+            // Use overlay to hide it visually until ready, but ensure it's always in the view hierarchy
+            ScannerView()
+                .id("scanner")
+                .background(
+                    // Black background when not ready
+                    scannerReady ? Color.clear : Color.black.ignoresSafeArea()
+                )
+                .tabItem {
+                    Label("Scan", systemImage: "camera.viewfinder")
                 }
-            }
-            .id("scanner") // Force view recreation
-            .tabItem {
-                Label("Scan", systemImage: "camera.viewfinder")
-            }
-            .tag(AppState.Tab.scanner)
+                .tag(AppState.Tab.scanner)
 
             MyWinesView()
                 .tabItem {
