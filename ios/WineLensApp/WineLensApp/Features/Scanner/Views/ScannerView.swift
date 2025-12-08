@@ -225,6 +225,33 @@ struct ScannerView: View {
                                 .transition(.opacity)
                         }
                         
+                        // Manual capture button (when in manual mode)
+                        if !viewModel.isAutoScanning {
+                            Button(action: {
+                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                                generator.impactOccurred()
+                                Task {
+                                    await viewModel.capturePhoto()
+                                }
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "camera.fill")
+                                        .font(.system(size: 18, weight: .semibold))
+                                    Text("Capture & Scan")
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Theme.primaryColor)
+                                .cornerRadius(12)
+                            }
+                            .padding(.horizontal)
+                            .disabled(viewModel.isProcessing)
+                            .opacity(viewModel.isProcessing ? 0.6 : 1.0)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
                         // Action buttons row (when wines found)
                         if sessionMatchCount > 0 {
                             HStack(spacing: 12) {

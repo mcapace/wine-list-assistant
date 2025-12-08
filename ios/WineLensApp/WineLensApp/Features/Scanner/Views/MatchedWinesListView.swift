@@ -447,7 +447,7 @@ struct MatchedWineCard: View {
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.white.opacity(0.9))
                         
-                        Text(wine.tastingNote)
+                        Text(note)
                             .font(.system(size: 14))
                             .foregroundColor(.white.opacity(0.8))
                             .fixedSize(horizontal: false, vertical: true)
