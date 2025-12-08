@@ -75,6 +75,10 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func startScanning() async {
+        #if DEBUG
+        print("🚀 ScannerViewModel.startScanning() called")
+        #endif
+        
         // Clear any previous errors
         error = nil
         
@@ -86,9 +90,15 @@ final class ScannerViewModel: ObservableObject {
         // }
 
         // Request camera authorization - this will show the permission dialog if needed
+        #if DEBUG
+        print("🔐 ScannerViewModel: Requesting camera authorization...")
+        #endif
         let authorized = await cameraService.requestAuthorization()
         
         guard authorized else {
+            #if DEBUG
+            print("❌ ScannerViewModel: Camera authorization failed")
+            #endif
             // Check current authorization status for better error message
             let status = AVCaptureDevice.authorizationStatus(for: .video)
             if status == .denied || status == .restricted {
@@ -100,16 +110,27 @@ final class ScannerViewModel: ObservableObject {
             return
         }
 
+        #if DEBUG
+        print("✅ ScannerViewModel: Camera authorized, configuring...")
+        #endif
+
         // Configure and start camera
         do {
             try await cameraService.configure()
             cameraService.start()
+            
+            #if DEBUG
+            print("✅ ScannerViewModel: Camera started successfully")
+            #endif
 
             // Record the scan for free users (only if subscription check passes)
             if subscriptionService.canPerformScan() {
                 subscriptionService.recordScan()
             }
         } catch let cameraError as CameraService.CameraError {
+            #if DEBUG
+            print("❌ ScannerViewModel: Camera error: \(cameraError)")
+            #endif
             switch cameraError {
             case .notAuthorized:
                 error = .cameraNotAuthorized
@@ -119,6 +140,9 @@ final class ScannerViewModel: ObservableObject {
                 break // Non-fatal
             }
         } catch {
+            #if DEBUG
+            print("❌ ScannerViewModel: Unexpected error: \(error)")
+            #endif
             self.error = .cameraConfigurationFailed
         }
     }

@@ -74,14 +74,27 @@ final class CameraService: NSObject, ObservableObject {
 
     func requestAuthorization() async -> Bool {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
+        
+        #if DEBUG
+        print("📷 Camera authorization status: \(status.rawValue)")
+        #endif
 
         switch status {
         case .authorized:
+            #if DEBUG
+            print("✅ Camera already authorized")
+            #endif
             isAuthorized = true
             return true
 
         case .notDetermined:
+            #if DEBUG
+            print("📱 Requesting camera permission...")
+            #endif
             let granted = await AVCaptureDevice.requestAccess(for: .video)
+            #if DEBUG
+            print("📱 Camera permission granted: \(granted)")
+            #endif
             await MainActor.run {
                 isAuthorized = granted
                 if !granted {
@@ -91,6 +104,9 @@ final class CameraService: NSObject, ObservableObject {
             return granted
 
         case .denied, .restricted:
+            #if DEBUG
+            print("❌ Camera permission denied or restricted")
+            #endif
             await MainActor.run {
                 isAuthorized = false
                 error = .notAuthorized
