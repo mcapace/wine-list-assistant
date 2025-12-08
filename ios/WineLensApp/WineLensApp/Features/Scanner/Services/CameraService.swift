@@ -240,23 +240,34 @@ final class CameraService: NSObject, ObservableObject {
     // MARK: - Session Control
 
     func start() {
-        guard !isRunning, isConfigured else { return }
+        guard !isRunning, isConfigured else {
+            print("📷 CameraService.start() - skipped: isRunning=\(isRunning), isConfigured=\(isConfigured)")
+            return
+        }
+
+        // Set isRunning immediately so frames aren't discarded during startup race condition
+        isRunning = true
+        print("📷 CameraService.start() - setting isRunning=true, starting session...")
 
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
 
             // Only start if not already running
             guard !self.captureSession.isRunning else {
-                Task { @MainActor in
-                    self.isRunning = true
-                }
+                print("📷 CameraService - session already running")
                 return
             }
 
             self.captureSession.startRunning()
+            let actuallyRunning = self.captureSession.isRunning
+            print("📷 CameraService - session started, isRunning=\(actuallyRunning)")
 
             Task { @MainActor in
-                self.isRunning = self.captureSession.isRunning
+                // Update to actual state (in case start failed)
+                if !actuallyRunning {
+                    self.isRunning = false
+                    print("📷 CameraService - session failed to start")
+                }
             }
         }
     }
@@ -388,6 +399,9 @@ final class CameraService: NSObject, ObservableObject {
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 
 extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
+    // Track frame count for debug logging (every 30 frames ~= 1 second)
+    private static var frameCount = 0
+
     nonisolated func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
@@ -402,6 +416,12 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
         Task { @MainActor in
             guard self.isRunning else { return }
             self.currentFrame = pixelBuffer
+
+            // Debug: log every 30th frame
+            CameraService.frameCount += 1
+            if CameraService.frameCount % 30 == 0 {
+                print("📷 Frame published: #\(CameraService.frameCount)")
+            }
         }
     }
 

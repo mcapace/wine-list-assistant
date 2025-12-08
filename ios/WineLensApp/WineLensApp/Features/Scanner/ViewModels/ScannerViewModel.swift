@@ -194,6 +194,7 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Frame Processing
 
     private func setupFrameProcessing() {
+        print("🔍 ScannerViewModel - setupFrameProcessing called")
         cameraService.$currentFrame
             .compactMap { $0 }
             .sink { [weak self] frame in
@@ -202,13 +203,21 @@ final class ScannerViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    private var frameReceivedCount = 0
+    private var frameProcessedCount = 0
+
     private func processFrameIfNeeded(_ frame: CVPixelBuffer) {
+        frameReceivedCount += 1
+
         let now = Date()
         // Debounce: Don't process frames faster than every 0.5 seconds
         guard now.timeIntervalSince(lastProcessedTime) >= max(processingInterval, 0.5) else {
             return
         }
         lastProcessedTime = now
+
+        frameProcessedCount += 1
+        print("🔍 Frame received #\(frameReceivedCount), processing #\(frameProcessedCount)")
 
         // Cancel any existing processing
         frameProcessingTask?.cancel()
@@ -224,15 +233,34 @@ final class ScannerViewModel: ObservableObject {
         isProcessing = true
         defer { isProcessing = false }
 
+        print("🔍 processFrame - starting OCR...")
+
         do {
             // Step 1: OCR - recognize text in frame
             let ocrResults = try await ocrService.recognizeText(in: frame)
+            print("🔍 OCR returned \(ocrResults.count) text results")
+
+            // Log first few results for debugging
+            for (index, result) in ocrResults.prefix(3).enumerated() {
+                print("🔍 OCR[\(index)]: '\(result.text.prefix(50))' confidence=\(result.confidence)")
+            }
+
             // Update recovery mode status
             ocrRecoveryMode = ocrService.isInRecoveryMode
+            if ocrRecoveryMode {
+                print("🔍 OCR in recovery/fast mode")
+            }
             guard !Task.isCancelled else { return }
 
             // Step 2: Group text into wine entry candidates
             let candidates = ocrService.groupIntoWineEntries(ocrResults)
+            print("🔍 Grouped into \(candidates.count) wine candidates")
+
+            // Log candidates for debugging
+            for (index, candidate) in candidates.prefix(3).enumerated() {
+                print("🔍 Candidate[\(index)]: '\(candidate.fullText.prefix(60))' confidence=\(candidate.confidence)")
+            }
+
             guard !Task.isCancelled else { return }
 
             // Step 3: Match each candidate against our wine database
@@ -245,11 +273,18 @@ final class ScannerViewModel: ObservableObject {
 
             Task.detached { [weak self] in
                 var matchedWines: [RecognizedWine] = []
+                print("🔍 Starting wine matching for \(candidates.count) candidates...")
 
-                for candidate in candidates {
+                for (index, candidate) in candidates.enumerated() {
                     // Note: We don't check Task.isCancelled here because this is a
                     // detached task that should complete its API calls
                     let matchResult = await matchingService.matchWine(from: candidate.fullText)
+
+                    if let match = matchResult {
+                        print("✅ Match[\(index)]: '\(match.wine.name)' score=\(match.wine.score ?? 0) confidence=\(match.confidence)")
+                    } else {
+                        print("⚪ No match[\(index)] for: '\(candidate.fullText.prefix(40))'")
+                    }
                     
                     // Extract price before creating RecognizedWine to avoid MainActor isolation issues
                     let price = await MainActor.run {
@@ -282,7 +317,8 @@ final class ScannerViewModel: ObservableObject {
         } catch {
             // Don't log cancellation errors - they're expected during rapid frame processing
             if !(error is CancellationError) {
-                print("Frame processing error: \(error)")
+                print("❌ Frame processing error: \(error)")
+                print("❌ Error type: \(type(of: error))")
             }
         }
     }
