@@ -21,9 +21,16 @@ final class OCRService {
         print("🔍 OCRService.init() - START")
         print("🔍 OCRService.init() - Creating AppleVisionOCRService...")
         #endif
-        self.appleVisionProvider = AppleVisionOCRService()
+        
+        // Create the provider first, then assign
+        let provider = AppleVisionOCRService()
         #if DEBUG
-        print("🔍 OCRService.init() - AppleVisionOCRService created")
+        print("🔍 OCRService.init() - AppleVisionOCRService instance created, about to assign...")
+        #endif
+        
+        self.appleVisionProvider = provider
+        #if DEBUG
+        print("🔍 OCRService.init() - AppleVisionOCRService assigned successfully")
         #endif
         
         // Initialize Google Cloud provider if API key is available
