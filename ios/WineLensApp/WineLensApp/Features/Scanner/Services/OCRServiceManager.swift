@@ -67,34 +67,21 @@ final class OCRService {
             #if DEBUG
             print("🔍 OCRService.init() - GoogleCloudOCRService created")
             #endif
+            
+            // If Google Cloud is preferred and now available, switch to it
+            if preferredProvider.lowercased() == "google" || 
+               preferredProvider.lowercased() == "googlecloud" || 
+               preferredProvider.lowercased() == "google cloud" {
+                if let googleCloud = googleCloudProvider {
+                    self.currentProvider = googleCloud
+                    #if DEBUG
+                    print("🔍 OCRService.init() - Switched to Google Cloud provider")
+                    #endif
+                }
+            }
         } else {
             #if DEBUG
             print("🔍 OCRService.init() - No Google Cloud API key, skipping")
-            #endif
-        }
-        
-        // Initialize currentProvider first (must be initialized before calling setProvider)
-        #if DEBUG
-        print("🔍 OCRService.init() - Setting preferred provider...")
-        #endif
-        let preferredProvider = AppConfiguration.preferredOCRProvider
-        switch preferredProvider.lowercased() {
-        case "google", "googlecloud", "google cloud":
-            if let googleCloud = googleCloudProvider {
-                self.currentProvider = googleCloud
-                #if DEBUG
-                print("🔍 OCRService.init() - Using Google Cloud provider")
-                #endif
-            } else {
-                self.currentProvider = appleVisionProvider
-                #if DEBUG
-                print("🔍 OCRService.init() - Google Cloud not available, using Apple Vision")
-                #endif
-            }
-        default:
-            self.currentProvider = appleVisionProvider
-            #if DEBUG
-            print("🔍 OCRService.init() - Using Apple Vision provider (default)")
             #endif
         }
         #if DEBUG
