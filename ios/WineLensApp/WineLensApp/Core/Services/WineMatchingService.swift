@@ -180,15 +180,22 @@ final class WineMatchingService {
 
     private func removePricePattern(from text: String) -> String {
         // Remove price patterns but preserve wine names
-        // Match $XXX or $XXX.XX patterns
+        // Match $XXX or $XXX.XX patterns (more comprehensive)
         var cleaned = text.replacingOccurrences(
             of: #"\$\s*[\d,]+(?:\.\d{2})?"#,
             with: "",
             options: .regularExpression
         )
-        // Remove standalone numbers that are likely prices (at end of line or followed by currency)
+        // Also match multiple prices like "$68 $100"
         cleaned = cleaned.replacingOccurrences(
-            of: #"\b\d{1,3}(?:\.\d{2})?\s*(?:USD|EUR|GBP|$)"#,
+            of: #"\$\s*[\d,]+(?:\.\d{2})?\s*"#,
+            with: "",
+            options: .regularExpression
+        )
+        // Remove standalone numbers that might be prices (be careful - don't remove years)
+        // Only remove if followed by common price indicators
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\b\d{1,3}(?:\.\d{2})?\s*(?:USD|EUR|GBP)\b"#,
             with: "",
             options: .regularExpression
         )

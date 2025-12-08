@@ -66,12 +66,30 @@ final class WineAPIClient {
 
         components.queryItems = queryItems
 
+        #if DEBUG
+        print("🌐 WineAPIClient.searchWines - URL: \(components.url?.absoluteString ?? "nil")")
+        #endif
+
         let request = try authorizedRequest(url: components.url!)
         let (data, response) = try await session.data(for: request)
 
         try validateResponse(response)
 
+        #if DEBUG
+        if let httpResponse = response as? HTTPURLResponse {
+            print("🌐 WineAPIClient.searchWines - Response status: \(httpResponse.statusCode)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("🌐 WineAPIClient.searchWines - Response data (first 500 chars): \(responseString.prefix(500))")
+            }
+        }
+        #endif
+
         let apiResponse = try decoder.decode(SearchResponse.self, from: data)
+        
+        #if DEBUG
+        print("🌐 WineAPIClient.searchWines - Decoded \(apiResponse.data.results.count) results")
+        #endif
+        
         return apiResponse.data.results.map {
             SearchResult(wine: $0.wine, confidence: $0.matchConfidence)
         }
