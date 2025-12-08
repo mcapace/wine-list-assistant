@@ -48,6 +48,12 @@ struct MainTabView: View {
                     }()
                     ScannerView()
                         .id("scanner") // Force view recreation
+                        .task {
+                            // Immediate task to ensure camera starts even if view hasn't fully appeared
+                            #if DEBUG
+                            print("📱 MainTabView: ScannerView.task executing - forcing camera start")
+                            #endif
+                        }
                         .onAppear {
                             #if DEBUG
                             print("📱 ScannerView.onAppear called from MainTabView")
