@@ -11,19 +11,13 @@ struct ScannerView: View {
         print("📷 ScannerView.init() - About to create ScannerViewModel...")
         #endif
         
-        // Initialize viewModel - wrap in do-catch to catch any initialization errors
-        do {
-            _viewModel = StateObject(wrappedValue: ScannerViewModel())
-            #if DEBUG
-            print("📷 ScannerView.init() - ScannerViewModel created successfully")
-            #endif
-        } catch {
-            #if DEBUG
-            print("❌ ScannerView.init() - ERROR creating ScannerViewModel: \(error)")
-            #endif
-            // Create a basic instance even if there's an error
-            _viewModel = StateObject(wrappedValue: ScannerViewModel())
-        }
+        // Initialize viewModel - StateObject is lazy, so we need to force initialization
+        // by accessing it immediately to trigger the wrappedValue initializer
+        let vm = ScannerViewModel()
+        #if DEBUG
+        print("📷 ScannerView.init() - ScannerViewModel instance created, now wrapping in StateObject")
+        #endif
+        _viewModel = StateObject(wrappedValue: vm)
         
         #if DEBUG
         print("📷 ScannerView.init() - COMPLETE")
