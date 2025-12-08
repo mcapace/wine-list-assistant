@@ -10,7 +10,6 @@ final class OCRService {
     
     // MARK: - Properties
     
-    private var currentProvider: OCRProvider
     // Make lazy to avoid blocking during singleton initialization
     private lazy var appleVisionProvider: AppleVisionOCRService = {
         #if DEBUG
@@ -24,6 +23,9 @@ final class OCRService {
     }()
     private var googleCloudProvider: GoogleCloudOCRService?
     
+    // Cache the preferred provider name to avoid repeated UserDefaults access
+    private let preferredProviderName: String
+    
     // MARK: - Initialization
     
     private init() {
@@ -35,37 +37,12 @@ final class OCRService {
         #if DEBUG
         print("🔍 OCRService.init() - Getting preferred OCR provider...")
         #endif
-        let preferredProvider = AppConfiguration.preferredOCRProvider
+        self.preferredProviderName = AppConfiguration.preferredOCRProvider
         #if DEBUG
-        print("🔍 OCRService.init() - Preferred provider: \(preferredProvider)")
+        print("🔍 OCRService.init() - Preferred provider: \(preferredProviderName)")
         #endif
         
-        // Temporarily create a dummy provider, we'll replace it below
-        // This avoids triggering lazy init during init()
-        #if DEBUG
-        print("🔍 OCRService.init() - Creating temporary provider...")
-        #endif
-        
-        // Initialize currentProvider - this will trigger lazy init of appleVisionProvider
-        // but we need to set it to something, so we'll access appleVisionProvider
-        switch preferredProvider.lowercased() {
-        case "google", "googlecloud", "google cloud":
-            #if DEBUG
-            print("🔍 OCRService.init() - Google Cloud preferred, will check below")
-            #endif
-            // Will set below after checking if Google Cloud is available
-            self.currentProvider = appleVisionProvider // Triggers lazy init
-        default:
-            #if DEBUG
-            print("🔍 OCRService.init() - Apple Vision preferred (default)")
-            #endif
-            self.currentProvider = appleVisionProvider // Triggers lazy init
-        }
-        #if DEBUG
-        print("🔍 OCRService.init() - Initial provider set (lazy init should have completed)")
-        #endif
-        
-        // Initialize Google Cloud provider if API key is available
+        // Initialize Google Cloud provider if API key is available (this is optional, so no blocking)
         #if DEBUG
         print("🔍 OCRService.init() - Checking for Google Cloud API key...")
         #endif
@@ -77,26 +54,30 @@ final class OCRService {
             #if DEBUG
             print("🔍 OCRService.init() - GoogleCloudOCRService created")
             #endif
-            
-            // If Google Cloud is preferred and now available, switch to it
-            if preferredProvider.lowercased() == "google" || 
-               preferredProvider.lowercased() == "googlecloud" || 
-               preferredProvider.lowercased() == "google cloud" {
-                if let googleCloud = googleCloudProvider {
-                    self.currentProvider = googleCloud
-                    #if DEBUG
-                    print("🔍 OCRService.init() - Switched to Google Cloud provider")
-                    #endif
-                }
-            }
         } else {
             #if DEBUG
             print("🔍 OCRService.init() - No Google Cloud API key, skipping")
             #endif
         }
+        
+        // DON'T access appleVisionProvider here - it will be created lazily on first use
+        // currentProvider is now computed, so no blocking during init
         #if DEBUG
-        print("🔍 OCRService.init() - COMPLETE")
+        print("🔍 OCRService.init() - COMPLETE (no lazy properties accessed)")
         #endif
+    }
+    
+    // MARK: - Computed Properties
+    
+    /// Current OCR provider (computed to avoid blocking during init)
+    private var currentProvider: OCRProvider {
+        let preferred = preferredProviderName.lowercased()
+        if (preferred == "google" || preferred == "googlecloud" || preferred == "google cloud"),
+           let googleCloud = googleCloudProvider {
+            return googleCloud
+        }
+        // Default to Apple Vision (lazy, created on first access)
+        return appleVisionProvider
     }
     
     // MARK: - Provider Management
