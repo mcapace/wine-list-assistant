@@ -44,15 +44,17 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack {
-            // Page content
+            // Page content - use drawingGroup for better performance
             TabView(selection: $currentPage) {
                 ForEach(0..<pages.count, id: \.self) { index in
                     OnboardingPageView(page: pages[index])
                         .tag(index)
                         .id(index) // Force view recreation on page change
+                        .drawingGroup() // Composite into single layer for better performance
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
+            .animation(.easeInOut(duration: 0.3), value: currentPage)
 
             // Bottom buttons
             VStack(spacing: Theme.Spacing.md) {
@@ -114,14 +116,15 @@ struct OnboardingPageView: View {
             Spacer()
 
             if page.isLogo {
-                // Logo page - use WineLensBadge component with actual logos and enhanced animations
+                // Logo page - use WineLensBadge component with optimized animations
                 VStack(spacing: 0) {
                     WineLensBadge(style: .onboarding)
                         .opacity(showContent ? 1.0 : 0.0)
-                        .scaleEffect(showContent ? 1.0 : 0.8)
-                        .animation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2), value: showContent)
+                        .scaleEffect(showContent ? 1.0 : 0.9)
+                        .animation(.easeOut(duration: 0.4).delay(0.1), value: showContent)
+                        .drawingGroup() // Optimize rendering
                     
-                    // Subtitle with fade-in animation
+                    // Subtitle with simplified fade-in animation
                     Text(page.subtitle)
                         .font(.system(size: 18, weight: .medium, design: .default))
                         .foregroundColor(.secondary)
@@ -130,8 +133,8 @@ struct OnboardingPageView: View {
                         .padding(.horizontal, Theme.Spacing.xl)
                         .padding(.top, 40)
                         .opacity(showContent ? 1.0 : 0.0)
-                        .offset(y: showContent ? 0 : 20)
-                        .animation(.easeOut(duration: 0.8).delay(0.6), value: showContent)
+                        .offset(y: showContent ? 0 : 10)
+                        .animation(.easeOut(duration: 0.4).delay(0.3), value: showContent)
                 }
             } else {
                 // Elegant icon page - Vivino-inspired clean design
@@ -142,7 +145,7 @@ struct OnboardingPageView: View {
                 )
             }
 
-            // Text - elegant typography with smooth animations (only for non-logo pages)
+            // Text - simplified animations for better performance
             if !page.isLogo {
                 VStack(spacing: Theme.Spacing.md) {
                     Text(page.title)
@@ -150,8 +153,8 @@ struct OnboardingPageView: View {
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
                         .opacity(showContent ? 1.0 : 0.0)
-                        .offset(y: showContent ? 0 : 15)
-                        .animation(.easeOut(duration: 0.6).delay(0.3), value: showContent)
+                        .offset(y: showContent ? 0 : 10)
+                        .animation(.easeOut(duration: 0.4).delay(0.2), value: showContent)
 
                     Text(page.subtitle)
                         .font(.system(size: 18, weight: .regular, design: .default))
@@ -160,8 +163,8 @@ struct OnboardingPageView: View {
                         .lineSpacing(6)
                         .padding(.horizontal, Theme.Spacing.xl)
                         .opacity(showContent ? 1.0 : 0.0)
-                        .offset(y: showContent ? 0 : 15)
-                        .animation(.easeOut(duration: 0.6).delay(0.5), value: showContent)
+                        .offset(y: showContent ? 0 : 10)
+                        .animation(.easeOut(duration: 0.4).delay(0.3), value: showContent)
                 }
                 .padding(.top, Theme.Spacing.xl)
             }
@@ -170,11 +173,8 @@ struct OnboardingPageView: View {
             Spacer()
         }
         .onAppear {
-            // Always set showContent to true when the page appears
-            // This ensures both logo and non-logo pages animate in
-            withAnimation {
-                showContent = true
-            }
+            // Simplified animation trigger - avoid nested animations
+            showContent = true
         }
         .onDisappear {
             // Reset when page disappears so it animates in again if user swipes back
@@ -191,86 +191,37 @@ struct ElegantIconView: View {
     let showContent: Bool
     
     @State private var iconScale: CGFloat = 0.7
-    @State private var glowPulse: Double = 0.3
     
     var body: some View {
         ZStack {
-            // Subtle outer glow
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            color.opacity(0.15),
-                            color.opacity(0.05),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 50,
-                        endRadius: 100
-                    )
-                )
-                .frame(width: 180, height: 180)
-                .blur(radius: 15)
-                .opacity(glowPulse)
-            
-            // Elegant container with subtle border
+            // Simplified container - remove heavy gradients for better performance
             RoundedRectangle(cornerRadius: 32)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(.systemBackground),
-                            Color(.systemBackground).opacity(0.95)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color(.systemBackground))
                 .frame(width: 140, height: 140)
                 .overlay(
                     RoundedRectangle(cornerRadius: 32)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    color.opacity(0.3),
-                                    color.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
+                        .stroke(color.opacity(0.2), lineWidth: 1.5)
                 )
-                .shadow(color: color.opacity(0.15), radius: 20, x: 0, y: 8)
-                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+                .shadow(color: color.opacity(0.1), radius: 12, x: 0, y: 4)
 
-            // Icon with elegant styling
+            // Icon - simplified styling
             Image(systemName: iconName)
-                .font(.system(size: 60, weight: .light))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [color, color.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .shadow(color: color.opacity(0.2), radius: 4, x: 0, y: 2)
+                .font(.system(size: 60, weight: .medium))
+                .foregroundColor(color)
         }
         .scaleEffect(iconScale)
         .opacity(showContent ? 1.0 : 0.0)
         .onAppear {
-            // Smooth entrance animation
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.75).delay(0.2)) {
-                iconScale = 1.0
-            }
-            
-            // Subtle pulse animation
-            withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
-                glowPulse = 0.6
+            // Simplified entrance animation - no infinite loops
+            if showContent {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.1)) {
+                    iconScale = 1.0
+                }
             }
         }
         .onChange(of: showContent) { newValue in
             if newValue {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.75)) {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                     iconScale = 1.0
                 }
             }
