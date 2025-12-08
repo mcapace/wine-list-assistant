@@ -69,11 +69,11 @@ enum WineFilter: String, CaseIterable, Identifiable {
 
         switch self {
         case .score95Plus:
-            return matchedWine.score >= 95
+            return (matchedWine.score ?? 0) >= 95
         case .score90Plus:
-            return matchedWine.score >= 90
+            return (matchedWine.score ?? 0) >= 90
         case .score85Plus:
-            return matchedWine.score >= 85
+            return (matchedWine.score ?? 0) >= 85
         case .drinkNow:
             return matchedWine.isReadyToDrink && !matchedWine.isPastPrime
         case .bestValue:

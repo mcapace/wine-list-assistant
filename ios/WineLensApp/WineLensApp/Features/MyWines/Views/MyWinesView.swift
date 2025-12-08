@@ -11,7 +11,7 @@ struct MyWinesView: View {
         }
         return viewModel.savedWines.filter { saved in
             saved.wine.fullName.localizedCaseInsensitiveContains(searchText) ||
-            saved.wine.region.localizedCaseInsensitiveContains(searchText)
+            (saved.wine.region?.localizedCaseInsensitiveContains(searchText) ?? false)
         }
     }
 
@@ -113,7 +113,7 @@ struct SavedWineRow: View {
                             .foregroundColor(.secondary)
                     }
 
-                    Text(savedWine.wine.region)
+                    Text(savedWine.wine.region ?? "Unknown")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
