@@ -49,6 +49,7 @@ struct OnboardingView: View {
                 ForEach(0..<pages.count, id: \.self) { index in
                     OnboardingPageView(page: pages[index])
                         .tag(index)
+                        .id(index) // Force view recreation on page change
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
@@ -132,9 +133,6 @@ struct OnboardingPageView: View {
                         .offset(y: showContent ? 0 : 20)
                         .animation(.easeOut(duration: 0.8).delay(0.6), value: showContent)
                 }
-                .onAppear {
-                    showContent = true
-                }
             } else {
                 // Elegant icon page - Vivino-inspired clean design
                 ElegantIconView(
@@ -170,6 +168,17 @@ struct OnboardingPageView: View {
 
             Spacer()
             Spacer()
+        }
+        .onAppear {
+            // Always set showContent to true when the page appears
+            // This ensures both logo and non-logo pages animate in
+            withAnimation {
+                showContent = true
+            }
+        }
+        .onDisappear {
+            // Reset when page disappears so it animates in again if user swipes back
+            showContent = false
         }
     }
 }
