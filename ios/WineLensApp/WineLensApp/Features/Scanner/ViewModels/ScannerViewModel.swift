@@ -26,7 +26,7 @@ final class ScannerViewModel: ObservableObject {
 
     // MARK: - Services
 
-    let cameraService = CameraService()
+    let cameraService: CameraService
     let ocrService = OCRService.shared // Made accessible to check recovery mode
     private let matchingService: WineMatchingService
     private let subscriptionService = SubscriptionService.shared
@@ -59,6 +59,15 @@ final class ScannerViewModel: ObservableObject {
         // CRITICAL: Print immediately as first line - before anything else
         #if DEBUG
         print("🎬 ScannerViewModel.init() - START - THIS SHOULD APPEAR IMMEDIATELY")
+        #endif
+
+        // Initialize CameraService FIRST - it was blocking as a property initializer
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 0: creating CameraService...")
+        #endif
+        self.cameraService = CameraService()
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 0: CameraService created")
         #endif
 
         // Access properties in order with logging between each
