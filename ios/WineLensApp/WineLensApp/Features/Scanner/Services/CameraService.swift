@@ -76,7 +76,15 @@ final class CameraService: NSObject, ObservableObject {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         
         #if DEBUG
-        print("📷 Camera authorization status: \(status.rawValue)")
+        let statusString: String
+        switch status {
+        case .notDetermined: statusString = "notDetermined"
+        case .restricted: statusString = "restricted"
+        case .denied: statusString = "denied"
+        case .authorized: statusString = "authorized"
+        @unknown default: statusString = "unknown"
+        }
+        print("📷 Camera authorization status: \(statusString) (rawValue: \(status.rawValue))")
         #endif
 
         switch status {
@@ -84,16 +92,22 @@ final class CameraService: NSObject, ObservableObject {
             #if DEBUG
             print("✅ Camera already authorized")
             #endif
-            isAuthorized = true
+            await MainActor.run {
+                isAuthorized = true
+            }
             return true
 
         case .notDetermined:
             #if DEBUG
-            print("📱 Requesting camera permission...")
+            print("📱 STATUS: notDetermined - iOS will show permission dialog when requestAccess() is called")
+            print("📱 Calling AVCaptureDevice.requestAccess(for: .video) NOW...")
             #endif
             let granted = await AVCaptureDevice.requestAccess(for: .video)
             #if DEBUG
-            print("📱 Camera permission granted: \(granted)")
+            print("📱 AVCaptureDevice.requestAccess() completed - granted: \(granted)")
+            if !granted {
+                print("⚠️ WARNING: Permission was denied by user or Info.plist is missing NSCameraUsageDescription")
+            }
             #endif
             await MainActor.run {
                 isAuthorized = granted
@@ -103,9 +117,20 @@ final class CameraService: NSObject, ObservableObject {
             }
             return granted
 
-        case .denied, .restricted:
+        case .denied:
             #if DEBUG
-            print("❌ Camera permission denied or restricted")
+            print("❌ Camera permission DENIED - User must enable in Settings")
+            print("❌ The permission dialog will NOT appear again unless app is deleted and reinstalled")
+            #endif
+            await MainActor.run {
+                isAuthorized = false
+                error = .notAuthorized
+            }
+            return false
+            
+        case .restricted:
+            #if DEBUG
+            print("❌ Camera permission RESTRICTED - Parental controls or MDM")
             #endif
             await MainActor.run {
                 isAuthorized = false
@@ -114,6 +139,9 @@ final class CameraService: NSObject, ObservableObject {
             return false
 
         @unknown default:
+            #if DEBUG
+            print("❌ Camera authorization status unknown")
+            #endif
             return false
         }
     }

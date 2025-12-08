@@ -288,40 +288,53 @@ struct ScannerView: View {
         } message: {
             Text("This will clear all wines found in this session. Continue?")
         }
-            .onAppear {
-                // Start camera initialization when view appears
+            .task {
+                // Use .task instead of .onAppear for better async handling
+                // This ensures the task runs when the view appears and is cancelled when it disappears
                 guard !hasStartedCamera else {
                     #if DEBUG
-                    print("⚠️ ScannerView: Camera already started, skipping")
+                    print("⚠️ ScannerView.task: Camera already started, skipping")
                     #endif
                     return
                 }
                 hasStartedCamera = true
                 
                 #if DEBUG
-                print("📷 ScannerView: Starting camera initialization")
+                print("📷 ScannerView.task: Starting camera initialization")
+                print("📷 ScannerView.task: About to call startScanning() in 0.2s")
                 #endif
                 
-                Task { @MainActor in
-                    // Small delay to ensure view is fully rendered
-                    try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-                    
-                    // Check if camera is already running to avoid duplicate starts
-                    guard !viewModel.cameraService.isRunning else {
-                        #if DEBUG
-                        print("⚠️ ScannerView: Camera already running")
-                        #endif
-                        return
-                    }
-                    
+                // Small delay to ensure view is fully rendered
+                try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+                
+                #if DEBUG
+                print("📷 ScannerView.task: Delay complete, checking camera status")
+                #endif
+                
+                // Check if camera is already running to avoid duplicate starts
+                guard !viewModel.cameraService.isRunning else {
                     #if DEBUG
-                    print("📷 ScannerView: Calling startScanning()")
+                    print("⚠️ ScannerView.task: Camera already running")
                     #endif
-                    
-                    // Always request authorization and start camera
-                    // This will show permission dialog if needed
-                    await viewModel.startScanning()
+                    return
                 }
+                
+                #if DEBUG
+                print("📷 ScannerView.task: Calling viewModel.startScanning() NOW")
+                #endif
+                
+                // Always request authorization and start camera
+                // This will show permission dialog if needed
+                await viewModel.startScanning()
+                
+                #if DEBUG
+                print("📷 ScannerView.task: startScanning() completed")
+                #endif
+            }
+            .onAppear {
+                #if DEBUG
+                print("📷 ScannerView.onAppear: View appeared, hasStartedCamera=\(hasStartedCamera)")
+                #endif
             }
             .onDisappear {
                 viewModel.stopScanning()
