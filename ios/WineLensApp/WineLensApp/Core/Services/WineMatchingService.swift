@@ -118,12 +118,15 @@ final class WineMatchingService {
     // MARK: - Text Parsing
 
     func parseWineText(_ text: String) -> ParsedWineText {
-        var normalized = normalizeText(text)
-        let vintage = extractVintage(from: normalized)
+        // Extract price FIRST from original text (before any processing)
         let price = extractPrice(from: text)
-
-        // Remove price from normalized text for matching
-        normalized = removePricePattern(from: normalized)
+        
+        // Remove price from original text BEFORE normalization to avoid corruption
+        var textWithoutPrice = removePricePattern(from: text)
+        
+        // Now normalize the cleaned text
+        var normalized = normalizeText(textWithoutPrice)
+        let vintage = extractVintage(from: normalized)
 
         return ParsedWineText(
             producer: nil,  // TODO: NLP extraction
