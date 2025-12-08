@@ -125,6 +125,52 @@ struct Wine: Identifiable, Codable, Hashable {
         case releasePriceCurrency = "release_price_currency"
     }
     
+    // MARK: - Memberwise Initializer (for preview code and manual creation)
+    
+    init(
+        id: String,
+        producer: String,
+        name: String,
+        vintage: Int?,
+        region: String,
+        subRegion: String?,
+        appellation: String?,
+        country: String,
+        color: WineColor,
+        grapeVarieties: [GrapeVariety],
+        alcohol: Double?,
+        score: Int,
+        tastingNote: String,
+        reviewer: Reviewer,
+        reviewDate: Date,
+        issueDate: Date?,
+        drinkWindowStart: Int?,
+        drinkWindowEnd: Int?,
+        releasePrice: Decimal?,
+        releasePriceCurrency: String?
+    ) {
+        self.id = id
+        self.producer = producer
+        self.name = name
+        self.vintage = vintage
+        self.region = region
+        self.subRegion = subRegion
+        self.appellation = appellation
+        self.country = country
+        self.color = color
+        self.grapeVarieties = grapeVarieties
+        self.alcohol = alcohol
+        self.score = score
+        self.tastingNote = tastingNote
+        self.reviewer = reviewer
+        self.reviewDate = reviewDate
+        self.issueDate = issueDate
+        self.drinkWindowStart = drinkWindowStart
+        self.drinkWindowEnd = drinkWindowEnd
+        self.releasePrice = releasePrice
+        self.releasePriceCurrency = releasePriceCurrency
+    }
+    
     // MARK: - Custom Decoding
     
     init(from decoder: Decoder) throws {
