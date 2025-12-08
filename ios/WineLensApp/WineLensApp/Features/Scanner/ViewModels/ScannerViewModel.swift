@@ -18,18 +18,22 @@ final class ScannerViewModel: ObservableObject {
             cameraService.torchEnabled = torchEnabled
         }
     }
-    
+
     // MARK: - Session Management
-    
+
     private var currentSession: ScanSession?
-    private let sessionManager = SessionManager.shared
+    // MOVED TO INIT: private let sessionManager = SessionManager.shared
+    private let sessionManager: SessionManager
 
     // MARK: - Services
+    // ALL services are now initialized in init() to avoid property initializer blocking
 
     let cameraService: CameraService
-    let ocrService = OCRService.shared // Made accessible to check recovery mode
+    // MOVED TO INIT: let ocrService = OCRService.shared
+    let ocrService: OCRService
     private let matchingService: WineMatchingService
-    private let subscriptionService = SubscriptionService.shared
+    // MOVED TO INIT: private let subscriptionService = SubscriptionService.shared
+    private let subscriptionService: SubscriptionService
 
     // MARK: - Internal State
 
@@ -44,11 +48,11 @@ final class ScannerViewModel: ObservableObject {
     var filteredWines: [RecognizedWine] {
         filters.apply(to: recognizedWines)
     }
-    
+
     var sessionMatchCount: Int {
         persistentMatches.count
     }
-    
+
     var matchedPersistentWines: [RecognizedWine] {
         persistentMatches.filter { $0.isMatched }
     }
@@ -61,13 +65,28 @@ final class ScannerViewModel: ObservableObject {
         print("🎬 ScannerViewModel.init() - START - THIS SHOULD APPEAR IMMEDIATELY")
         #endif
 
-        // Initialize CameraService FIRST - it was blocking as a property initializer
+        // Initialize ALL services in init() to avoid property initializer blocking
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - Step 0: creating CameraService...")
+        print("🎬 ScannerViewModel.init() - Step 0a: getting SessionManager.shared...")
+        #endif
+        self.sessionManager = SessionManager.shared
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 0b: getting OCRService.shared...")
+        #endif
+        self.ocrService = OCRService.shared
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 0c: getting SubscriptionService.shared...")
+        #endif
+        self.subscriptionService = SubscriptionService.shared
+
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 0d: creating CameraService...")
         #endif
         self.cameraService = CameraService()
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - Step 0: CameraService created")
+        print("🎬 ScannerViewModel.init() - Step 0d: CameraService created")
         #endif
 
         // Access properties in order with logging between each
@@ -90,7 +109,7 @@ final class ScannerViewModel: ObservableObject {
         #if DEBUG
         print("🎬 ScannerViewModel.init() - Step 3: deferring setupFrameProcessing to async task...")
         #endif
-        
+
         // Defer frame processing setup to avoid blocking init
         Task { @MainActor [weak self] in
             #if DEBUG
