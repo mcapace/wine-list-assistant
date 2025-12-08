@@ -56,22 +56,30 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Initialization
 
     init() {
+        // CRITICAL: Print immediately as first line - before anything else
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - START")
+        print("🎬 ScannerViewModel.init() - START - THIS SHOULD APPEAR IMMEDIATELY")
         #endif
 
+        // Access properties in order with logging between each
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - creating WineMatchingService...")
+        print("🎬 ScannerViewModel.init() - Step 1: creating WineMatchingService...")
         #endif
         self.matchingService = WineMatchingService()
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 1: WineMatchingService created")
+        #endif
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - getting processingInterval...")
+        print("🎬 ScannerViewModel.init() - Step 2: getting processingInterval...")
         #endif
         self.processingInterval = AppConfiguration.ocrProcessingIntervalSeconds
+        #if DEBUG
+        print("🎬 ScannerViewModel.init() - Step 2: processingInterval = \(self.processingInterval)")
+        #endif
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - deferring setupFrameProcessing to async task...")
+        print("🎬 ScannerViewModel.init() - Step 3: deferring setupFrameProcessing to async task...")
         #endif
         
         // Defer frame processing setup to avoid blocking init
@@ -83,19 +91,31 @@ final class ScannerViewModel: ObservableObject {
         }
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - loading session...")
+        print("🎬 ScannerViewModel.init() - Step 4: loading session...")
         #endif
-        // Load incomplete session if exists
-        if let session = sessionManager.loadCurrentSession() {
-            currentSession = session
-            persistentMatches = session.wines
-        } else {
-            // Start new session
+        // Load incomplete session if exists - wrap in do-catch for safety
+        do {
+            if let session = sessionManager.loadCurrentSession() {
+                currentSession = session
+                persistentMatches = session.wines
+                #if DEBUG
+                print("🎬 ScannerViewModel.init() - Step 4: loaded existing session with \(session.wines.count) wines")
+                #endif
+            } else {
+                currentSession = ScanSession()
+                #if DEBUG
+                print("🎬 ScannerViewModel.init() - Step 4: created new session")
+                #endif
+            }
+        } catch {
+            #if DEBUG
+            print("⚠️ ScannerViewModel.init() - Step 4: Error loading session: \(error), creating new session")
+            #endif
             currentSession = ScanSession()
         }
 
         #if DEBUG
-        print("🎬 ScannerViewModel.init() - COMPLETE (non-blocking)")
+        print("🎬 ScannerViewModel.init() - COMPLETE - All steps finished")
         #endif
     }
 
