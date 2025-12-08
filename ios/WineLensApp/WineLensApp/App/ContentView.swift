@@ -39,24 +39,21 @@ struct MainTabView: View {
         }()
 
         TabView(selection: $appState.selectedTab) {
+            // Use Group to ensure views are properly created
             Group {
                 if shouldInitializeScanner {
+                    // Create ScannerView with explicit initialization
+                    let scannerView = ScannerView()
                     let _ = {
                         #if DEBUG
-                        print("📱 MainTabView: Creating ScannerView...")
+                        print("📱 MainTabView: ScannerView instance created, body type: \(type(of: scannerView.body))")
                         #endif
                     }()
-                    ScannerView()
+                    scannerView
                         .id("scanner") // Force view recreation
-                        .task {
-                            // Immediate task to ensure camera starts even if view hasn't fully appeared
-                            #if DEBUG
-                            print("📱 MainTabView: ScannerView.task executing - forcing camera start")
-                            #endif
-                        }
                         .onAppear {
                             #if DEBUG
-                            print("📱 ScannerView.onAppear called from MainTabView")
+                            print("📱 MainTabView: ScannerView.onAppear called from MainTabView wrapper")
                             #endif
                         }
                 } else {
