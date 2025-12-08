@@ -12,7 +12,17 @@ final class AppleVisionOCRService: OCRProvider {
 
     // MARK: - Properties
 
-    private let requestHandler = VNSequenceRequestHandler()
+    // Make requestHandler lazy to avoid blocking during initialization
+    private lazy var requestHandler: VNSequenceRequestHandler = {
+        #if DEBUG
+        print("👁️ AppleVisionOCRService - Creating VNSequenceRequestHandler...")
+        #endif
+        let handler = VNSequenceRequestHandler()
+        #if DEBUG
+        print("👁️ AppleVisionOCRService - VNSequenceRequestHandler created")
+        #endif
+        return handler
+    }()
 
     /// Languages to recognize (prioritized)
     private let recognitionLanguages = ["en-US", "fr-FR", "it-IT", "es-ES", "de-DE", "pt-PT"]
@@ -23,6 +33,18 @@ final class AppleVisionOCRService: OCRProvider {
     /// Public property to check if OCR is in recovery/fast mode
     var isInRecoveryMode: Bool {
         useFastRecognition
+    }
+    
+    // MARK: - Initialization
+    
+    init() {
+        #if DEBUG
+        print("👁️ AppleVisionOCRService.init() - START")
+        #endif
+        // requestHandler is now lazy, so initialization completes immediately
+        #if DEBUG
+        print("👁️ AppleVisionOCRService.init() - COMPLETE (requestHandler will be created on first use)")
+        #endif
     }
 
     // MARK: - OCRProvider Methods
