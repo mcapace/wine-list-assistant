@@ -31,8 +31,8 @@ struct WineDetailSheet: View {
                         }
 
                         // Tasting Note - Enhanced typography
-                        if let wine = wine, !wine.tastingNote.isEmpty {
-                            PremiumTastingNoteSection(note: wine.tastingNote)
+                        if let wine = wine, let note = wine.tastingNote, !note.isEmpty {
+                            PremiumTastingNoteSection(note: note)
                         }
 
                         // Price & Value - Premium card
@@ -93,7 +93,7 @@ struct WineDetailSheet: View {
         \(wine.fullName)
         Wine Spectator Score: \(wine.score)
 
-        \(wine.tastingNote)
+        \(wine.tastingNote ?? "No tasting note available")
 
         Drink: \(wine.drinkWindowDisplay)
         """

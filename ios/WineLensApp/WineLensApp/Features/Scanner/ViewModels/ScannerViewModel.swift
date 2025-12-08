@@ -19,6 +19,7 @@ final class ScannerViewModel: ObservableObject {
             cameraService.torchEnabled = torchEnabled
         }
     }
+    @Published var isAutoScanning = true // Auto-scan vs manual photo mode
 
     // MARK: - Session Management
 
@@ -266,6 +267,28 @@ final class ScannerViewModel: ObservableObject {
     func focusAt(_ point: CGPoint) {
         cameraService.focus(at: point)
     }
+    
+    // MARK: - Manual Photo Capture
+    
+    func capturePhoto() async {
+        guard !isAutoScanning else { return }
+        
+        guard let pixelBuffer = cameraService.currentFrame else {
+            #if DEBUG
+            print("📸 capturePhoto: No frame available")
+            #endif
+            return
+        }
+        
+        isProcessing = true
+        defer { isProcessing = false }
+        
+        #if DEBUG
+        print("📸 capturePhoto: Processing captured frame...")
+        #endif
+        
+        await processFrame(pixelBuffer)
+    }
 
     // MARK: - Frame Processing
 
@@ -283,6 +306,11 @@ final class ScannerViewModel: ObservableObject {
     private var frameProcessedCount = 0
 
     private func processFrameIfNeeded(_ frame: CVPixelBuffer) {
+        // If auto-scanning is disabled, don't process frames automatically
+        guard isAutoScanning else {
+            return
+        }
+        
         frameReceivedCount += 1
 
         let now = Date()

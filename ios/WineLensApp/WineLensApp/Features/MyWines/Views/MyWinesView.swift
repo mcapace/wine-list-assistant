@@ -165,8 +165,8 @@ struct SavedWineDetailView: View {
                     PremiumWineInfoSection(wine: savedWine.wine)
 
                     // Tasting Note
-                    if !savedWine.wine.tastingNote.isEmpty {
-                        PremiumTastingNoteSection(note: savedWine.wine.tastingNote)
+                    if let note = savedWine.wine.tastingNote, !note.isEmpty {
+                        PremiumTastingNoteSection(note: note)
                     }
 
                     // User Notes

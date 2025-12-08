@@ -13,7 +13,7 @@ struct Wine: Identifiable, Codable, Hashable {
     let grapeVarieties: [GrapeVariety]  // Optional in API, default to empty array
     let alcohol: Double?
     let score: Int
-    let tastingNote: String
+    let tastingNote: String? // Made optional - API sometimes returns null
     let reviewer: Reviewer
     let reviewDate: Date
     let issueDate: Date?
@@ -189,7 +189,7 @@ struct Wine: Identifiable, Codable, Hashable {
         grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties) ?? []
         alcohol = try container.decodeIfPresent(Double.self, forKey: .alcohol)
         score = try container.decode(Int.self, forKey: .score)
-        tastingNote = try container.decode(String.self, forKey: .tastingNote)
+        tastingNote = try container.decodeIfPresent(String.self, forKey: .tastingNote)
         reviewer = try container.decode(Reviewer.self, forKey: .reviewer)
         reviewDate = try container.decode(Date.self, forKey: .reviewDate)
         issueDate = try container.decodeIfPresent(Date.self, forKey: .issueDate)
@@ -216,7 +216,7 @@ struct Wine: Identifiable, Codable, Hashable {
         try container.encode(grapeVarieties, forKey: .grapeVarieties)
         try container.encodeIfPresent(alcohol, forKey: .alcohol)
         try container.encode(score, forKey: .score)
-        try container.encode(tastingNote, forKey: .tastingNote)
+        try container.encodeIfPresent(tastingNote, forKey: .tastingNote)
         try container.encode(reviewer, forKey: .reviewer)
         try container.encode(reviewDate, forKey: .reviewDate)
         try container.encodeIfPresent(issueDate, forKey: .issueDate)

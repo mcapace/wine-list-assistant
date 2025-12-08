@@ -441,7 +441,7 @@ struct MatchedWineCard: View {
                     .background(Color.white.opacity(0.2))
                 
                 // Full tasting note
-                if !wine.tastingNote.isEmpty {
+                if let note = wine.tastingNote, !note.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Tasting Notes")
                             .font(.system(size: 14, weight: .semibold))

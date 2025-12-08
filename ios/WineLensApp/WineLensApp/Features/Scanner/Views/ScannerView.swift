@@ -110,6 +110,27 @@ struct ScannerView: View {
                         
                         Spacer()
                         
+                        // Auto-scan toggle
+                        Button(action: {
+                            viewModel.isAutoScanning.toggle()
+                            let generator = UIImpactFeedbackGenerator(style: .light)
+                            generator.impactOccurred()
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: viewModel.isAutoScanning ? "arrow.clockwise" : "camera.fill")
+                                    .font(.system(size: 14, weight: .medium))
+                                Text(viewModel.isAutoScanning ? "Auto" : "Manual")
+                                    .font(.system(size: 13, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(viewModel.isAutoScanning ? Theme.primaryColor : Color.gray.opacity(0.6))
+                            )
+                        }
+                        
                         // Torch toggle
                         Button(action: {
                             viewModel.torchEnabled.toggle()
