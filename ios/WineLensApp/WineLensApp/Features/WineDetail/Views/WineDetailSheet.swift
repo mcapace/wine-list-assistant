@@ -113,8 +113,8 @@ struct PremiumScoreHeader: View {
             ZStack(alignment: .top) {
                 LinearGradient(
                     colors: [
-                        Theme.scoreBackgroundColor(for: wine.score),
-                        Theme.scoreBackgroundColor(for: wine.score).opacity(0.5),
+                        Theme.scoreBackgroundColor(for: wine.score ?? 0),
+                        Theme.scoreBackgroundColor(for: wine.score ?? 0).opacity(0.5),
                         Color(.systemGroupedBackground)
                     ],
                     startPoint: .top,
@@ -129,19 +129,19 @@ struct PremiumScoreHeader: View {
 
                     // Large score display
                     VStack(spacing: Theme.Spacing.sm) {
-                        Text("\(wine.score)")
+                        Text(wine.score != nil ? "\(wine.score!)" : "N/A")
                             .font(.system(size: 72, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.scoreColor(for: wine.score))
+                            .foregroundColor(Theme.scoreColor(for: wine.score ?? 0))
                             .opacity(appear ? 1.0 : 0.0)
                             .scaleEffect(appear ? 1.0 : 0.8)
                             .animation(.spring(response: 0.6, dampingFraction: 0.7), value: appear)
 
                         if let score = wine.score {
                             ScoreCategoryBadge(score: score)
+                                .opacity(appear ? 1.0 : 0.0)
+                                .offset(y: appear ? 0 : 10)
+                                .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: appear)
                         }
-                            .opacity(appear ? 1.0 : 0.0)
-                            .offset(y: appear ? 0 : 10)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: appear)
                     }
 
                     // Wine name section
@@ -239,13 +239,13 @@ struct PremiumWineInfoSection: View {
                 PremiumInfoItem(
                     icon: "mappin.circle.fill",
                     label: "Region",
-                    value: wine.region,
+                    value: wine.region ?? "Unknown",
                     iconColor: .blue
                 )
                 PremiumInfoItem(
                     icon: "globe",
                     label: "Country",
-                    value: wine.country,
+                    value: wine.country ?? "Unknown",
                     iconColor: .green
                 )
                 PremiumInfoItem(
