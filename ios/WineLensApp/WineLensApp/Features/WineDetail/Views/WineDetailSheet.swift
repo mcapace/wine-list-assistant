@@ -157,7 +157,7 @@ struct PremiumScoreHeader: View {
                             .multilineTextAlignment(.center)
 
                         if let vintage = wine.vintage {
-                            Text("\(vintage)")
+                            Text(String(vintage))
                                 .font(.system(size: 16, weight: .regular))
                                 .foregroundColor(.secondary.opacity(0.8))
                                 .padding(.top, 4)

@@ -108,7 +108,7 @@ struct SavedWineRow: View {
 
                 HStack(spacing: 8) {
                     if let vintage = savedWine.wine.vintage {
-                        Text("\(vintage)")
+                        Text(String(vintage))
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }

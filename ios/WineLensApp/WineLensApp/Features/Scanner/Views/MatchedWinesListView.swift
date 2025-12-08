@@ -366,7 +366,7 @@ struct MatchedWineCard: View {
                 // Vintage and region
                 HStack(spacing: 12) {
                     if let vintage = wine.vintage {
-                        Label("\(vintage)", systemImage: "calendar")
+                        Label(String(vintage), systemImage: "calendar")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.white.opacity(0.6))
                     }

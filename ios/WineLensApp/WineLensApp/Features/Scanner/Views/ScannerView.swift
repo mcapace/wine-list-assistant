@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import PhotosUI
 
 struct ScannerView: View {
     @StateObject private var viewModel: ScannerViewModel
@@ -37,6 +38,8 @@ struct ScannerView: View {
     @State private var sessionLocation = ""
     @State private var showSessionHistory = false
     @State private var hasStartedCamera = false
+    @State private var showImagePicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
     @AppStorage("hasSeenScannerInstructions") private var hasSeenInstructions = false
 
     // Count only wines that have been matched from the database (current frame)
@@ -225,30 +228,50 @@ struct ScannerView: View {
                                 .transition(.opacity)
                         }
                         
-                        // Manual capture button - always show when no results, or in manual mode
+                        // Manual capture and upload buttons - always show when no results, or in manual mode
                         if sessionMatchCount == 0 || !viewModel.isAutoScanning {
-                            Button(action: {
-                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                generator.impactOccurred()
-                                Task {
-                                    await viewModel.capturePhoto()
+                            HStack(spacing: 12) {
+                                // Capture Photo button
+                                Button(action: {
+                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                    generator.impactOccurred()
+                                    Task {
+                                        await viewModel.capturePhoto()
+                                    }
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Capture")
+                                            .font(.system(size: 16, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Theme.primaryColor)
+                                    .cornerRadius(12)
                                 }
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "camera.fill")
-                                        .font(.system(size: 18, weight: .semibold))
-                                    Text(viewModel.isAutoScanning ? "Capture Photo" : "Capture & Scan")
-                                        .font(.system(size: 16, weight: .semibold))
+                                .disabled(viewModel.isProcessing)
+                                .opacity(viewModel.isProcessing ? 0.6 : 1.0)
+
+                                // Upload from Library button
+                                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "photo.on.rectangle")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Upload")
+                                            .font(.system(size: 16, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color.white.opacity(0.2))
+                                    .cornerRadius(12)
                                 }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Theme.primaryColor)
-                                .cornerRadius(12)
+                                .disabled(viewModel.isProcessing)
+                                .opacity(viewModel.isProcessing ? 0.6 : 1.0)
                             }
                             .padding(.horizontal)
-                            .disabled(viewModel.isProcessing)
-                            .opacity(viewModel.isProcessing ? 0.6 : 1.0)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
@@ -420,6 +443,16 @@ struct ScannerView: View {
             .onDisappear {
                 viewModel.stopScanning()
                 hasStartedCamera = false // Reset so it can start again if view reappears
+            }
+            .onChange(of: selectedPhotoItem) { oldValue, newValue in
+                guard let item = newValue else { return }
+                Task {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let image = UIImage(data: data) {
+                        await viewModel.processUploadedImage(image)
+                    }
+                    selectedPhotoItem = nil
+                }
             }
         .onChange(of: sessionMatchCount) { oldValue, newValue in
             // First match celebration!

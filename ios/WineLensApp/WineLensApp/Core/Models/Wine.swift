@@ -26,7 +26,7 @@ struct Wine: Identifiable, Codable, Hashable {
 
     var fullName: String {
         if let vintage = vintage {
-            return "\(producer) \(name) \(vintage)"
+            return "\(producer) \(name) \(String(vintage))"
         }
         return "\(producer) \(name)"
     }

@@ -293,6 +293,72 @@ final class ScannerViewModel: ObservableObject {
         await processFrame(pixelBuffer)
     }
 
+    // MARK: - Upload Image Processing
+
+    func processUploadedImage(_ image: UIImage) async {
+        #if DEBUG
+        print("📷 processUploadedImage: Called with image size \(image.size)")
+        #endif
+
+        isProcessing = true
+        defer { isProcessing = false }
+
+        do {
+            // Use OCR service to recognize text in the uploaded image
+            let ocrResults = try await ocrService.recognizeText(in: image)
+
+            #if DEBUG
+            print("📷 processUploadedImage: OCR returned \(ocrResults.count) results")
+            #endif
+
+            // Group text into wine entry candidates
+            let candidates = ocrService.groupIntoWineEntries(ocrResults)
+
+            #if DEBUG
+            print("📷 processUploadedImage: Grouped into \(candidates.count) wine candidates")
+            #endif
+
+            // Match each candidate against our wine database
+            var matchedWines: [RecognizedWine] = []
+
+            for (index, candidate) in candidates.enumerated() {
+                let matchResult = await matchingService.matchWine(from: candidate.fullText)
+
+                if let match = matchResult {
+                    #if DEBUG
+                    print("✅ Upload Match[\(index)]: '\(match.wine.name)' score=\(match.wine.score ?? 0)")
+                    #endif
+                }
+
+                let price = extractPrice(from: candidate.fullText)
+
+                let recognized = RecognizedWine(
+                    id: UUID(),
+                    originalText: candidate.fullText,
+                    boundingBox: candidate.boundingBox,
+                    ocrConfidence: candidate.confidence,
+                    matchedWine: matchResult?.wine,
+                    matchConfidence: matchResult?.confidence ?? 0,
+                    matchedVintage: matchResult?.matchedVintage,
+                    matchType: matchResult?.matchType ?? .noMatch,
+                    listPrice: price
+                )
+
+                matchedWines.append(recognized)
+            }
+
+            // Update UI on main thread
+            await MainActor.run {
+                mergeResults(matchedWines)
+            }
+
+        } catch {
+            #if DEBUG
+            print("❌ processUploadedImage error: \(error)")
+            #endif
+        }
+    }
+
     // MARK: - Frame Processing
 
     private func setupFrameProcessing() {
