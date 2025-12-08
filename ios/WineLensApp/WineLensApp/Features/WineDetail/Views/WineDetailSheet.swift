@@ -136,7 +136,9 @@ struct PremiumScoreHeader: View {
                             .scaleEffect(appear ? 1.0 : 0.8)
                             .animation(.spring(response: 0.6, dampingFraction: 0.7), value: appear)
 
-                        ScoreCategoryBadge(score: wine.score)
+                        if let score = wine.score {
+                            ScoreCategoryBadge(score: score)
+                        }
                             .opacity(appear ? 1.0 : 0.0)
                             .offset(y: appear ? 0 : 10)
                             .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: appear)
