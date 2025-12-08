@@ -53,10 +53,11 @@ final class TextNormalizer {
             // Letters that look like numbers (in word context)
             ("\\bO(\\d)", "0$1", []),  // "O2019" -> "02019" (but we'll extract vintage separately)
             
-            // Common single-character OCR errors
-            ("5", "S", []),  // "5auvignon" -> "Sauvignon" (but only in certain contexts)
-            ("8", "B", []),  // Less common but happens
-            ("6", "G", []),  // Less common
+            // Common single-character OCR errors (DISABLED - too aggressive, corrupts prices)
+            // Only apply in word context, not when part of numbers
+            // ("5", "S", []),  // DISABLED - breaks prices like $5.99
+            // ("8", "B", []),  // DISABLED - breaks prices like $68
+            // ("6", "G", []),  // DISABLED - breaks prices
             
             // Common multi-character patterns
             ("rn", "m", []),  // "rn" often misread as "m"

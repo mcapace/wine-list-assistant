@@ -11,16 +11,16 @@ struct ScannerView: View {
         print("📷 ScannerView.init() - About to create ScannerViewModel...")
         #endif
         
-        // Initialize viewModel - StateObject is lazy, so we need to force initialization
-        // by accessing it immediately to trigger the wrappedValue initializer
+        // Create ScannerViewModel directly - this will call its init() immediately
+        // Then wrap it in StateObject
         let vm = ScannerViewModel()
         #if DEBUG
-        print("📷 ScannerView.init() - ScannerViewModel instance created, now wrapping in StateObject")
+        print("📷 ScannerView.init() - ScannerViewModel created, wrapping in StateObject")
         #endif
         _viewModel = StateObject(wrappedValue: vm)
         
         #if DEBUG
-        print("📷 ScannerView.init() - COMPLETE")
+        print("📷 ScannerView.init() - StateObject created, viewModel should be initialized")
         #endif
     }
     @State private var selectedWine: RecognizedWine?

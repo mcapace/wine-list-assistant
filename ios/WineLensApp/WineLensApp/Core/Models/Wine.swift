@@ -10,7 +10,7 @@ struct Wine: Identifiable, Codable, Hashable {
     let appellation: String?
     let country: String
     let color: WineColor
-    let grapeVarieties: [GrapeVariety]
+    let grapeVarieties: [GrapeVariety]  // Optional in API, default to empty array
     let alcohol: Double?
     let score: Int
     let tastingNote: String
