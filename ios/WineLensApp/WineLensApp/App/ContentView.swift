@@ -8,9 +8,19 @@ struct ContentView: View {
         Group {
             if !appState.isOnboardingComplete {
                 OnboardingView()
+                    .onAppear {
+                        #if DEBUG
+                        print("📱 ContentView: Showing OnboardingView")
+                        #endif
+                    }
             } else {
                 MainTabView()
                     .transition(.opacity)
+                    .onAppear {
+                        #if DEBUG
+                        print("📱 ContentView: Showing MainTabView (transition complete)")
+                        #endif
+                    }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: appState.isOnboardingComplete)
@@ -31,6 +41,11 @@ struct MainTabView: View {
                     // Placeholder to prevent freeze during transition
                     Color.black
                         .ignoresSafeArea()
+                        .onAppear {
+                            #if DEBUG
+                            print("📱 MainTabView: Showing black placeholder (scanner not initialized yet)")
+                            #endif
+                        }
                 }
             }
             .tabItem {
@@ -52,18 +67,33 @@ struct MainTabView: View {
         }
         .tint(Theme.primaryColor)
         .onAppear {
+            #if DEBUG
+            print("📱 MainTabView.onAppear - selectedTab=\(appState.selectedTab), shouldInitializeScanner=\(shouldInitializeScanner)")
+            #endif
+
             // Initialize scanner after a brief delay to ensure transition completes
             Task { @MainActor in
                 // Wait for transition to complete
                 try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
-                
+
+                #if DEBUG
+                print("📱 MainTabView: After 0.3s delay, selectedTab=\(appState.selectedTab)")
+                #endif
+
                 // Only initialize if we're on the scanner tab
                 if appState.selectedTab == .scanner {
+                    #if DEBUG
+                    print("📱 MainTabView: Setting shouldInitializeScanner = true")
+                    #endif
                     shouldInitializeScanner = true
                 }
             }
         }
         .onChange(of: appState.selectedTab) { newTab in
+            #if DEBUG
+            print("📱 MainTabView: Tab changed to \(newTab)")
+            #endif
+
             // Initialize scanner when user switches to scanner tab
             if newTab == .scanner && !shouldInitializeScanner {
                 Task { @MainActor in

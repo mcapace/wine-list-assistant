@@ -37,15 +37,26 @@ final class AppState: ObservableObject {
 
     init() {
         self.isOnboardingComplete = UserDefaults.standard.bool(forKey: "onboarding_complete")
+        #if DEBUG
+        print("🏠 AppState init: isOnboardingComplete=\(isOnboardingComplete)")
+        #endif
     }
 
     func completeOnboarding() {
+        #if DEBUG
+        print("🏠 AppState.completeOnboarding() called")
+        #endif
+
         // Save to UserDefaults first (synchronous, fast)
         UserDefaults.standard.set(true, forKey: "onboarding_complete")
-        
+
         // Update UI immediately with animation (MainActor ensures we're on main thread)
         withAnimation(.easeInOut(duration: 0.25)) {
             isOnboardingComplete = true
         }
+
+        #if DEBUG
+        print("🏠 AppState.completeOnboarding() - isOnboardingComplete now: \(isOnboardingComplete)")
+        #endif
     }
 }
