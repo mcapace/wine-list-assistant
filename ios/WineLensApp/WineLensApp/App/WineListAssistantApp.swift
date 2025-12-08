@@ -43,13 +43,9 @@ final class AppState: ObservableObject {
         // Save to UserDefaults first (synchronous, fast)
         UserDefaults.standard.set(true, forKey: "onboarding_complete")
         
-        // Then update UI with animation (non-blocking)
-        Task { @MainActor in
-            // Small delay to ensure smooth transition
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            withAnimation(.easeInOut(duration: 0.3)) {
-                isOnboardingComplete = true
-            }
+        // Update UI immediately with animation (MainActor ensures we're on main thread)
+        withAnimation(.easeInOut(duration: 0.25)) {
+            isOnboardingComplete = true
         }
     }
 }

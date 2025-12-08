@@ -19,14 +19,23 @@ struct ContentView: View {
 
 struct MainTabView: View {
     @EnvironmentObject var appState: AppState
+    @State private var shouldInitializeScanner = false
 
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            ScannerView()
-                .tabItem {
-                    Label("Scan", systemImage: "camera.viewfinder")
+            Group {
+                if shouldInitializeScanner {
+                    ScannerView()
+                } else {
+                    // Placeholder to prevent freeze during transition
+                    Color.black
+                        .ignoresSafeArea()
                 }
-                .tag(AppState.Tab.scanner)
+            }
+            .tabItem {
+                Label("Scan", systemImage: "camera.viewfinder")
+            }
+            .tag(AppState.Tab.scanner)
 
             MyWinesView()
                 .tabItem {
@@ -41,6 +50,15 @@ struct MainTabView: View {
                 .tag(AppState.Tab.settings)
         }
         .tint(Theme.primaryColor)
+        .onAppear {
+            // Delay scanner initialization slightly to allow transition to complete
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 400_000_000) // 0.4 seconds
+                withAnimation {
+                    shouldInitializeScanner = true
+                }
+            }
+        }
     }
 }
 
