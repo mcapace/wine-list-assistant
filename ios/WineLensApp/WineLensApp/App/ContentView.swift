@@ -34,13 +34,21 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $appState.selectedTab) {
             // Always create ScannerView - don't use conditional that might prevent instantiation
-            ScannerView()
-                .id("scanner") // Force view recreation
-                .opacity(scannerReady ? 1.0 : 0.0) // Hide until ready to prevent flash
-                .tabItem {
-                    Label("Scan", systemImage: "camera.viewfinder")
+            // Use background instead of opacity to ensure view is actually rendered
+            ZStack {
+                if scannerReady {
+                    ScannerView()
+                        .transition(.opacity)
+                } else {
+                    Color.black
+                        .ignoresSafeArea()
                 }
-                .tag(AppState.Tab.scanner)
+            }
+            .id("scanner") // Force view recreation
+            .tabItem {
+                Label("Scan", systemImage: "camera.viewfinder")
+            }
+            .tag(AppState.Tab.scanner)
 
             MyWinesView()
                 .tabItem {
