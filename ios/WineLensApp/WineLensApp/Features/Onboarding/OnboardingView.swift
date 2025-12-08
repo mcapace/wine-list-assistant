@@ -15,28 +15,28 @@ struct OnboardingView: View {
         OnboardingPage(
             title: "Scan Any Wine List",
             subtitle: "Point your camera at a restaurant wine list and see Wine Spectator scores instantly.",
-            imageName: "camera.aperture",
+            imageName: "camera.viewfinder",
             color: Theme.primaryColor,
             isLogo: false
         ),
         OnboardingPage(
             title: "Expert Scores, Not Crowds",
             subtitle: "Unlike other apps, our scores come from professional blind tastings by experienced critics.",
-            imageName: "sparkles",
+            imageName: "star.circle.fill",
             color: Theme.secondaryColor,
             isLogo: false
         ),
         OnboardingPage(
             title: "Find the Best Value",
             subtitle: "Filter by score, drink window, and value to find the perfect bottle for your budget.",
-            imageName: "chart.line.uptrend.xyaxis",
+            imageName: "tag.circle.fill",
             color: .green,
             isLogo: false
         ),
         OnboardingPage(
             title: "Save Your Favorites",
             subtitle: "Build your personal wine list and never forget a great bottle.",
-            imageName: "bookmark.fill",
+            imageName: "heart.circle.fill",
             color: Theme.primaryColor,
             isLogo: false
         )
@@ -136,88 +136,135 @@ struct OnboardingPageView: View {
                     showContent = true
                 }
             } else {
-                // Standard icon page - elevated design with gradients and shadows
-                ZStack {
-                    // Outer glow
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    page.color.opacity(0.25),
-                                    page.color.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 200, height: 200)
-                        .blur(radius: 20)
-                    
-                    // Main circle with gradient
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    page.color.opacity(0.2),
-                                    page.color.opacity(0.08)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 180, height: 180)
-                        .overlay(
-                            Circle()
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            page.color.opacity(0.4),
-                                            page.color.opacity(0.2)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 2
-                                )
-                        )
-                        .shadow(color: page.color.opacity(0.3), radius: 20, x: 0, y: 10)
-                        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-
-                    // Icon with enhanced styling
-                    Image(systemName: page.imageName)
-                        .font(.system(size: 80, weight: .medium))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [page.color, page.color.opacity(0.8)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .shadow(color: page.color.opacity(0.3), radius: 8, x: 0, y: 4)
-                }
+                // Elegant icon page - Vivino-inspired clean design
+                ElegantIconView(
+                    iconName: page.imageName,
+                    color: page.color,
+                    showContent: showContent
+                )
             }
 
-            // Text - elevated typography (only for non-logo pages)
+            // Text - elegant typography with smooth animations (only for non-logo pages)
             if !page.isLogo {
                 VStack(spacing: Theme.Spacing.md) {
                     Text(page.title)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .font(.system(size: 34, weight: .bold, design: .default))
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
-                        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        .opacity(showContent ? 1.0 : 0.0)
+                        .offset(y: showContent ? 0 : 15)
+                        .animation(.easeOut(duration: 0.6).delay(0.3), value: showContent)
 
                     Text(page.subtitle)
-                        .font(.system(size: 17, weight: .regular))
+                        .font(.system(size: 18, weight: .regular, design: .default))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
-                        .lineSpacing(4)
+                        .lineSpacing(6)
                         .padding(.horizontal, Theme.Spacing.xl)
+                        .opacity(showContent ? 1.0 : 0.0)
+                        .offset(y: showContent ? 0 : 15)
+                        .animation(.easeOut(duration: 0.6).delay(0.5), value: showContent)
                 }
-                .padding(.top, Theme.Spacing.lg)
+                .padding(.top, Theme.Spacing.xl)
             }
 
             Spacer()
             Spacer()
+        }
+    }
+}
+
+// MARK: - Elegant Icon View (Vivino-inspired)
+
+struct ElegantIconView: View {
+    let iconName: String
+    let color: Color
+    let showContent: Bool
+    
+    @State private var iconScale: CGFloat = 0.7
+    @State private var glowPulse: Double = 0.3
+    
+    var body: some View {
+        ZStack {
+            // Subtle outer glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            color.opacity(0.15),
+                            color.opacity(0.05),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 50,
+                        endRadius: 100
+                    )
+                )
+                .frame(width: 180, height: 180)
+                .blur(radius: 15)
+                .opacity(glowPulse)
+            
+            // Elegant container with subtle border
+            RoundedRectangle(cornerRadius: 32)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(.systemBackground),
+                            Color(.systemBackground).opacity(0.95)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 140, height: 140)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    color.opacity(0.3),
+                                    color.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                )
+                .shadow(color: color.opacity(0.15), radius: 20, x: 0, y: 8)
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+
+            // Icon with elegant styling
+            Image(systemName: iconName)
+                .font(.system(size: 60, weight: .light))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [color, color.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: color.opacity(0.2), radius: 4, x: 0, y: 2)
+        }
+        .scaleEffect(iconScale)
+        .opacity(showContent ? 1.0 : 0.0)
+        .onAppear {
+            // Smooth entrance animation
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.75).delay(0.2)) {
+                iconScale = 1.0
+            }
+            
+            // Subtle pulse animation
+            withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+                glowPulse = 0.6
+            }
+        }
+        .onChange(of: showContent) { newValue in
+            if newValue {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.75)) {
+                    iconScale = 1.0
+                }
+            }
         }
     }
 }
