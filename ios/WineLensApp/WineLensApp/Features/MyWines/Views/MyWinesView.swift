@@ -16,7 +16,7 @@ struct MyWinesView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Group {
                 if viewModel.isLoading && viewModel.savedWines.isEmpty {
                     ProgressView("Loading wines...")
@@ -152,21 +152,21 @@ struct SavedWineDetailView: View {
     @State private var showDeleteConfirmation = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: Theme.Spacing.xl) {
                     // Score Header
-                    ScoreHeader(
+                    PremiumScoreHeader(
                         wine: savedWine.wine,
                         confidence: 1.0
                     )
 
                     // Wine Info
-                    WineInfoSection(wine: savedWine.wine)
+                    PremiumWineInfoSection(wine: savedWine.wine)
 
                     // Tasting Note
                     if !savedWine.wine.tastingNote.isEmpty {
-                        TastingNoteSection(note: savedWine.wine.tastingNote)
+                        PremiumTastingNoteSection(note: savedWine.wine.tastingNote)
                     }
 
                     // User Notes
