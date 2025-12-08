@@ -38,21 +38,49 @@ final class WineMatchingService {
     /// Match a wine text candidate to our database
     func matchWine(from text: String) async -> MatchResult? {
         let parsed = parseWineText(text)
+        
+        #if DEBUG
+        print("🍷 WineMatchingService.matchWine() - Original: '\(text.prefix(60))'")
+        print("🍷 WineMatchingService.matchWine() - Normalized: '\(parsed.normalizedText)'")
+        print("🍷 WineMatchingService.matchWine() - Vintage: \(parsed.vintage?.description ?? "nil")")
+        #endif
 
         // Step 1: Try exact match in local cache
+        #if DEBUG
+        print("🍷 Trying exact match...")
+        #endif
         if let exactMatch = await tryExactMatch(parsed) {
+            #if DEBUG
+            print("✅ Exact match found: \(exactMatch.wine.name)")
+            #endif
             return exactMatch
         }
 
         // Step 2: Try fuzzy match in local cache
+        #if DEBUG
+        print("🍷 Trying fuzzy match...")
+        #endif
         if let fuzzyMatch = await tryFuzzyMatch(parsed) {
+            #if DEBUG
+            print("✅ Fuzzy match found: \(fuzzyMatch.wine.name) (confidence: \(fuzzyMatch.confidence))")
+            #endif
             return fuzzyMatch
         }
 
         // Step 3: Query API for broader search
+        #if DEBUG
+        print("🍷 Trying API match for: '\(parsed.normalizedText)'")
+        #endif
         if let apiMatch = await tryAPIMatch(parsed) {
+            #if DEBUG
+            print("✅ API match found: \(apiMatch.wine.name) (confidence: \(apiMatch.confidence))")
+            #endif
             return apiMatch
         }
+        
+        #if DEBUG
+        print("❌ No match found for: '\(parsed.normalizedText)'")
+        #endif
 
         return nil
     }
@@ -192,14 +220,31 @@ final class WineMatchingService {
 
     private func tryAPIMatch(_ parsed: ParsedWineText) async -> MatchResult? {
         do {
+            #if DEBUG
+            print("🌐 API: Calling searchWines(query: '\(parsed.normalizedText)', vintage: \(parsed.vintage?.description ?? "nil"))")
+            #endif
             let results = try await apiClient.searchWines(
                 query: parsed.normalizedText,
                 vintage: parsed.vintage,
                 limit: 1
             )
+            
+            #if DEBUG
+            print("🌐 API: Received \(results.count) results")
+            for (index, result) in results.enumerated() {
+                print("🌐 API: Result[\(index)]: '\(result.wine.name)' confidence=\(result.confidence)")
+            }
+            #endif
 
             guard let best = results.first,
                   best.confidence >= AppConfiguration.matchConfidenceThreshold else {
+                #if DEBUG
+                if let best = results.first {
+                    print("❌ API: Best result confidence \(best.confidence) below threshold \(AppConfiguration.matchConfidenceThreshold)")
+                } else {
+                    print("❌ API: No results returned")
+                }
+                #endif
                 return nil
             }
 
@@ -215,7 +260,12 @@ final class WineMatchingService {
         } catch {
             // Don't log cancellation errors - they're expected when new frames arrive
             if (error as NSError).code != NSURLErrorCancelled {
-                print("API match failed: \(error)")
+                print("❌ API match failed: \(error)")
+                print("❌ Error details: \((error as NSError).userInfo)")
+            } else {
+                #if DEBUG
+                print("⚠️ API match cancelled (expected during rapid frame processing)")
+                #endif
             }
             return nil
         }
