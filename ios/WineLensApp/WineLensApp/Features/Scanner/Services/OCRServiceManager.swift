@@ -17,25 +17,60 @@ final class OCRService {
     // MARK: - Initialization
     
     private init() {
+        #if DEBUG
+        print("🔍 OCRService.init() - START")
+        print("🔍 OCRService.init() - Creating AppleVisionOCRService...")
+        #endif
         self.appleVisionProvider = AppleVisionOCRService()
+        #if DEBUG
+        print("🔍 OCRService.init() - AppleVisionOCRService created")
+        #endif
         
         // Initialize Google Cloud provider if API key is available
+        #if DEBUG
+        print("🔍 OCRService.init() - Checking for Google Cloud API key...")
+        #endif
         if let apiKey = AppConfiguration.googleCloudVisionAPIKey, !apiKey.isEmpty {
+            #if DEBUG
+            print("🔍 OCRService.init() - Creating GoogleCloudOCRService...")
+            #endif
             self.googleCloudProvider = GoogleCloudOCRService(apiKey: apiKey)
+            #if DEBUG
+            print("🔍 OCRService.init() - GoogleCloudOCRService created")
+            #endif
+        } else {
+            #if DEBUG
+            print("🔍 OCRService.init() - No Google Cloud API key, skipping")
+            #endif
         }
         
         // Initialize currentProvider first (must be initialized before calling setProvider)
+        #if DEBUG
+        print("🔍 OCRService.init() - Setting preferred provider...")
+        #endif
         let preferredProvider = AppConfiguration.preferredOCRProvider
         switch preferredProvider.lowercased() {
         case "google", "googlecloud", "google cloud":
             if let googleCloud = googleCloudProvider {
                 self.currentProvider = googleCloud
+                #if DEBUG
+                print("🔍 OCRService.init() - Using Google Cloud provider")
+                #endif
             } else {
                 self.currentProvider = appleVisionProvider
+                #if DEBUG
+                print("🔍 OCRService.init() - Google Cloud not available, using Apple Vision")
+                #endif
             }
         default:
             self.currentProvider = appleVisionProvider
+            #if DEBUG
+            print("🔍 OCRService.init() - Using Apple Vision provider (default)")
+            #endif
         }
+        #if DEBUG
+        print("🔍 OCRService.init() - COMPLETE")
+        #endif
     }
     
     // MARK: - Provider Management
