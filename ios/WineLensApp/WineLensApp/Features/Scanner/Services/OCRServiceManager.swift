@@ -31,28 +31,38 @@ final class OCRService {
         print("🔍 OCRService.init() - START")
         #endif
         
-        // Initialize currentProvider to use appleVisionProvider (will be created on first access)
-        // We need to access it to force lazy initialization
+        // Get preferred provider first (this reads UserDefaults, should be fast)
         #if DEBUG
-        print("🔍 OCRService.init() - Accessing appleVisionProvider to trigger lazy init...")
+        print("🔍 OCRService.init() - Getting preferred OCR provider...")
         #endif
         let preferredProvider = AppConfiguration.preferredOCRProvider
+        #if DEBUG
+        print("🔍 OCRService.init() - Preferred provider: \(preferredProvider)")
+        #endif
+        
+        // Temporarily create a dummy provider, we'll replace it below
+        // This avoids triggering lazy init during init()
+        #if DEBUG
+        print("🔍 OCRService.init() - Creating temporary provider...")
+        #endif
+        
+        // Initialize currentProvider - this will trigger lazy init of appleVisionProvider
+        // but we need to set it to something, so we'll access appleVisionProvider
         switch preferredProvider.lowercased() {
         case "google", "googlecloud", "google cloud":
-            // Will be set below if Google Cloud is available
             #if DEBUG
-            print("🔍 OCRService.init() - Google Cloud preferred, checking availability...")
+            print("🔍 OCRService.init() - Google Cloud preferred, will check below")
             #endif
-            // Temporarily use Apple Vision, will be replaced below if Google Cloud is available
-            self.currentProvider = appleVisionProvider
+            // Will set below after checking if Google Cloud is available
+            self.currentProvider = appleVisionProvider // Triggers lazy init
         default:
             #if DEBUG
             print("🔍 OCRService.init() - Apple Vision preferred (default)")
             #endif
-            self.currentProvider = appleVisionProvider
+            self.currentProvider = appleVisionProvider // Triggers lazy init
         }
         #if DEBUG
-        print("🔍 OCRService.init() - Initial provider set (triggered lazy init)")
+        print("🔍 OCRService.init() - Initial provider set (lazy init should have completed)")
         #endif
         
         // Initialize Google Cloud provider if API key is available
