@@ -328,13 +328,19 @@ final class WineMatchingService {
 
     private func tryAPIMatch(_ parsed: ParsedWineText) async -> MatchResult? {
         do {
+            // Build a cleaner query - extract key terms (producer, region, grape)
+            // Limit query length to avoid overly long corrupted strings
+            let cleanQuery = extractCleanQuery(from: parsed.normalizedText)
+            
             #if DEBUG
-            print("🌐 API: Calling searchWines(query: '\(parsed.normalizedText)', vintage: \(parsed.vintage?.description ?? "nil"))")
+            print("🌐 API: Calling searchWines(query: '\(cleanQuery)', vintage: \(parsed.vintage?.description ?? "nil"))")
+            print("🌐 API: Original normalized text: '\(parsed.normalizedText)'")
             #endif
+            
             let results = try await apiClient.searchWines(
-                query: parsed.normalizedText,
+                query: cleanQuery,
                 vintage: parsed.vintage,
-                limit: 1
+                limit: 5  // Get more results to improve matching chances
             )
             
             #if DEBUG
