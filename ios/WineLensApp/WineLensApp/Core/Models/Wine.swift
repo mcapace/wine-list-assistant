@@ -5,17 +5,17 @@ struct Wine: Identifiable, Codable, Hashable {
     let producer: String
     let name: String
     let vintage: Int?
-    let region: String
+    let region: String?
     let subRegion: String?
     let appellation: String?
-    let country: String
-    let color: WineColor
-    let grapeVarieties: [GrapeVariety]  // Optional in API, default to empty array
+    let country: String?
+    let color: WineColor?
+    let grapeVarieties: [GrapeVariety]?
     let alcohol: Double?
-    let score: Int
-    let tastingNote: String? // Made optional - API sometimes returns null
-    let reviewer: Reviewer
-    let reviewDate: Date
+    let score: Int?
+    let tastingNote: String?
+    let reviewer: Reviewer?
+    let reviewDate: Date?
     let issueDate: Date?
     let drinkWindowStart: Int?
     let drinkWindowEnd: Int?
@@ -97,7 +97,7 @@ struct Wine: Identifiable, Codable, Hashable {
     }
 
     var scoreCategory: ScoreCategory {
-        ScoreCategory(score: score)
+        ScoreCategory(score: score ?? 0)
     }
 
     // MARK: - Coding Keys
@@ -124,25 +124,25 @@ struct Wine: Identifiable, Codable, Hashable {
         case releasePrice = "release_price"
         case releasePriceCurrency = "release_price_currency"
     }
-    
+
     // MARK: - Memberwise Initializer (for preview code and manual creation)
-    
+
     init(
         id: String,
         producer: String,
         name: String,
         vintage: Int?,
-        region: String,
+        region: String?,
         subRegion: String?,
         appellation: String?,
-        country: String,
-        color: WineColor,
-        grapeVarieties: [GrapeVariety],
+        country: String?,
+        color: WineColor?,
+        grapeVarieties: [GrapeVariety]?,
         alcohol: Double?,
-        score: Int,
-        tastingNote: String,
-        reviewer: Reviewer,
-        reviewDate: Date,
+        score: Int?,
+        tastingNote: String?,
+        reviewer: Reviewer?,
+        reviewDate: Date?,
         issueDate: Date?,
         drinkWindowStart: Int?,
         drinkWindowEnd: Int?,
@@ -170,55 +170,54 @@ struct Wine: Identifiable, Codable, Hashable {
         self.releasePrice = releasePrice
         self.releasePriceCurrency = releasePriceCurrency
     }
-    
+
     // MARK: - Custom Decoding
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         id = try container.decode(String.self, forKey: .id)
         producer = try container.decode(String.self, forKey: .producer)
         name = try container.decode(String.self, forKey: .name)
         vintage = try container.decodeIfPresent(Int.self, forKey: .vintage)
-        region = try container.decode(String.self, forKey: .region)
+        region = try container.decodeIfPresent(String.self, forKey: .region)
         subRegion = try container.decodeIfPresent(String.self, forKey: .subRegion)
         appellation = try container.decodeIfPresent(String.self, forKey: .appellation)
-        country = try container.decode(String.self, forKey: .country)
-        color = try container.decode(WineColor.self, forKey: .color)
-        // Make grape_varieties optional - API might not always return it
-        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties) ?? []
+        country = try container.decodeIfPresent(String.self, forKey: .country)
+        color = try container.decodeIfPresent(WineColor.self, forKey: .color)
+        grapeVarieties = try container.decodeIfPresent([GrapeVariety].self, forKey: .grapeVarieties)
         alcohol = try container.decodeIfPresent(Double.self, forKey: .alcohol)
-        score = try container.decode(Int.self, forKey: .score)
+        score = try container.decodeIfPresent(Int.self, forKey: .score)
         tastingNote = try container.decodeIfPresent(String.self, forKey: .tastingNote)
-        reviewer = try container.decode(Reviewer.self, forKey: .reviewer)
-        reviewDate = try container.decode(Date.self, forKey: .reviewDate)
+        reviewer = try container.decodeIfPresent(Reviewer.self, forKey: .reviewer)
+        reviewDate = try container.decodeIfPresent(Date.self, forKey: .reviewDate)
         issueDate = try container.decodeIfPresent(Date.self, forKey: .issueDate)
         drinkWindowStart = try container.decodeIfPresent(Int.self, forKey: .drinkWindowStart)
         drinkWindowEnd = try container.decodeIfPresent(Int.self, forKey: .drinkWindowEnd)
         releasePrice = try container.decodeIfPresent(Decimal.self, forKey: .releasePrice)
         releasePriceCurrency = try container.decodeIfPresent(String.self, forKey: .releasePriceCurrency)
     }
-    
+
     // MARK: - Encoding
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        
+
         try container.encode(id, forKey: .id)
         try container.encode(producer, forKey: .producer)
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(vintage, forKey: .vintage)
-        try container.encode(region, forKey: .region)
+        try container.encodeIfPresent(region, forKey: .region)
         try container.encodeIfPresent(subRegion, forKey: .subRegion)
         try container.encodeIfPresent(appellation, forKey: .appellation)
-        try container.encode(country, forKey: .country)
-        try container.encode(color, forKey: .color)
-        try container.encode(grapeVarieties, forKey: .grapeVarieties)
+        try container.encodeIfPresent(country, forKey: .country)
+        try container.encodeIfPresent(color, forKey: .color)
+        try container.encodeIfPresent(grapeVarieties, forKey: .grapeVarieties)
         try container.encodeIfPresent(alcohol, forKey: .alcohol)
-        try container.encode(score, forKey: .score)
+        try container.encodeIfPresent(score, forKey: .score)
         try container.encodeIfPresent(tastingNote, forKey: .tastingNote)
-        try container.encode(reviewer, forKey: .reviewer)
-        try container.encode(reviewDate, forKey: .reviewDate)
+        try container.encodeIfPresent(reviewer, forKey: .reviewer)
+        try container.encodeIfPresent(reviewDate, forKey: .reviewDate)
         try container.encodeIfPresent(issueDate, forKey: .issueDate)
         try container.encodeIfPresent(drinkWindowStart, forKey: .drinkWindowStart)
         try container.encodeIfPresent(drinkWindowEnd, forKey: .drinkWindowEnd)
