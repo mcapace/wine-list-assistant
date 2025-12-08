@@ -26,6 +26,7 @@ struct MainTabView: View {
             Group {
                 if shouldInitializeScanner {
                     ScannerView()
+                        .id("scanner") // Force view recreation
                 } else {
                     // Placeholder to prevent freeze during transition
                     Color.black
@@ -51,10 +52,22 @@ struct MainTabView: View {
         }
         .tint(Theme.primaryColor)
         .onAppear {
-            // Delay scanner initialization slightly to allow transition to complete
+            // Initialize scanner after a brief delay to ensure transition completes
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 400_000_000) // 0.4 seconds
-                withAnimation {
+                // Wait for transition to complete
+                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+                
+                // Only initialize if we're on the scanner tab
+                if appState.selectedTab == .scanner {
+                    shouldInitializeScanner = true
+                }
+            }
+        }
+        .onChange(of: appState.selectedTab) { newTab in
+            // Initialize scanner when user switches to scanner tab
+            if newTab == .scanner && !shouldInitializeScanner {
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
                     shouldInitializeScanner = true
                 }
             }

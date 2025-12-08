@@ -288,20 +288,22 @@ struct ScannerView: View {
         } message: {
             Text("This will clear all wines found in this session. Continue?")
         }
-            .task {
-                // Start camera when view appears - task ensures proper async handling
+            .onAppear {
+                // Start camera initialization when view appears
                 guard !hasStartedCamera else { return }
                 hasStartedCamera = true
                 
-                // Small delay to ensure view is fully rendered and transition is complete
-                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
-                
-                // Check if camera is already running to avoid duplicate starts
-                guard !viewModel.cameraService.isRunning else { return }
-                
-                // Always request authorization and start camera
-                // This will show permission dialog if needed
-                await viewModel.startScanning()
+                Task { @MainActor in
+                    // Small delay to ensure view is fully rendered
+                    try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+                    
+                    // Check if camera is already running to avoid duplicate starts
+                    guard !viewModel.cameraService.isRunning else { return }
+                    
+                    // Always request authorization and start camera
+                    // This will show permission dialog if needed
+                    await viewModel.startScanning()
+                }
             }
             .onDisappear {
                 viewModel.stopScanning()

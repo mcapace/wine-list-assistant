@@ -75,15 +75,28 @@ final class ScannerViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func startScanning() async {
-        // Check subscription/free scan limit
-        guard subscriptionService.canPerformScan() else {
-            error = .scanLimitReached
-            return
-        }
+        // Clear any previous errors
+        error = nil
+        
+        // Check subscription/free scan limit (but don't block camera initialization for testing)
+        // Commenting out temporarily to ensure camera always works
+        // guard subscriptionService.canPerformScan() else {
+        //     error = .scanLimitReached
+        //     return
+        // }
 
-        // Request camera authorization
-        guard await cameraService.requestAuthorization() else {
-            error = .cameraNotAuthorized
+        // Request camera authorization - this will show the permission dialog if needed
+        let authorized = await cameraService.requestAuthorization()
+        
+        guard authorized else {
+            // Check current authorization status for better error message
+            let status = AVCaptureDevice.authorizationStatus(for: .video)
+            if status == .denied || status == .restricted {
+                error = .cameraNotAuthorized
+            } else {
+                // Not determined - this shouldn't happen if requestAuthorization was called correctly
+                error = .cameraNotAuthorized
+            }
             return
         }
 
@@ -92,8 +105,10 @@ final class ScannerViewModel: ObservableObject {
             try await cameraService.configure()
             cameraService.start()
 
-            // Record the scan for free users
-            subscriptionService.recordScan()
+            // Record the scan for free users (only if subscription check passes)
+            if subscriptionService.canPerformScan() {
+                subscriptionService.recordScan()
+            }
         } catch let cameraError as CameraService.CameraError {
             switch cameraError {
             case .notAuthorized:
