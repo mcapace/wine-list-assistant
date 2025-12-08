@@ -118,31 +118,34 @@ final class WineMatchingService {
     // MARK: - Text Parsing
 
     func parseWineText(_ text: String) -> ParsedWineText {
-        // Step 1: Remove menu UI elements FIRST (before any other processing)
-        var cleanedText = removeMenuUIElements(from: text)
+        // Step 1: Extract vintage and price FIRST from original text (before any cleanup)
+        let vintage = extractVintage(from: text)
+        let price = extractPrice(from: text)
         
-        // Step 2: Extract price from cleaned text
-        let price = extractPrice(from: cleanedText)
+        // Step 2: Remove menu UI elements (but preserve spaces and important info)
+        var cleanedText = removeMenuUIElements(from: text, preserveVintage: vintage)
         
         // Step 3: Remove price from text BEFORE normalization to avoid corruption
         var textWithoutPrice = removePricePattern(from: cleanedText)
         
-        // Step 4: Now normalize the cleaned text
+        // Step 4: Now normalize the cleaned text (preserving spaces)
         var normalized = normalizeText(textWithoutPrice)
-        let vintage = extractVintage(from: normalized)
+        
+        // Step 5: Try to extract vintage again from normalized text if not found initially
+        let finalVintage = vintage ?? extractVintage(from: normalized)
         
         #if DEBUG
         print("🍷 WineMatchingService.parseWineText() - Original: '\(text)'")
         print("🍷 WineMatchingService.parseWineText() - After menu cleanup: '\(cleanedText)'")
         print("🍷 WineMatchingService.parseWineText() - Normalized: '\(normalized)'")
-        print("🍷 WineMatchingService.parseWineText() - Vintage: \(vintage?.description ?? "nil")")
+        print("🍷 WineMatchingService.parseWineText() - Vintage: \(finalVintage?.description ?? "nil")")
         print("🍷 WineMatchingService.parseWineText() - Price: \(price?.description ?? "nil")")
         #endif
 
         return ParsedWineText(
             producer: nil,  // TODO: NLP extraction
             wineName: nil,  // TODO: NLP extraction
-            vintage: vintage,
+            vintage: finalVintage,
             region: nil,    // TODO: NLP extraction
             price: price,
             normalizedText: normalized
@@ -152,34 +155,38 @@ final class WineMatchingService {
     // MARK: - Text Cleaning
     
     /// Remove menu UI elements from OCR text to extract just wine information
-    private func removeMenuUIElements(from text: String) -> String {
+    /// - Parameter preserveVintage: If provided, ensure this vintage year is not removed
+    private func removeMenuUIElements(from text: String, preserveVintage: Int? = nil) -> String {
         var cleaned = text
         
-        // Menu UI keywords to remove (case-insensitive)
+        // Menu UI keywords to remove (case-insensitive) - be more conservative
         let menuKeywords = [
             "wine color", "wine type", "country", "grid", "list", "share", "share:",
-            "top100", "spectator", "= list", "= lis", "= lis",
-            "all", "white", "red", "rose", "na", "still", "sparkling", "dessert",
-            "australia", "argentina", "france", "spain", "united states", "chile",
-            "austria", "germany", "italy", "points", "point",
+            "top100", "spectator", "= list", "= lis",
+            // Don't remove color/type keywords that might be part of wine names
+            // "all", "white", "red", "rose", "na", "still", "sparkling", "dessert",
+            // Don't remove country names - they might be part of appellation
+            // "australia", "argentina", "france", "spain", "united states", "chile",
+            "points", "point",
             "bookmarks", "profiles", "tab", "window", "help", "option", "command",
-            "esc", "fa", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10"
+            "esc", "fa", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10",
+            "edit", "view", "history", "file", "rome"
         ]
         
-        // Remove menu keywords (as whole words where possible)
+        // Remove menu keywords (as whole words where possible) - replace with space
         for keyword in menuKeywords {
-            // Use word boundaries for better matching
+            // Use word boundaries for better matching, replace with space to preserve word separation
             let pattern = "\\b\(NSRegularExpression.escapedPattern(for: keyword))\\b"
             cleaned = cleaned.replacingOccurrences(
                 of: pattern,
-                with: "",
+                with: " ",
                 options: [.regularExpression, .caseInsensitive]
             )
         }
         
-        // Remove special characters that are keyboard noise
+        // Remove special characters that are keyboard noise (replace with space)
         cleaned = cleaned.replacingOccurrences(
-            of: #"[&%$#@~^*+=]"#,
+            of: #"[&%$#@~^*+=|]"#,
             with: " ",
             options: .regularExpression
         )
@@ -187,18 +194,26 @@ final class WineMatchingService {
         // Remove keyboard function keys
         cleaned = cleaned.replacingOccurrences(
             of: #"\bF[0-9]+\b"#,
-            with: "",
+            with: " ",
             options: .regularExpression
         )
         
-        // Remove sequences of numbers and symbols (keyboard layout)
+        // Remove sequences of ONLY numbers and symbols (but preserve vintages)
+        // Only remove if it's clearly keyboard noise (multiple single digits or symbols)
         cleaned = cleaned.replacingOccurrences(
-            of: #"\b[\d\s&%$#@~^*+=]+\b"#,
-            with: "",
+            of: #"\b[2-9]\s+[0-9]\s+[0-9]\s+[0-9]+\s+[A-Z]+\s+POINTS\b"#,
+            with: " ",
             options: .regularExpression
         )
         
-        // Clean up extra whitespace
+        // Remove "2 95" or "96 2" patterns that are clearly menu noise
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\b[0-9]\s+[0-9]{2}\s+[0-9]{4}\s+POINTS\b"#,
+            with: " ",
+            options: .regularExpression
+        )
+        
+        // Clean up extra whitespace but PRESERVE single spaces between words
         cleaned = cleaned
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespaces)

@@ -53,16 +53,21 @@ final class TextNormalizer {
             // Letters that look like numbers (in word context)
             ("\\bO(\\d)", "0$1", []),  // "O2019" -> "02019" (but we'll extract vintage separately)
             
-            // Common single-character OCR errors (DISABLED - too aggressive, corrupts prices)
-            // Only apply in word context, not when part of numbers
-            // ("5", "S", []),  // DISABLED - breaks prices like $5.99
-            // ("8", "B", []),  // DISABLED - breaks prices like $68
-            // ("6", "G", []),  // DISABLED - breaks prices
+            // Common wine name OCR errors - fix "Giscours" misreadings
+            ("\\b[Ss]iscours\\b", "Giscours", []),  // "Siscours" -> "Giscours"
+            ("\\b[Ff]iscours\\b", "Giscours", []),  // "Fiscours" -> "Giscours"
+            ("\\b[Cc]iscours\\b", "Giscours", []),  // "Ciscours" -> "Giscours"
+            ("\\b[Jj]iscours\\b", "Giscours", []),  // "Jiscours" -> "Giscours"
+            ("\\b([Ss]|F|C|J)iscours", "Giscours", []),  // Generic pattern
+            
+            // Common OCR errors in wine words (context-aware - only in words, not numbers)
+            ("\\b[Ss]i(\\w{3,})\\b", "Gi$1", []),  // "Si..." -> "Gi..." when followed by word (context-aware)
+            ("([Cc])hateau", "$1hateau", []),  // Preserve Chateau capitalization
             
             // Common multi-character patterns
-            ("rn", "m", []),  // "rn" often misread as "m"
-            ("vv", "w", []),  // "vv" often misread as "w"
-            ("cl", "d", []),  // In certain fonts
+            ("\\brn\\b", "m", []),  // "rn" often misread as "m" (word boundary)
+            ("\\bvv\\b", "w", []),  // "vv" often misread as "w" (word boundary)
+            // Don't do "cl" -> "d" as it might be correct in some contexts
         ]
         
         // Apply corrections (be careful with order)
