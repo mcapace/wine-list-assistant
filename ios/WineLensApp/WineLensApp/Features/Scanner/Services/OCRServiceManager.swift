@@ -219,65 +219,110 @@ final class OCRService {
     private func isLikelyWineEntry(_ candidate: WineTextCandidate) -> Bool {
         let text = candidate.fullText.lowercased()
 
-        // Skip common non-wine patterns
-        let skipPatterns = [
-            "wine list",
-            "by the glass",
-            "by the bottle",
-            "sparkling wines",
-            "white wines",
-            "red wines",
-            "rose wines",
-            "dessert wines",
-            "page ",
-            "continued",
-            "see server",
-            "ask your",
-            "reserve list"
-        ]
+        // Must have minimum length
+        guard candidate.fullText.count >= 15 else { return false }
+        
+        // Check OCR confidence threshold
+        guard candidate.confidence > 0.5 else { return false }
 
-        for pattern in skipPatterns {
-            if text.contains(pattern) {
+        // STRICT: Reject menu UI elements and keyboard noise
+        let rejectPatterns = [
+            "wine color", "wine type", "country", "grid", "list", "share",
+            "menu", "restaurant", "welcome", "please", "thank",
+            "bookmarks", "profiles", "tab", "window", "help",
+            "option", "command", "esc", "fa", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8",
+            "&", "%", "$", "#", "@", "~", "^", "*", "+", "=", "-",
+            "top100", "spectator", "share:", "= list", "= lis",
+            "all", "white", "red", "rose", "na", // These alone aren't wines
+            "sparkling", "still", "dessert", // These alone aren't wines
+            "australia", "argentina", "france", "spain", "united states", // Countries alone
+            "chile", "austria", "germany", "italy" // Countries alone
+        ]
+        
+        // Reject if it contains reject patterns (except as part of actual wine names)
+        for pattern in rejectPatterns {
+            // Use word boundaries to avoid false positives (e.g., "chardonnay" contains "on")
+            if text == pattern || text.hasPrefix(pattern + " ") || text.hasSuffix(" " + pattern) || text.contains(" " + pattern + " ") {
                 return false
             }
         }
-
-        // Look for wine-like patterns
-        let wineIndicators = [
-            // Vintage year patterns
-            #"(19|20)\d{2}"#,
-            #"'\d{2}"#,
-            // Price patterns
-            #"\$\d+"#,
-            #"\d+\.\d{2}"#,
-            // Common wine terms
-            "cabernet", "merlot", "pinot", "chardonnay", "sauvignon",
-            "shiraz", "syrah", "riesling", "zinfandel", "malbec",
-            "champagne", "prosecco", "chablis", "barolo", "chianti",
-            "rioja", "bordeaux", "burgundy", "napa", "sonoma",
-            "chateau", "domaine", "estate", "vineyard", "reserve"
-        ]
-
-        for indicator in wineIndicators {
-            if indicator.hasPrefix("#") {
-                // Regex pattern
-                if let regex = try? NSRegularExpression(pattern: indicator, options: .caseInsensitive) {
-                    let range = NSRange(text.startIndex..., in: text)
-                    if regex.firstMatch(in: text, range: range) != nil {
-                        return true
-                    }
-                }
-            } else {
-                // Simple string contains
-                if text.contains(indicator) {
-                    return true
-                }
-            }
+        
+        // Reject keyboard-like strings (too many special chars or function keys)
+        let specialCharCount = candidate.fullText.filter { "&%$#@~^*+-=".contains($0) }.count
+        if specialCharCount > 2 {
+            return false
+        }
+        
+        // Reject strings that are mostly numbers/symbols (keyboard layout detection)
+        let numericSymbolCount = candidate.fullText.filter { $0.isNumber || "&%$#@~^*+-= ".contains($0) }.count
+        if Double(numericSymbolCount) / Double(candidate.fullText.count) > 0.5 {
+            return false
+        }
+        
+        // Reject all caps headers (menu section titles) - but allow short ALL CAPS wine names
+        if candidate.fullText == candidate.fullText.uppercased() && candidate.fullText.count > 8 {
+            // Allow short ALL CAPS like "OPUS ONE" but reject longer headers
+            return false
         }
 
-        // If text is long enough and has multiple words, might be a wine
-        let wordCount = text.split(separator: " ").count
-        return wordCount >= 3 && candidate.fullText.count >= 15
+        // MUST contain at least one STRONG wine indicator
+        var hasGrapeVariety = false
+        var hasWineRegion = false
+        var hasVintage = false
+        var hasProducer = false
+        
+        // Grape varieties
+        let grapes = ["cabernet", "merlot", "pinot", "chardonnay", "sauvignon", "shiraz", "syrah", 
+                     "riesling", "zinfandel", "malbec", "sangiovese", "tempranillo", "grenache",
+                     "viognier", "gewurztraminer", "chenin", "semillon", "muscat"]
+        for grape in grapes {
+            if text.contains(grape) {
+                hasGrapeVariety = true
+                break
+            }
+        }
+        
+        // Wine regions
+        let regions = ["bordeaux", "burgundy", "champagne", "napa", "sonoma", "rioja", "barolo",
+                      "chianti", "tuscany", "rhone", "alsace", "loire", "chablis", "cote",
+                      "margaux", "pauillac", "saint", "st.", "chateau", "domaine", "estate",
+                      "vineyard", "appellation", "ava", "aoc", "doc", "docg"]
+        for region in regions {
+            if text.contains(region) {
+                hasWineRegion = true
+                break
+            }
+        }
+        
+        // Vintage year (4-digit year between 1970-2025)
+        if let _ = text.range(of: #"\b(19[789]\d|20[012]\d)\b"#, options: .regularExpression) {
+            hasVintage = true
+        }
+        
+        // Producer indicators
+        let producers = ["chateau", "château", "domaine", "estate", "vineyard", "winery", "cellars",
+                        "wines", "vintners", "productions", "reserve", "special", "private", "select"]
+        for producer in producers {
+            if text.contains(producer) {
+                hasProducer = true
+                break
+            }
+        }
+        
+        // Must have at least TWO strong indicators (to avoid false positives)
+        let indicatorCount = [hasGrapeVariety, hasWineRegion, hasVintage, hasProducer].filter { $0 }.count
+        guard indicatorCount >= 2 else {
+            return false
+        }
+
+        // Additional check: reject if it's clearly menu structure text
+        let menuWords = ["grid", "list", "share", "color", "type", "country"]
+        let menuWordCount = menuWords.filter { text.contains($0) }.count
+        if menuWordCount >= 2 {
+            return false
+        }
+
+        return true
     }
 }
 

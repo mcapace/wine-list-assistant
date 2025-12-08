@@ -118,15 +118,26 @@ final class WineMatchingService {
     // MARK: - Text Parsing
 
     func parseWineText(_ text: String) -> ParsedWineText {
-        // Extract price FIRST from original text (before any processing)
-        let price = extractPrice(from: text)
+        // Step 1: Remove menu UI elements FIRST (before any other processing)
+        var cleanedText = removeMenuUIElements(from: text)
         
-        // Remove price from original text BEFORE normalization to avoid corruption
-        var textWithoutPrice = removePricePattern(from: text)
+        // Step 2: Extract price from cleaned text
+        let price = extractPrice(from: cleanedText)
         
-        // Now normalize the cleaned text
+        // Step 3: Remove price from text BEFORE normalization to avoid corruption
+        var textWithoutPrice = removePricePattern(from: cleanedText)
+        
+        // Step 4: Now normalize the cleaned text
         var normalized = normalizeText(textWithoutPrice)
         let vintage = extractVintage(from: normalized)
+        
+        #if DEBUG
+        print("🍷 WineMatchingService.parseWineText() - Original: '\(text)'")
+        print("🍷 WineMatchingService.parseWineText() - After menu cleanup: '\(cleanedText)'")
+        print("🍷 WineMatchingService.parseWineText() - Normalized: '\(normalized)'")
+        print("🍷 WineMatchingService.parseWineText() - Vintage: \(vintage?.description ?? "nil")")
+        print("🍷 WineMatchingService.parseWineText() - Price: \(price?.description ?? "nil")")
+        #endif
 
         return ParsedWineText(
             producer: nil,  // TODO: NLP extraction
@@ -136,6 +147,63 @@ final class WineMatchingService {
             price: price,
             normalizedText: normalized
         )
+    }
+    
+    // MARK: - Text Cleaning
+    
+    /// Remove menu UI elements from OCR text to extract just wine information
+    private func removeMenuUIElements(from text: String) -> String {
+        var cleaned = text
+        
+        // Menu UI keywords to remove (case-insensitive)
+        let menuKeywords = [
+            "wine color", "wine type", "country", "grid", "list", "share", "share:",
+            "top100", "spectator", "= list", "= lis", "= lis",
+            "all", "white", "red", "rose", "na", "still", "sparkling", "dessert",
+            "australia", "argentina", "france", "spain", "united states", "chile",
+            "austria", "germany", "italy", "points", "point",
+            "bookmarks", "profiles", "tab", "window", "help", "option", "command",
+            "esc", "fa", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10"
+        ]
+        
+        // Remove menu keywords (as whole words where possible)
+        for keyword in menuKeywords {
+            // Use word boundaries for better matching
+            let pattern = "\\b\(NSRegularExpression.escapedPattern(for: keyword))\\b"
+            cleaned = cleaned.replacingOccurrences(
+                of: pattern,
+                with: "",
+                options: [.regularExpression, .caseInsensitive]
+            )
+        }
+        
+        // Remove special characters that are keyboard noise
+        cleaned = cleaned.replacingOccurrences(
+            of: #"[&%$#@~^*+=]"#,
+            with: " ",
+            options: .regularExpression
+        )
+        
+        // Remove keyboard function keys
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\bF[0-9]+\b"#,
+            with: "",
+            options: .regularExpression
+        )
+        
+        // Remove sequences of numbers and symbols (keyboard layout)
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\b[\d\s&%$#@~^*+=]+\b"#,
+            with: "",
+            options: .regularExpression
+        )
+        
+        // Clean up extra whitespace
+        cleaned = cleaned
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+        
+        return cleaned
     }
 
     // MARK: - Text Normalization
