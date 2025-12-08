@@ -32,11 +32,27 @@ struct MainTabView: View {
     @State private var shouldInitializeScanner = false
 
     var body: some View {
+        let _ = {
+            #if DEBUG
+            print("📱 MainTabView.body evaluated - shouldInitializeScanner=\(shouldInitializeScanner)")
+            #endif
+        }()
+
         TabView(selection: $appState.selectedTab) {
             Group {
                 if shouldInitializeScanner {
+                    let _ = {
+                        #if DEBUG
+                        print("📱 MainTabView: Creating ScannerView...")
+                        #endif
+                    }()
                     ScannerView()
                         .id("scanner") // Force view recreation
+                        .onAppear {
+                            #if DEBUG
+                            print("📱 ScannerView.onAppear called from MainTabView")
+                            #endif
+                        }
                 } else {
                     // Placeholder to prevent freeze during transition
                     Color.black
@@ -89,13 +105,18 @@ struct MainTabView: View {
                 }
             }
         }
-        .onChange(of: appState.selectedTab) { newTab in
+        .onChange(of: shouldInitializeScanner) { oldValue, newValue in
             #if DEBUG
-            print("📱 MainTabView: Tab changed to \(newTab)")
+            print("📱 MainTabView: shouldInitializeScanner changed from \(oldValue) to \(newValue)")
+            #endif
+        }
+        .onChange(of: appState.selectedTab) { oldValue, newValue in
+            #if DEBUG
+            print("📱 MainTabView: Tab changed from \(oldValue) to \(newValue)")
             #endif
 
             // Initialize scanner when user switches to scanner tab
-            if newTab == .scanner && !shouldInitializeScanner {
+            if newValue == .scanner && !shouldInitializeScanner {
                 Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
                     shouldInitializeScanner = true
