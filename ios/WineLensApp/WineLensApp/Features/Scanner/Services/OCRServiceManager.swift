@@ -71,6 +71,12 @@ final class OCRService {
     
     /// Current OCR provider (computed to avoid blocking during init)
     private var currentProvider: OCRProvider {
+        // If manually set, use that
+        if let manual = _manualProvider {
+            return manual
+        }
+        
+        // Otherwise use preferred provider
         let preferred = preferredProviderName.lowercased()
         if (preferred == "google" || preferred == "googlecloud" || preferred == "google cloud"),
            let googleCloud = googleCloudProvider {
@@ -79,6 +85,9 @@ final class OCRService {
         // Default to Apple Vision (lazy, created on first access)
         return appleVisionProvider
     }
+    
+    // Store manually set provider (when setProvider is called)
+    private var _manualProvider: OCRProvider?
     
     // MARK: - Provider Management
     
@@ -105,16 +114,16 @@ final class OCRService {
     func setProvider(_ providerName: String) {
         switch providerName.lowercased() {
         case "apple", "vision":
-            currentProvider = appleVisionProvider
+            _manualProvider = appleVisionProvider
         case "google", "googlecloud", "google cloud":
             if let googleCloud = googleCloudProvider {
-                currentProvider = googleCloud
+                _manualProvider = googleCloud
             } else {
                 print("⚠️ Google Cloud Vision not available - API key missing")
-                currentProvider = appleVisionProvider
+                _manualProvider = appleVisionProvider
             }
         default:
-            currentProvider = appleVisionProvider
+            _manualProvider = appleVisionProvider
         }
     }
     
