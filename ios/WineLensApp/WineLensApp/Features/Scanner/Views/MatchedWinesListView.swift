@@ -375,8 +375,8 @@ struct MatchedWineCard: View {
                         Label(region, systemImage: "mappin.circle.fill")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.white.opacity(0.6))
+                            .lineLimit(1)
                     }
-                        .lineLimit(1)
                 }
                 
                 // Tasting note preview (2 lines max)
