@@ -396,7 +396,7 @@ struct MatchedWineCard: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(Theme.secondaryColor)
                     }
-                    
+
                     if recognizedWine.isBestValue {
                         HStack(spacing: 4) {
                             Image(systemName: "tag.fill")
@@ -412,11 +412,17 @@ struct MatchedWineCard: View {
                                 .fill(Color.green.opacity(0.8))
                         )
                     }
-                    
+
                     if let ratio = recognizedWine.valueRatio {
                         ValueIndicatorBadge(ratio: ratio)
                     }
+
+                    // Show drink window status if available
+                    if let wine = wine, wine.drinkWindowStatus != .ready {
+                        DrinkStatusBadge(status: wine.drinkWindowStatus)
+                    }
                 }
+                .padding(.top, 4)
             }
         }
     }
@@ -609,6 +615,41 @@ struct ValueIndicatorBadge: View {
             return (.orange, "Fair")
         default:
             return (.red, "Premium")
+        }
+    }
+}
+
+// MARK: - Drink Status Badge
+
+struct DrinkStatusBadge: View {
+    let status: DrinkWindowStatus
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: status.iconName)
+                .font(.system(size: 10))
+            Text(status.displayText)
+                .font(.system(size: 11, weight: .semibold))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(statusColor.opacity(0.8))
+        )
+    }
+
+    private var statusColor: Color {
+        switch status {
+        case .tooYoung:
+            return .purple
+        case .peaking:
+            return .orange
+        case .pastPrime:
+            return .red
+        case .ready:
+            return .green
         }
     }
 }
