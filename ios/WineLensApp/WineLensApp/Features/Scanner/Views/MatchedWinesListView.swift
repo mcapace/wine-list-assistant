@@ -76,7 +76,7 @@ struct MatchedWinesListView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             // Header summary
-                            SummaryHeaderView(count: matchedWines.count)
+                            SummaryHeaderView(wines: matchedWines)
                                 .padding(.horizontal, 20)
                                 .padding(.top, 8)
                             
@@ -246,26 +246,102 @@ extension ScoreCategory {
 // MARK: - Summary Header
 
 struct SummaryHeaderView: View {
-    let count: Int
-    
+    let wines: [RecognizedWine]
+
+    private var count: Int { wines.count }
+
+    private var outstandingCount: Int {
+        wines.filter { ($0.matchedWine?.score ?? 0) >= 95 }.count
+    }
+
+    private var excellentCount: Int {
+        wines.filter {
+            let score = $0.matchedWine?.score ?? 0
+            return score >= 90 && score < 95
+        }.count
+    }
+
+    private var bestValueCount: Int {
+        wines.filter { $0.isBestValue }.count
+    }
+
+    private var avgScore: Int {
+        let scores = wines.compactMap { $0.matchedWine?.score }
+        guard !scores.isEmpty else { return 0 }
+        return scores.reduce(0, +) / scores.count
+    }
+
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(count) wine\(count == 1 ? "" : "s") found")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                
-                Text("Tap any wine for details")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.7))
+        VStack(spacing: 16) {
+            // Main title row
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(count) wine\(count == 1 ? "" : "s") found")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+
+                    Text("Tap any wine for details")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+
+                Spacer()
+
+                // Average score badge
+                if avgScore > 0 {
+                    VStack(spacing: 2) {
+                        Text("\(avgScore)")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundColor(Theme.scoreColor(for: avgScore))
+                        Text("avg")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                    .frame(width: 60, height: 60)
+                    .background(
+                        Circle()
+                            .fill(Theme.scoreColor(for: avgScore).opacity(0.2))
+                            .overlay(
+                                Circle()
+                                    .stroke(Theme.scoreColor(for: avgScore).opacity(0.4), lineWidth: 2)
+                            )
+                    )
+                }
             }
-            
-            Spacer()
-            
-            // Decorative icon
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 32))
-                .foregroundColor(Theme.secondaryColor.opacity(0.8))
+
+            // Stats row
+            if outstandingCount > 0 || excellentCount > 0 || bestValueCount > 0 {
+                HStack(spacing: 12) {
+                    if outstandingCount > 0 {
+                        StatBadge(
+                            count: outstandingCount,
+                            label: "Outstanding",
+                            color: .yellow,
+                            icon: "star.fill"
+                        )
+                    }
+
+                    if excellentCount > 0 {
+                        StatBadge(
+                            count: excellentCount,
+                            label: "Excellent",
+                            color: .gray,
+                            icon: "medal.fill"
+                        )
+                    }
+
+                    if bestValueCount > 0 {
+                        StatBadge(
+                            count: bestValueCount,
+                            label: "Best Value",
+                            color: .green,
+                            icon: "tag.fill"
+                        )
+                    }
+
+                    Spacer()
+                }
+            }
         }
         .padding(20)
         .background(
@@ -284,6 +360,31 @@ struct SummaryHeaderView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 1)
                 )
+        )
+    }
+}
+
+struct StatBadge: View {
+    let count: Int
+    let label: String
+    let color: Color
+    let icon: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+            Text("\(count)")
+                .font(.system(size: 13, weight: .bold))
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+        }
+        .foregroundColor(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(color.opacity(0.15))
         )
     }
 }
