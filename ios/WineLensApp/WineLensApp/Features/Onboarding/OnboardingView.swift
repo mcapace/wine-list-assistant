@@ -9,6 +9,7 @@ struct OnboardingView: View {
             title: "Wine Spectator\nWine Lens",
             subtitle: "The smartest way to navigate any wine list. Powered by 40+ years of expert reviews.",
             imageName: "winelens.logo",
+            animationName: "Wine_Spectator_Wine_Lens",
             color: Theme.primaryColor,
             isLogo: true
         ),
@@ -16,6 +17,7 @@ struct OnboardingView: View {
             title: "Scan Any Wine List",
             subtitle: "Point your camera at a restaurant wine list and see Wine Spectator scores instantly.",
             imageName: "camera.viewfinder",
+            animationName: "Scan_Any_Wine_List",
             color: Theme.primaryColor,
             isLogo: false
         ),
@@ -23,6 +25,7 @@ struct OnboardingView: View {
             title: "Expert Scores, Not Crowds",
             subtitle: "Unlike other apps, our scores come from professional blind tastings by experienced critics.",
             imageName: "star.circle.fill",
+            animationName: "Expert_Scores_Not_Crowd",
             color: Theme.secondaryColor,
             isLogo: false
         ),
@@ -30,6 +33,7 @@ struct OnboardingView: View {
             title: "Find the Best Value",
             subtitle: "Filter by score, drink window, and value to find the perfect bottle for your budget.",
             imageName: "tag.circle.fill",
+            animationName: "Find_The_Best_Value",
             color: .green,
             isLogo: false
         ),
@@ -37,6 +41,7 @@ struct OnboardingView: View {
             title: "Save Your Favorites",
             subtitle: "Build your personal wine list and never forget a great bottle.",
             imageName: "heart.circle.fill",
+            animationName: "Save_Your_Favorites",
             color: Theme.primaryColor,
             isLogo: false
         )
@@ -103,6 +108,7 @@ struct OnboardingPage {
     let title: String
     let subtitle: String
     let imageName: String
+    let animationName: String? // Lottie animation name (without .json extension)
     let color: Color
     let isLogo: Bool
 }
@@ -116,13 +122,21 @@ struct OnboardingPageView: View {
             Spacer()
 
             if page.isLogo {
-                // Logo page - use WineLensBadge component with optimized animations
+                // Logo page - use Lottie animation if available, otherwise use WineLensBadge
                 VStack(spacing: 0) {
-                    WineLensBadge(style: .onboarding)
-                        .opacity(showContent ? 1.0 : 0.0)
-                        .scaleEffect(showContent ? 1.0 : 0.9)
-                        .animation(.easeOut(duration: 0.4).delay(0.1), value: showContent)
-                        .drawingGroup() // Optimize rendering
+                    if let animationName = page.animationName {
+                        OnboardingLottieView(
+                            animationName: animationName,
+                            showContent: showContent
+                        )
+                        .padding(.bottom, 20)
+                    } else {
+                        WineLensBadge(style: .onboarding)
+                            .opacity(showContent ? 1.0 : 0.0)
+                            .scaleEffect(showContent ? 1.0 : 0.9)
+                            .animation(.easeOut(duration: 0.4).delay(0.1), value: showContent)
+                            .drawingGroup() // Optimize rendering
+                    }
                     
                     // Subtitle with simplified fade-in animation
                     Text(page.subtitle)
@@ -137,12 +151,19 @@ struct OnboardingPageView: View {
                         .animation(.easeOut(duration: 0.4).delay(0.3), value: showContent)
                 }
             } else {
-                // Elegant icon page - Vivino-inspired clean design
-                ElegantIconView(
-                    iconName: page.imageName,
-                    color: page.color,
-                    showContent: showContent
-                )
+                // Use Lottie animation if available, otherwise fall back to SF Symbol
+                if let animationName = page.animationName {
+                    OnboardingLottieView(
+                        animationName: animationName,
+                        showContent: showContent
+                    )
+                } else {
+                    ElegantIconView(
+                        iconName: page.imageName,
+                        color: page.color,
+                        showContent: showContent
+                    )
+                }
             }
 
             // Text - simplified animations for better performance
@@ -179,6 +200,40 @@ struct OnboardingPageView: View {
         .onDisappear {
             // Reset when page disappears so it animates in again if user swipes back
             showContent = false
+        }
+    }
+}
+
+// MARK: - Onboarding Lottie Animation View
+
+struct OnboardingLottieView: View {
+    let animationName: String
+    let showContent: Bool
+    
+    @State private var animationScale: CGFloat = 0.8
+    
+    var body: some View {
+        LottieView(
+            animationName: animationName,
+            loopMode: .loop,
+            animationSpeed: 1.0
+        )
+        .frame(width: 280, height: 280)
+        .scaleEffect(animationScale)
+        .opacity(showContent ? 1.0 : 0.0)
+        .onAppear {
+            if showContent {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.1)) {
+                    animationScale = 1.0
+                }
+            }
+        }
+        .onChange(of: showContent) { newValue in
+            if newValue {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    animationScale = 1.0
+                }
+            }
         }
     }
 }
