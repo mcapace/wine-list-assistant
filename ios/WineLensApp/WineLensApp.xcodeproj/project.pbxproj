@@ -582,15 +582,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEB4BB252EE37EBA00014979 /* Score_Reveal.json in Resources */,
-				CEB4BB262EE37EBA00014979 /* Card_Slide_Up.json in Resources */,
-				CEB4BB272EE37EBA00014979 /* Wine_Glass_Fill.json in Resources */,
-				CEB4BB282EE37EBA00014979 /* Scan_Pulse.json in Resources */,
-				CEB4BB4A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json in Resources */,
-				CEB4BB4B2EE37EBA00014979 /* Find_The_Best_Value.json in Resources */,
-				CEB4BB4C2EE37EBA00014979 /* Save_Your_Favorites.json in Resources */,
-				CEB4BB4D2EE37EBA00014979 /* Scan_Any_Wine_List.json in Resources */,
-				CEB4BB4E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,48 +606,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEB4BB072EE37EBA00014979 /* AppConfiguration.swift in Sources */,
-				CEB4BB082EE37EBA00014979 /* ScanResult.swift in Sources */,
-				CEB4BB092EE37EBA00014979 /* WineMatchingService.swift in Sources */,
-				CEB4BB0A2EE37EBA00014979 /* AROverlayView.swift in Sources */,
-				CEB4BB0B2EE37EBA00014979 /* SubscriptionView.swift in Sources */,
-				CEB4BB0C2EE37EBA00014979 /* OnboardingView.swift in Sources */,
-				CEB4BB0D2EE37EBA00014979 /* SubscriptionService.swift in Sources */,
-				CEB4BB0E2EE37EBA00014979 /* CameraService.swift in Sources */,
-				CEB4BB0F2EE37EBA00014979 /* LocalWineCache.swift in Sources */,
-				CEB4BB102EE37EBA00014979 /* User.swift in Sources */,
-				CEB4BB112EE37EBA00014979 /* AuthenticationService.swift in Sources */,
-				CEB4BB122EE37EBA00014979 /* ContentView.swift in Sources */,
-				CEB4BB132EE37EBA00014979 /* RecognizedWine.swift in Sources */,
-				CEB4BB142EE37EBA00014979 /* KeychainManager.swift in Sources */,
-				CEB4BB152EE37EBA00014979 /* SettingsView.swift in Sources */,
-				CEB4BB162EE37EBA00014979 /* ScoreBadge.swift in Sources */,
-				CEB4BB172EE37EBA00014979 /* Theme.swift in Sources */,
-				CEB4BB182EE37EBA00014979 /* CameraPreviewView.swift in Sources */,
-				CEB4BB192EE37EBA00014979 /* SavedWine.swift in Sources */,
-				CEB4BB1A2EE37EBA00014979 /* WineListAssistantApp.swift in Sources */,
-				CEB4BB1B2EE37EBA00014979 /* WineFilter.swift in Sources */,
-				CEB4BB1C2EE37EBA00014979 /* ScannerView.swift in Sources */,
-				CEB4BB1D2EE37EBA00014979 /* Constants.swift in Sources */,
-				CEB4BB1F2EE37EBA00014979 /* MyWinesView.swift in Sources */,
-				CEB4BB202EE37EBA00014979 /* MyWinesViewModel.swift in Sources */,
-				CEB4BB212EE37EBA00014979 /* ScannerViewModel.swift in Sources */,
-				CEB4BB222EE37EBA00014979 /* WineDetailSheet.swift in Sources */,
-				CEB4BB232EE37EBA00014979 /* WineAPIClient.swift in Sources */,
-				CEB4BB242EE37EBA00014979 /* Wine.swift in Sources */,
-				CEB4BB292EE37EBA00014979 /* WineLensBadge.swift in Sources */,
-				CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */,
-				CEB4BD3607E2EE37EBA00014979 /* AppleVisionOCRService.swift in Sources */,
-				CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */,
-				CEB4BB2F2EE37EBA00014979 /* OCRServiceManager.swift in Sources */,
-				CEB4BB312EE37EBA00014979 /* TextNormalizer.swift in Sources */,
-				CEB4BB332EE37EBA00014979 /* MatchedWinesListView.swift in Sources */,
-				CEB4BBFEE192EE37EBA00014979 /* SessionHistoryView.swift in Sources */,
-				CEB4BC00E192EE37EBA00014980 /* ScannerErrorView.swift in Sources */,
-				CEB4BC02E192EE37EBA00014981 /* ScannerError.swift in Sources */,
-				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
-				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
-				CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
