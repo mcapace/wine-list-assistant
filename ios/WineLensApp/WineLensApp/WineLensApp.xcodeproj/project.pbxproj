@@ -139,7 +139,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CEB4BAA22EE37B9F00014979 /* WineLensApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ../WineLensApp;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		CEB4BAB02EE37BA100014979 /* WineLensAppTests */ = {
