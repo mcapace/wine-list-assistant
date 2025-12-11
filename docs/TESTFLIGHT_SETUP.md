@@ -11,7 +11,7 @@
      - **Platform**: iOS
      - **Name**: Wine Lens (or Wine Spectator Wine Lens)
      - **Primary Language**: English
-     - **Bundle ID**: `com.winespectator.WineLens2026` (must match Xcode)
+     - **Bundle ID**: `com.mcapace.winelens` (must match Xcode)
      - **SKU**: `wine-lens-app` (unique identifier, can be anything)
      - **User Access**: Full Access
 
@@ -24,7 +24,7 @@
 ### 2. Xcode Configuration
 
 #### Current Settings:
-- **Bundle Identifier**: `com.winespectator.WineLens2026`
+- **Bundle Identifier**: `com.mcapace.winelens`
 - **Version**: `1.0`
 - **Build**: `1`
 
@@ -194,7 +194,7 @@ Before uploading:
 
 ## Quick Reference
 
-**Bundle ID**: `com.winespectator.WineLens2026`  
+**Bundle ID**: `com.mcapace.winelens`  
 **Current Version**: `1.0`  
 **Current Build**: `1`  
 **Next Build**: `2` (increment this!)

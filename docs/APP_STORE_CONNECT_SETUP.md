@@ -3,7 +3,7 @@
 ## App ID Registration (Apple Developer Portal)
 
 ### Bundle ID
-**Enter**: `com.winespectator.WineLens2026`
+**Enter**: `com.mcapace.winelens`
 
 ### Description
 **Enter**: `Wine Lens - Wine Spectator's smart wine list scanner`
@@ -59,7 +59,7 @@ Based on your app's features, enable these capabilities:
 - Primary: **Food & Drink**
 - Secondary: **Lifestyle** (optional)
 
-**Bundle ID**: `com.winespectator.WineLens2026`
+**Bundle ID**: `com.mcapace.winelens`
 
 **SKU**: `wine-lens-app` (unique identifier, can be anything)
 
@@ -166,13 +166,13 @@ Premium subscription unlocks unlimited scans.
 Create two subscription products:
 
 1. **Monthly Premium**
-   - Product ID: `com.winespectator.wla.premium.monthly`
+   - Product ID: `com.mcapace.winelens.premium.monthly`
    - Display Name: `Wine Lens Premium Monthly`
    - Price: Set your price (e.g., $4.99/month)
    - Duration: 1 Month
 
 2. **Yearly Premium**
-   - Product ID: `com.winespectator.wla.premium.yearly`
+   - Product ID: `com.mcapace.winelens.premium.yearly`
    - Display Name: `Wine Lens Premium Yearly`
    - Price: Set your price (e.g., $39.99/year)
    - Duration: 1 Year
@@ -191,7 +191,7 @@ Create a subscription group:
 
 - [ ] App ID registered with In-App Purchase enabled
 - [ ] App created in App Store Connect
-- [ ] Bundle ID matches: `com.winespectator.WineLens2026`
+- [ ] Bundle ID matches: `com.mcapace.winelens`
 - [ ] App icon (1024x1024) uploaded
 - [ ] Screenshots uploaded (at least 6.7" iPhone)
 - [ ] Description and keywords filled in
@@ -214,7 +214,7 @@ Create a subscription group:
 
 **"Invalid Bundle ID"**
 - Make sure Bundle ID in Xcode matches App Store Connect exactly
-- Check for typos: `com.winespectator.WineLens2026`
+- Check for typos: `com.mcapace.winelens`
 
 **"Missing Capability"**
 - Enable In-App Purchase in App ID settings

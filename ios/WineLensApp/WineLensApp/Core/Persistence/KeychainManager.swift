@@ -8,7 +8,7 @@ final class KeychainManager {
 
     // MARK: - Configuration
 
-    private let service = "com.winespectator.winelistassistant"
+    private let service = "com.mcapace.winelens"
 
     // MARK: - Initialization
 
