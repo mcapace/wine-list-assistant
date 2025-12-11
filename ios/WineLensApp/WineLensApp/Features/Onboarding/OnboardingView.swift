@@ -55,7 +55,7 @@ struct OnboardingView: View {
                     OnboardingPageView(page: pages[index])
                         .tag(index)
                         .id(index) // Force view recreation on page change
-                        .drawingGroup() // Composite into single layer for better performance
+                        // Note: Don't use .drawingGroup() here - it breaks UIViewRepresentable (LottieView)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
