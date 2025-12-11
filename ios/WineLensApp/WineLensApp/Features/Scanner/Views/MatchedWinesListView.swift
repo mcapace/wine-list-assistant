@@ -519,7 +519,7 @@ struct MatchedWineCard: View {
                     }
 
                     // Show drink window status if available
-                    if let wine = wine, wine.drinkWindowStatus != .ready {
+                    if wine.drinkWindowStatus != .ready {
                         DrinkStatusBadge(status: wine.drinkWindowStatus)
                     }
                 }
