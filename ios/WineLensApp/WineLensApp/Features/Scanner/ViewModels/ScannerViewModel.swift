@@ -201,8 +201,9 @@ final class ScannerViewModel: ObservableObject {
             #endif
 
             // Record the scan for free users (only if subscription check passes)
-            if subscriptionService.canPerformScan() {
-                subscriptionService.recordScan()
+            let canScan = await MainActor.run { subscriptionService.canPerformScan() }
+            if canScan {
+                await MainActor.run { subscriptionService.recordScan() }
             }
         } catch let cameraError as CameraService.CameraError {
             #if DEBUG
