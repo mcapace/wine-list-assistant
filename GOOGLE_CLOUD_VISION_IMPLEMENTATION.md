@@ -81,3 +81,6 @@ Or via environment variable in Xcode scheme.
 - **Google Cloud**: $1.50 per 1,000 images (first 1,000/month free)
 - **Recommendation**: Use Apple Vision for real-time scanning, Google Cloud for captured photos
 
+
+
+

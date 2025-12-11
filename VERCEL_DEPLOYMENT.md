@@ -68,3 +68,6 @@ curl "https://your-project-name.vercel.app/api/wines/search?q=opus"
 3. **Seed the database** with your wine data
 4. **Update iOS app** with the Vercel API URL
 
+
+
+

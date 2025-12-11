@@ -32,3 +32,6 @@ Try registering these in order until one works:
 2. `com.winespectator.winelensapp`
 3. `com.winespectator.wla`
 
+
+
+
