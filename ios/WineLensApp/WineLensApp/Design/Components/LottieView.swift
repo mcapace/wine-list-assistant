@@ -24,8 +24,9 @@ struct LottieView: UIViewRepresentable {
         let containerView = UIView()
         containerView.backgroundColor = .clear
 
-        // Try to load animation from bundle
-        if let animation = LottieAnimation.named(animationName, bundle: .main) {
+        let animation = Self.loadAnimation(named: animationName)
+
+        if let animation = animation {
             let animationView = LottieAnimationView(animation: animation)
             animationView.loopMode = loopMode
             animationView.animationSpeed = animationSpeed
@@ -45,6 +46,85 @@ struct LottieView: UIViewRepresentable {
         }
 
         return containerView
+    }
+
+    /// Load animation with multiple fallback strategies
+    private static func loadAnimation(named name: String) -> LottieAnimation? {
+        // Strategy 1: Try with subdirectory (for FileSystemSynchronizedRootGroup structure)
+        if let animation = LottieAnimation.named(name, bundle: .main, subdirectory: "Resources/Animations") {
+            #if DEBUG
+            print("✅ LottieView: Loaded '\(name)' from Resources/Animations subdirectory")
+            #endif
+            return animation
+        }
+
+        // Strategy 2: Try at bundle root (flat structure)
+        if let animation = LottieAnimation.named(name, bundle: .main) {
+            #if DEBUG
+            print("✅ LottieView: Loaded '\(name)' from bundle root")
+            #endif
+            return animation
+        }
+
+        // Strategy 3: Try filepath directly from bundle
+        if let path = Bundle.main.path(forResource: name, ofType: "json") {
+            if let animation = LottieAnimation.filepath(path) {
+                #if DEBUG
+                print("✅ LottieView: Loaded '\(name)' via filepath at root")
+                #endif
+                return animation
+            }
+        }
+
+        // Strategy 4: Try filepath with subdirectory
+        if let path = Bundle.main.path(forResource: name, ofType: "json", inDirectory: "Resources/Animations") {
+            if let animation = LottieAnimation.filepath(path) {
+                #if DEBUG
+                print("✅ LottieView: Loaded '\(name)' via filepath in Resources/Animations")
+                #endif
+                return animation
+            }
+        }
+
+        // Strategy 5: Search recursively in bundle
+        if let resourceURL = Bundle.main.resourceURL {
+            let fileManager = FileManager.default
+            if let enumerator = fileManager.enumerator(at: resourceURL, includingPropertiesForKeys: nil) {
+                while let fileURL = enumerator.nextObject() as? URL {
+                    if fileURL.deletingPathExtension().lastPathComponent == name && fileURL.pathExtension == "json" {
+                        if let animation = LottieAnimation.filepath(fileURL.path) {
+                            #if DEBUG
+                            print("✅ LottieView: Loaded '\(name)' via recursive search at \(fileURL.path)")
+                            #endif
+                            return animation
+                        }
+                    }
+                }
+            }
+        }
+
+        #if DEBUG
+        print("⚠️ LottieView: Failed to load animation '\(name)'")
+        // List JSON files in bundle for debugging
+        if let resourceURL = Bundle.main.resourceURL {
+            let fileManager = FileManager.default
+            if let enumerator = fileManager.enumerator(at: resourceURL, includingPropertiesForKeys: nil) {
+                var jsonFiles: [String] = []
+                while let fileURL = enumerator.nextObject() as? URL {
+                    if fileURL.pathExtension == "json" {
+                        jsonFiles.append(fileURL.lastPathComponent)
+                    }
+                }
+                if !jsonFiles.isEmpty {
+                    print("⚠️ LottieView: JSON files found in bundle: \(jsonFiles)")
+                } else {
+                    print("⚠️ LottieView: No JSON files found in bundle")
+                }
+            }
+        }
+        #endif
+
+        return nil
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {
