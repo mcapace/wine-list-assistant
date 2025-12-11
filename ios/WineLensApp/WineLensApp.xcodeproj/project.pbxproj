@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		CEB4BACC2EE37BB800014979 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = CEB4BACB2EE37BB800014979 /* Lottie */; };
+		CEB4BAD02EE37BC100014979 /* Card_Slide_Up.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */; };
+		CEB4BAD12EE37BC100014979 /* Expert_Scores_Not_Crowd.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */; };
+		CEB4BAD22EE37BC100014979 /* Find_The_Best_Value.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */; };
+		CEB4BAD42EE37BC100014979 /* Save_Your_Favorites.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */; };
+		CEB4BAD62EE37BC100014979 /* Scan_Any_Wine_List.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */; };
+		CEB4BAD82EE37BC100014979 /* Scan_Pulse.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */; };
+		CEB4BADA2EE37BC100014979 /* Score_Reveal.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADB2EE37BC100014979 /* Score_Reveal.json */; };
+		CEB4BADC2EE37BC100014979 /* Wine_Glass_Fill.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */; };
+		CEB4BADE2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,32 +40,20 @@
 		CEB4BAA02EE37B9F00014979 /* WineLensApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineLensApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB4BAAD2EE37BA100014979 /* WineLensAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Card_Slide_Up.json; sourceTree = "<group>"; };
+		CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Expert_Scores_Not_Crowd.json; sourceTree = "<group>"; };
+		CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Find_The_Best_Value.json; sourceTree = "<group>"; };
+		CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Save_Your_Favorites.json; sourceTree = "<group>"; };
+		CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Any_Wine_List.json; sourceTree = "<group>"; };
+		CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Pulse.json; sourceTree = "<group>"; };
+		CEB4BADB2EE37BC100014979 /* Score_Reveal.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Score_Reveal.json; sourceTree = "<group>"; };
+		CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Glass_Fill.json; sourceTree = "<group>"; };
+		CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Spectator_Wine_Lens.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CEB4BACD2EE37BC000014979 /* Exceptions for "WineLensApp" folder in "WineLensApp" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Resources/Animations/Card_Slide_Up.json,
-				Resources/Animations/Expert_Scores_Not_Crowd.json,
-				Resources/Animations/Find_The_Best_Value.json,
-				Resources/Animations/Save_Your_Favorites.json,
-				Resources/Animations/Scan_Any_Wine_List.json,
-				Resources/Animations/Scan_Pulse.json,
-				Resources/Animations/Score_Reveal.json,
-				Resources/Animations/Wine_Glass_Fill.json,
-				Resources/Animations/Wine_Spectator_Wine_Lens.json,
-			);
-			target = CEB4BA9F2EE37B9F00014979 /* WineLensApp */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CEB4BAA22EE37B9F00014979 /* WineLensApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				CEB4BACD2EE37BC000014979 /* Exceptions for "WineLensApp" folder in "WineLensApp" target */,
-			);
 			path = WineLensApp;
 			sourceTree = "<group>";
 		};
@@ -102,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB4BAA22EE37B9F00014979 /* WineLensApp */,
+				CEB4BAE02EE37BC100014979 /* Animations */,
 				CEB4BAB02EE37BA100014979 /* WineLensAppTests */,
 				CEB4BABA2EE37BA100014979 /* WineLensAppUITests */,
 				CEB4BAA12EE37B9F00014979 /* Products */,
@@ -116,6 +114,23 @@
 				CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CEB4BAE02EE37BC100014979 /* Animations */ = {
+			isa = PBXGroup;
+			children = (
+				CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */,
+				CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */,
+				CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */,
+				CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */,
+				CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */,
+				CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */,
+				CEB4BADB2EE37BC100014979 /* Score_Reveal.json */,
+				CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */,
+				CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */,
+			);
+			name = Animations;
+			path = WineLensApp/Resources/Animations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,6 +257,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEB4BAD02EE37BC100014979 /* Card_Slide_Up.json in Resources */,
+				CEB4BAD12EE37BC100014979 /* Expert_Scores_Not_Crowd.json in Resources */,
+				CEB4BAD22EE37BC100014979 /* Find_The_Best_Value.json in Resources */,
+				CEB4BAD42EE37BC100014979 /* Save_Your_Favorites.json in Resources */,
+				CEB4BAD62EE37BC100014979 /* Scan_Any_Wine_List.json in Resources */,
+				CEB4BAD82EE37BC100014979 /* Scan_Pulse.json in Resources */,
+				CEB4BADA2EE37BC100014979 /* Score_Reveal.json in Resources */,
+				CEB4BADC2EE37BC100014979 /* Wine_Glass_Fill.json in Resources */,
+				CEB4BADE2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
