@@ -129,10 +129,10 @@ struct SessionCard: View {
                 }
                 
                 HStack(spacing: 16) {
-                    StatBadge(icon: "wineglass.fill", value: "\(session.matchedCount)", label: "matched")
+                    SessionStatBadge(icon: "wineglass.fill", value: "\(session.matchedCount)", label: "matched")
                     
                     if let topScore = session.topScore {
-                        StatBadge(icon: "star.fill", value: "\(topScore)", label: "top score")
+                        SessionStatBadge(icon: "star.fill", value: "\(topScore)", label: "top score")
                     }
                 }
             }
@@ -159,11 +159,11 @@ struct SessionCard: View {
     }
 }
 
-struct StatBadge: View {
+struct SessionStatBadge: View {
     let icon: String
     let value: String
     let label: String
-    
+
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
