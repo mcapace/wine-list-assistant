@@ -33,9 +33,30 @@
 		CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CEB4BACD2EE37BC000014979 /* Exceptions for "WineLensApp" folder in "WineLensApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Animations/Card_Slide_Up.json,
+				Resources/Animations/Expert_Scores_Not_Crowd.json,
+				Resources/Animations/Find_The_Best_Value.json,
+				Resources/Animations/Save_Your_Favorites.json,
+				Resources/Animations/Scan_Any_Wine_List.json,
+				Resources/Animations/Scan_Pulse.json,
+				Resources/Animations/Score_Reveal.json,
+				Resources/Animations/Wine_Glass_Fill.json,
+				Resources/Animations/Wine_Spectator_Wine_Lens.json,
+			);
+			target = CEB4BA9F2EE37B9F00014979 /* WineLensApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CEB4BAA22EE37B9F00014979 /* WineLensApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CEB4BACD2EE37BC000014979 /* Exceptions for "WineLensApp" folder in "WineLensApp" target */,
+			);
 			path = WineLensApp;
 			sourceTree = "<group>";
 		};
