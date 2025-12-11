@@ -44,11 +44,11 @@
 		CEB4BB262EE37EBA00014979 /* Card_Slide_Up.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB012EE37EBA00014979 /* Card_Slide_Up.json */; };
 		CEB4BB272EE37EBA00014979 /* Wine_Glass_Fill.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */; };
 		CEB4BB282EE37EBA00014979 /* Scan_Pulse.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB022EE37EBA00014979 /* Scan_Pulse.json */; };
-		CEB4BB4A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB0A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */; };
-		CEB4BB4B2EE37EBA00014979 /* Find_The_Best_Value.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB0B2EE37EBA00014979 /* Find_The_Best_Value.json */; };
-		CEB4BB4C2EE37EBA00014979 /* Save_Your_Favorites.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB0C2EE37EBA00014979 /* Save_Your_Favorites.json */; };
-		CEB4BB4D2EE37EBA00014979 /* Scan_Any_Wine_List.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB0D2EE37EBA00014979 /* Scan_Any_Wine_List.json */; };
-		CEB4BB4E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB0E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */; };
+		CEB4BB4A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB5A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */; };
+		CEB4BB4B2EE37EBA00014979 /* Find_The_Best_Value.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB5B2EE37EBA00014979 /* Find_The_Best_Value.json */; };
+		CEB4BB4C2EE37EBA00014979 /* Save_Your_Favorites.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB5C2EE37EBA00014979 /* Save_Your_Favorites.json */; };
+		CEB4BB4D2EE37EBA00014979 /* Scan_Any_Wine_List.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB5D2EE37EBA00014979 /* Scan_Any_Wine_List.json */; };
+		CEB4BB4E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BB5E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */; };
 		CEB4BB292EE37EBA00014979 /* WineLensBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */; };
 		CEB4BB2B2EE37EBA00014979 /* GoogleCloudOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */; };
 		CEB4BB2D2EE37EBA00014979 /* OCRProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */; };
@@ -120,11 +120,11 @@
 		CEB4BB022EE37EBA00014979 /* Scan_Pulse.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Pulse.json; sourceTree = "<group>"; };
 		CEB4BB032EE37EBA00014979 /* Score_Reveal.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Score_Reveal.json; sourceTree = "<group>"; };
 		CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Glass_Fill.json; sourceTree = "<group>"; };
-		CEB4BB0A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Expert_Scores_Not_Crowd.json; sourceTree = "<group>"; };
-		CEB4BB0B2EE37EBA00014979 /* Find_The_Best_Value.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Find_The_Best_Value.json; sourceTree = "<group>"; };
-		CEB4BB0C2EE37EBA00014979 /* Save_Your_Favorites.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Save_Your_Favorites.json; sourceTree = "<group>"; };
-		CEB4BB0D2EE37EBA00014979 /* Scan_Any_Wine_List.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Any_Wine_List.json; sourceTree = "<group>"; };
-		CEB4BB0E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Spectator_Wine_Lens.json; sourceTree = "<group>"; };
+		CEB4BB5A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Expert_Scores_Not_Crowd.json; sourceTree = "<group>"; };
+		CEB4BB5B2EE37EBA00014979 /* Find_The_Best_Value.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Find_The_Best_Value.json; sourceTree = "<group>"; };
+		CEB4BB5C2EE37EBA00014979 /* Save_Your_Favorites.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Save_Your_Favorites.json; sourceTree = "<group>"; };
+		CEB4BB5D2EE37EBA00014979 /* Scan_Any_Wine_List.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Any_Wine_List.json; sourceTree = "<group>"; };
+		CEB4BB5E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Spectator_Wine_Lens.json; sourceTree = "<group>"; };
 		CEB4BB2A2EE37EBA00014979 /* WineLensBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WineLensBadge.swift; sourceTree = "<group>"; };
 		CEB4BB2C2EE37EBA00014979 /* GoogleCloudOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCloudOCRService.swift; sourceTree = "<group>"; };
 		CEB4BB2E2EE37EBA00014979 /* OCRProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRProviderProtocol.swift; sourceTree = "<group>"; };
@@ -434,11 +434,11 @@
 				CEB4BB022EE37EBA00014979 /* Scan_Pulse.json */,
 				CEB4BB032EE37EBA00014979 /* Score_Reveal.json */,
 				CEB4BB042EE37EBA00014979 /* Wine_Glass_Fill.json */,
-				CEB4BB0A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */,
-				CEB4BB0B2EE37EBA00014979 /* Find_The_Best_Value.json */,
-				CEB4BB0C2EE37EBA00014979 /* Save_Your_Favorites.json */,
-				CEB4BB0D2EE37EBA00014979 /* Scan_Any_Wine_List.json */,
-				CEB4BB0E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */,
+				CEB4BB5A2EE37EBA00014979 /* Expert_Scores_Not_Crowd.json */,
+				CEB4BB5B2EE37EBA00014979 /* Find_The_Best_Value.json */,
+				CEB4BB5C2EE37EBA00014979 /* Save_Your_Favorites.json */,
+				CEB4BB5D2EE37EBA00014979 /* Scan_Any_Wine_List.json */,
+				CEB4BB5E2EE37EBA00014979 /* Wine_Spectator_Wine_Lens.json */,
 			);
 			path = Animations;
 			sourceTree = "<group>";
