@@ -70,7 +70,7 @@ final class WineAPIClient {
         print("🌐 WineAPIClient.searchWines - URL: \(components.url?.absoluteString ?? "nil")")
         #endif
 
-        let request = try authorizedRequest(url: components.url!)
+        let request = try await authorizedRequest(url: components.url!)
         let (data, response) = try await session.data(for: request)
 
         try validateResponse(response)
@@ -103,7 +103,7 @@ final class WineAPIClient {
     func batchMatch(queries: [String]) async throws -> [String: BatchMatchResult] {
         let url = baseURL.appendingPathComponent("wines/batch-match")
 
-        var request = try authorizedRequest(url: url)
+        var request = try await authorizedRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -130,7 +130,7 @@ final class WineAPIClient {
 
     func getWine(id: String) async throws -> Wine {
         let url = baseURL.appendingPathComponent("wines/\(id)")
-        let request = try authorizedRequest(url: url)
+        let request = try await authorizedRequest(url: url)
 
         let (data, response) = try await session.data(for: request)
         try validateResponse(response)
@@ -148,7 +148,7 @@ final class WineAPIClient {
             URLQueryItem(name: "offset", value: String(offset))
         ]
 
-        let request = try authorizedRequest(url: components.url!, requiresAuth: true)
+        let request = try await authorizedRequest(url: components.url!, requiresAuth: true)
         let (data, response) = try await session.data(for: request)
         try validateResponse(response)
 
@@ -159,7 +159,7 @@ final class WineAPIClient {
     func saveWine(wineId: String, notes: String? = nil, context: SavedWine.SaveContext? = nil) async throws -> SavedWine {
         let url = baseURL.appendingPathComponent("users/me/wines")
 
-        var request = try authorizedRequest(url: url, requiresAuth: true)
+        var request = try await authorizedRequest(url: url, requiresAuth: true)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -176,7 +176,7 @@ final class WineAPIClient {
     func deleteSavedWine(savedId: String) async throws {
         let url = baseURL.appendingPathComponent("users/me/wines/\(savedId)")
 
-        var request = try authorizedRequest(url: url, requiresAuth: true)
+        var request = try await authorizedRequest(url: url, requiresAuth: true)
         request.httpMethod = "DELETE"
 
         let (_, response) = try await session.data(for: request)
@@ -188,7 +188,7 @@ final class WineAPIClient {
     func verifySubscription(receiptData: String, transactionId: String) async throws -> Subscription {
         let url = baseURL.appendingPathComponent("subscriptions/verify")
 
-        var request = try authorizedRequest(url: url, requiresAuth: true)
+        var request = try await authorizedRequest(url: url, requiresAuth: true)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -208,14 +208,15 @@ final class WineAPIClient {
 
     // MARK: - Helpers
 
-    private func authorizedRequest(url: URL, requiresAuth: Bool = false) throws -> URLRequest {
+    private func authorizedRequest(url: URL, requiresAuth: Bool = false) async throws -> URLRequest {
         var request = URLRequest(url: url)
 
         // Always include API key
         request.setValue(AppConfiguration.apiKey, forHTTPHeaderField: "X-API-Key")
 
-        // Include auth token if available and required
-        if let token = AuthenticationService.shared.accessToken {
+        // Include auth token if available and required (access on MainActor)
+        let token = await MainActor.run { AuthenticationService.shared.accessToken }
+        if let token = token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else if requiresAuth {
             throw APIError.unauthorized
