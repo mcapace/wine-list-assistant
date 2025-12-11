@@ -59,7 +59,6 @@
 		CEB4BC00E192EE37EBA00014980 /* ScannerErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BC01E192EE37EBA00014980 /* ScannerErrorView.swift */; };
 		CEB4BC02E192EE37EBA00014981 /* ScannerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4BC03E192EE37EBA00014981 /* ScannerError.swift */; };
 		CEB4BD3607E2EE37EBA00014979 /* AppleVisionOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B157B352EE37EBA00014979 /* AppleVisionOCRService.swift */; };
-		CEB4BEE415E2EE37EBA00014979 /* Utilities in Sources */ = {isa = PBXBuildFile; fileRef = CEB4B6C4F312EE37EBA00014979 /* Utilities */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -657,7 +656,6 @@
 				CEB4BC02E192EE37EBA00014981 /* ScannerError.swift in Sources */,
 				CEB4B0504D32EE37EBA00014979 /* SessionManager.swift in Sources */,
 				CEB4B07CD6A2EE37EBA00014979 /* ScanSession.swift in Sources */,
-				CEB4BEE415E2EE37EBA00014979 /* Utilities in Sources */,
 				CEB4B342BE02EE37EBA00014979 /* LottieView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
