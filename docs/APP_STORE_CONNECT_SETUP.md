@@ -3,7 +3,7 @@
 ## App ID Registration (Apple Developer Portal)
 
 ### Bundle ID
-**Enter**: `com.winespec.winelensapp`
+**Enter**: `com.winespec.winelens`
 
 ### Description
 **Enter**: `Wine Lens - Wine Spectator's smart wine list scanner`
@@ -59,7 +59,7 @@ Based on your app's features, enable these capabilities:
 - Primary: **Food & Drink**
 - Secondary: **Lifestyle** (optional)
 
-**Bundle ID**: `com.winespec.winelensapp`
+**Bundle ID**: `com.winespec.winelens`
 
 **SKU**: `wine-lens-app` (unique identifier, can be anything)
 
@@ -166,13 +166,13 @@ Premium subscription unlocks unlimited scans.
 Create two subscription products:
 
 1. **Monthly Premium**
-   - Product ID: `com.winespec.winelensapp.premium.monthly`
+   - Product ID: `com.winespec.winelens.premium.monthly`
    - Display Name: `Wine Lens Premium Monthly`
    - Price: Set your price (e.g., $4.99/month)
    - Duration: 1 Month
 
 2. **Yearly Premium**
-   - Product ID: `com.winespec.winelensapp.premium.yearly`
+   - Product ID: `com.winespec.winelens.premium.yearly`
    - Display Name: `Wine Lens Premium Yearly`
    - Price: Set your price (e.g., $39.99/year)
    - Duration: 1 Year
