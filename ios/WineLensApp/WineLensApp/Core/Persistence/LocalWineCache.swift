@@ -73,19 +73,29 @@ actor LocalWineCache {
     }
 
     func clear() {
+        let memoryCount = wineCache.count
+        let indexCount = searchIndex.count
+        
         wineCache.removeAll()
         searchIndex.removeAll()
         
         // Remove cache file and version file from disk
+        var removedFiles: [String] = []
         if FileManager.default.fileExists(atPath: cacheURL.path) {
             try? FileManager.default.removeItem(at: cacheURL)
+            removedFiles.append("cache.json")
         }
         if FileManager.default.fileExists(atPath: cacheVersionURL.path) {
             try? FileManager.default.removeItem(at: cacheVersionURL)
+            removedFiles.append("cache_version.txt")
         }
         
         #if DEBUG
-        print("🗑️ LocalWineCache: Cleared cache files and memory")
+        print("🗑️ LocalWineCache.clear() called")
+        print("   - Cleared \(memoryCount) wines from memory")
+        print("   - Cleared \(indexCount) entries from search index")
+        print("   - Removed files: \(removedFiles.isEmpty ? "none" : removedFiles.joined(separator: ", "))")
+        print("   - Current memory cache count: \(wineCache.count)")
         #endif
     }
 

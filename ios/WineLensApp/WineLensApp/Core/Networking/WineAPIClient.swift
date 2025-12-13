@@ -300,6 +300,11 @@ private struct SearchResponse: Codable {
     struct SearchResultItem: Codable {
         let wine: Wine
         let matchConfidence: Double
+        
+        enum CodingKeys: String, CodingKey {
+            case wine
+            case matchConfidence = "match_confidence"
+        }
     }
 }
 

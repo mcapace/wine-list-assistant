@@ -265,25 +265,50 @@ struct WineLabelDisplay: View {
 
     var body: some View {
         Group {
-            if let urlString = wine.labelUrl, let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        WineBottlePlaceholder(wineColor: wine.color)
-                            .overlay(ProgressView().tint(.white))
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(color: .black.opacity(0.4), radius: 20, x: 0, y: 10)
-                    case .failure:
-                        WineBottlePlaceholder(wineColor: wine.color)
-                    @unknown default:
-                        WineBottlePlaceholder(wineColor: wine.color)
+            if let urlString = wine.labelUrl {
+                #if DEBUG
+                print("🖼️ WineLabelDisplay: labelUrl = \(urlString)")
+                #endif
+                if let url = URL(string: urlString) {
+                    #if DEBUG
+                    print("🖼️ WineLabelDisplay: Created URL successfully: \(url.absoluteString)")
+                    #endif
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            #if DEBUG
+                            print("🖼️ WineLabelDisplay: Image loading...")
+                            #endif
+                            WineBottlePlaceholder(wineColor: wine.color)
+                                .overlay(ProgressView().tint(.white))
+                        case .success(let image):
+                            #if DEBUG
+                            print("🖼️ WineLabelDisplay: Image loaded successfully!")
+                            #endif
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .shadow(color: .black.opacity(0.4), radius: 20, x: 0, y: 10)
+                        case .failure(let error):
+                            #if DEBUG
+                            print("🖼️ WineLabelDisplay: Image load failed: \(error.localizedDescription)")
+                            #endif
+                            WineBottlePlaceholder(wineColor: wine.color)
+                        @unknown default:
+                            WineBottlePlaceholder(wineColor: wine.color)
+                        }
                     }
+                } else {
+                    #if DEBUG
+                    print("🖼️ WineLabelDisplay: Failed to create URL from string: \(urlString)")
+                    #endif
+                    WineBottlePlaceholder(wineColor: wine.color)
                 }
             } else {
+                #if DEBUG
+                print("🖼️ WineLabelDisplay: No labelUrl for wine: \(wine.producer) \(wine.name)")
+                #endif
                 WineBottlePlaceholder(wineColor: wine.color)
             }
         }
@@ -835,6 +860,14 @@ struct TastingNoteTabContent: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+            #if DEBUG
+            let _ = {
+                print("📝 TastingNoteTabContent: Checking tasting note for \(wine.producer) \(wine.name)")
+                print("   - Has tastingNote: \(wine.tastingNote != nil)")
+                print("   - tastingNote value: \(wine.tastingNote?.prefix(100) ?? "nil")")
+                print("   - tastingNote isEmpty: \(wine.tastingNote?.isEmpty ?? true)")
+            }()
+            #endif
             if let note = wine.tastingNote, !note.isEmpty {
                 // Tasting Note Card
                 VStack(alignment: .leading, spacing: Theme.Spacing.md) {
