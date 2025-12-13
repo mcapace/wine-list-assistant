@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var showSubscription = false
     @State private var showSignIn = false
     @State private var showSignOut = false
+    @State private var showResetConfirmation = false
 
     var body: some View {
         NavigationView {
@@ -79,18 +80,27 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    #if DEBUG
-                    // Development: Reset scan count
+                    // Development/Testing: Reset scan count
                     Button(action: {
                         subscriptionService.resetScanCount()
                     }) {
                         HStack {
                             Image(systemName: "arrow.counterclockwise")
-                            Text("Reset Scan Count (Dev)")
+                            Text("Reset Scan Count")
                         }
                         .foregroundColor(.orange)
                     }
-                    #endif
+
+                    // Development/Testing: Reset entire app
+                    Button(action: {
+                        showResetConfirmation = true
+                    }) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Reset App")
+                        }
+                        .foregroundColor(.red)
+                    }
 
                     Link(destination: URL(string: "https://www.winespectator.com/privacy")!) {
                         HStack {
@@ -154,6 +164,14 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Are you sure you want to sign out?")
+            }
+            .confirmationDialog("Reset App", isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button("Reset App", role: .destructive) {
+                    appState.resetApp()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will reset the app to its initial state, showing the onboarding screens again. Your account will remain signed in.")
             }
         }
     }

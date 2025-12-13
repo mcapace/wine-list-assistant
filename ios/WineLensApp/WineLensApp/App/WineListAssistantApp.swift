@@ -59,4 +59,26 @@ final class AppState: ObservableObject {
         print("🏠 AppState.completeOnboarding() - isOnboardingComplete now: \(isOnboardingComplete)")
         #endif
     }
+
+    /// Resets the app to initial state (for testing purposes)
+    func resetApp() {
+        // Clear onboarding state
+        UserDefaults.standard.removeObject(forKey: Constants.StorageKeys.onboardingComplete)
+
+        // Clear scan count
+        UserDefaults.standard.removeObject(forKey: Constants.StorageKeys.scansThisMonth)
+        UserDefaults.standard.removeObject(forKey: Constants.StorageKeys.scansMonthStart)
+
+        // Clear other preferences
+        UserDefaults.standard.removeObject(forKey: Constants.StorageKeys.userPreferences)
+
+        // Sync UserDefaults
+        UserDefaults.standard.synchronize()
+
+        // Update UI with animation
+        withAnimation(.easeInOut(duration: 0.25)) {
+            isOnboardingComplete = false
+            selectedTab = .scanner
+        }
+    }
 }
