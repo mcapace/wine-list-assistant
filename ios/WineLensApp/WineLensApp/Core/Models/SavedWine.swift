@@ -9,7 +9,7 @@ struct SavedWine: Identifiable, Codable {
 
     struct SaveContext: Codable {
         var restaurant: String?
-        var pricePaid: Decimal?
+        var pricePaid: Double?
         var date: Date?
         var rating: Int?  // User's personal rating 1-5
 
@@ -25,14 +25,7 @@ struct SavedWine: Identifiable, Codable {
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
             formatter.currencyCode = "USD"
-            return formatter.string(from: price as NSDecimalNumber)
-        }
-
-        enum CodingKeys: String, CodingKey {
-            case restaurant
-            case pricePaid
-            case date
-            case rating
+            return formatter.string(from: NSNumber(value: price))
         }
     }
 
