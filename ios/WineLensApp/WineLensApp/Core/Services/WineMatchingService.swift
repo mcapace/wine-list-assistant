@@ -52,8 +52,20 @@ final class WineMatchingService {
         if let exactMatch = await tryExactMatch(parsed) {
             #if DEBUG
             print("✅ Exact match found: \(exactMatch.wine.name)")
+            print("   - Has labelUrl: \(exactMatch.wine.labelUrl != nil)")
+            print("   - Has tastingNote: \(exactMatch.wine.tastingNote != nil)")
+            // If cache match doesn't have fields, skip it and try API
+            if exactMatch.wine.labelUrl == nil && exactMatch.wine.tastingNote == nil {
+                print("⚠️ Cache match missing fields, trying API instead...")
+            } else {
+                return exactMatch
+            }
+            #else
+            // In release, skip cache if missing critical fields
+            if exactMatch.wine.labelUrl != nil || exactMatch.wine.tastingNote != nil {
+                return exactMatch
+            }
             #endif
-            return exactMatch
         }
 
         // Step 2: Try fuzzy match in local cache
@@ -63,8 +75,20 @@ final class WineMatchingService {
         if let fuzzyMatch = await tryFuzzyMatch(parsed) {
             #if DEBUG
             print("✅ Fuzzy match found: \(fuzzyMatch.wine.name) (confidence: \(fuzzyMatch.confidence))")
+            print("   - Has labelUrl: \(fuzzyMatch.wine.labelUrl != nil)")
+            print("   - Has tastingNote: \(fuzzyMatch.wine.tastingNote != nil)")
+            // If cache match doesn't have fields, skip it and try API
+            if fuzzyMatch.wine.labelUrl == nil && fuzzyMatch.wine.tastingNote == nil {
+                print("⚠️ Cache match missing fields, trying API instead...")
+            } else {
+                return fuzzyMatch
+            }
+            #else
+            // In release, skip cache if missing critical fields
+            if fuzzyMatch.wine.labelUrl != nil || fuzzyMatch.wine.tastingNote != nil {
+                return fuzzyMatch
+            }
             #endif
-            return fuzzyMatch
         }
 
         // Step 3: Query API for broader search
