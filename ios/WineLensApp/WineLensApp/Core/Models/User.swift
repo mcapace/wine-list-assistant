@@ -155,7 +155,7 @@ extension User {
             expiresAt: Calendar.current.date(byAdding: .month, value: 6, to: Date()),
             autoRenew: true,
             store: .appStore,
-            productId: "com.mcapace.winelens.premium.yearly"
+            productId: "com.winespec.winelens.premium.yearly"
         ),
         stats: UserStats(
             winesSaved: 47,
