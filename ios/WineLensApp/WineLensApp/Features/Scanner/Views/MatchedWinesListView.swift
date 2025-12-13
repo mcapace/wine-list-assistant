@@ -805,6 +805,7 @@ struct TipRow: View {
 
 // MARK: - Preview
 
+#if DEBUG
 #Preview {
     MatchedWinesListView(
         matchedWines: [
@@ -814,4 +815,5 @@ struct TipRow: View {
         onWineTapped: { _ in }
     )
 }
+#endif
 

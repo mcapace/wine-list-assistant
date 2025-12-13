@@ -178,6 +178,7 @@ struct DrinkWindowIndicatorOverlay: View {
 
 // MARK: - Preview
 
+#if DEBUG
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
@@ -193,3 +194,4 @@ struct DrinkWindowIndicatorOverlay: View {
         )
     }
 }
+#endif

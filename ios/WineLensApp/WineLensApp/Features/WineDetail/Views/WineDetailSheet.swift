@@ -634,6 +634,8 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 // MARK: - Preview
 
+#if DEBUG
 #Preview {
     WineDetailSheet(recognizedWine: RecognizedWine.preview)
 }
+#endif
