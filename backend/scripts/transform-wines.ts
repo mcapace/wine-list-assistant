@@ -21,8 +21,9 @@ interface SourceWine {
   score: number;
   price: number;
   issue_date: string;
-  top100_year: number;
-  top100_rank: number;
+  top100_year?: number;
+  top100_rank?: number;
+  label_url?: string;
   wine_type: string;
 }
 
@@ -46,6 +47,9 @@ interface TargetWine {
   drink_window_start?: number;
   drink_window_end?: number;
   release_price?: number;
+  label_url?: string;
+  top100_rank?: number;
+  top100_year?: number;
 }
 
 // Convert color string to lowercase and map to valid values
@@ -138,6 +142,9 @@ function transformWine(source: SourceWine): TargetWine {
     drink_window_start: drinkWindow.start,
     drink_window_end: drinkWindow.end,
     release_price: source.price || undefined,
+    label_url: source.label_url || undefined,
+    top100_rank: source.top100_rank || undefined,
+    top100_year: source.top100_year || undefined,
   };
 }
 

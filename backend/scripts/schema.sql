@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS wines (
     color TEXT NOT NULL CHECK (color IN ('red', 'white', 'rose', 'sparkling', 'dessert', 'fortified')),
     grape_varieties JSONB DEFAULT '[]'::jsonb,
     alcohol DECIMAL(4,2),
+    label_url TEXT,
+    top100_rank INTEGER,
+    top100_year INTEGER,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -76,6 +79,8 @@ CREATE INDEX IF NOT EXISTS idx_wines_vintage ON wines(vintage);
 CREATE INDEX IF NOT EXISTS idx_wines_region ON wines(region);
 CREATE INDEX IF NOT EXISTS idx_wines_country ON wines(country);
 CREATE INDEX IF NOT EXISTS idx_wines_color ON wines(color);
+CREATE INDEX IF NOT EXISTS idx_wines_top100_rank ON wines(top100_rank) WHERE top100_rank IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_wines_top100_year ON wines(top100_year) WHERE top100_year IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_reviews_wine_id ON reviews(wine_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_score ON reviews(score);

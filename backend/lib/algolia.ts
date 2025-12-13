@@ -91,6 +91,9 @@ interface AlgoliaWineRecord {
   drink_window_start: number | null;
   drink_window_end: number | null;
   release_price: number | null;
+  label_url: string | null;
+  top100_rank: number | null;
+  top100_year: number | null;
   // Searchable variants
   producer_normalized: string;
   name_normalized: string;
@@ -121,6 +124,9 @@ function wineToAlgoliaRecord(wine: WineWithReview): AlgoliaWineRecord {
     drink_window_start: wine.drink_window_start,
     drink_window_end: wine.drink_window_end,
     release_price: wine.release_price,
+    label_url: wine.label_url || null,
+    top100_rank: wine.top100_rank || null,
+    top100_year: wine.top100_year || null,
     // Normalized for better matching
     producer_normalized: normalizeText(wine.producer),
     name_normalized: normalizeText(wine.name),
@@ -141,6 +147,9 @@ function algoliaHitToWine(hit: AlgoliaWineRecord): WineWithReview {
     color: hit.color as WineWithReview['color'],
     grape_varieties: hit.grape_varieties.map(name => ({ name, percentage: null })),
     alcohol: null,
+    label_url: hit.label_url || null,
+    top100_rank: hit.top100_rank || null,
+    top100_year: hit.top100_year || null,
     score: hit.score,
     tasting_note: hit.tasting_note,
     reviewer_initials: hit.reviewer_initials,

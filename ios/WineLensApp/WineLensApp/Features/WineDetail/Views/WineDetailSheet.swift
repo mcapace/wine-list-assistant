@@ -7,6 +7,9 @@ struct WineDetailSheet: View {
     @State private var isSaved = false
     @State private var showShareSheet = false
     @State private var selectedTab: DetailTab = .details
+    @State private var saveError: String?
+    @State private var showSaveError = false
+    @State private var isSaving = false
 
     enum DetailTab: String, CaseIterable {
         case details = "Details"
@@ -55,6 +58,7 @@ struct WineDetailSheet: View {
                         // Action Buttons
                         ActionButtons(
                             isSaved: $isSaved,
+                            isSaving: isSaving,
                             onSave: saveWine,
                             onShare: { showShareSheet = true }
                         )
@@ -96,15 +100,45 @@ struct WineDetailSheet: View {
                 ShareSheet(items: [createShareText(wine)])
             }
         }
+        .alert("Error Saving Wine", isPresented: $showSaveError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(saveError ?? "An unknown error occurred. Please try again.")
+        }
     }
 
     private func saveWine() {
         guard let wine = wine else { return }
+        guard !isSaving else { return } // Prevent multiple saves
+        
+        isSaving = true
+        saveError = nil
+        
         Task {
             do {
                 _ = try await WineAPIClient.shared.saveWine(wineId: wine.id)
-                withAnimation { isSaved = true }
+                await MainActor.run {
+                    withAnimation { 
+                        isSaved = true
+                        isSaving = false
+                    }
+                }
+            } catch let error as WineAPIClient.APIError {
+                await MainActor.run {
+                    isSaving = false
+                    saveError = error.errorDescription
+                    showSaveError = true
+                }
             } catch {
+                await MainActor.run {
+                    isSaving = false
+                    if let apiError = error as? WineAPIClient.APIError {
+                        saveError = apiError.errorDescription
+                    } else {
+                        saveError = "Failed to save wine. Please check your connection and try again."
+                    }
+                    showSaveError = true
+                }
                 print("Failed to save wine: \(error)")
             }
         }
@@ -870,19 +904,27 @@ struct TastingNoteTabContent: View {
 
 struct ActionButtons: View {
     @Binding var isSaved: Bool
+    var isSaving: Bool = false
     let onSave: () -> Void
     let onShare: () -> Void
 
     var body: some View {
         Button(action: {
+            guard !isSaving && !isSaved else { return }
             let generator = UIImpactFeedbackGenerator(style: .medium)
             generator.impactOccurred()
             onSave()
         }) {
             HStack(spacing: 8) {
-                Image(systemName: isSaved ? "heart.fill" : "heart")
-                    .font(.system(size: 18, weight: .semibold))
-                Text(isSaved ? "Saved to My Wines" : "Save to My Wines")
+                if isSaving {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Theme.primaryColor))
+                        .scaleEffect(0.8)
+                } else {
+                    Image(systemName: isSaved ? "heart.fill" : "heart")
+                        .font(.system(size: 18, weight: .semibold))
+                }
+                Text(isSaving ? "Saving..." : (isSaved ? "Saved to My Wines" : "Save to My Wines"))
                     .font(.system(size: 16, weight: .semibold))
             }
             .foregroundColor(isSaved ? .white : Theme.primaryColor)
@@ -897,7 +939,7 @@ struct ActionButtons: View {
                     )
             )
         }
-        .disabled(isSaved)
+        .disabled(isSaved || isSaving)
     }
 }
 

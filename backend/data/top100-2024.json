@@ -13,7 +13,10 @@
     "issue_date": "2025-03-31",
     "drink_window_start": 2026,
     "drink_window_end": 2040,
-    "release_price": 68
+    "release_price": 68,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20Giscours/Margaux/2022/a698e96c8cf2aeb6c2ccb58302a0f2b9.jpeg",
+    "top100_rank": 1,
+    "top100_year": 2025
   },
   {
     "producer": "Aubert",
@@ -28,7 +31,10 @@
     "review_date": "2025-07-31",
     "issue_date": "2025-07-31",
     "drink_window_end": 2035,
-    "release_price": 100
+    "release_price": 100,
+    "label_url": "https://wineapi.s3.amazonaws.com/Aubert/Chardonnay%20Sonoma%20Coast%20UV-SL%20Vineyard/2023/8c56d3ecb7bc6cf929d0c99351f86663.jpeg",
+    "top100_rank": 2,
+    "top100_year": 2025
   },
   {
     "producer": "Ridge",
@@ -43,7 +49,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2035,
-    "release_price": 56
+    "release_price": 56,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ridge/Lytton%20Springs%20Dry%20Creek%20Valley/2023/713f729956f32140102c220fd02fa6e7.jpeg",
+    "top100_rank": 3,
+    "top100_year": 2025
   },
   {
     "producer": "Williams Selyem",
@@ -59,7 +68,10 @@
     "issue_date": "2025-09-30",
     "drink_window_start": 2026,
     "drink_window_end": 2040,
-    "release_price": 72
+    "release_price": 72,
+    "label_url": "https://wineapi.s3.amazonaws.com/Williams%20Selyem/Pinot%20Noir%20Russian%20River%20Valley%20Eastside%20Road%20Neighbors/2023/f9f6d6bbb3bafaa5d7fe6b4924d3899e.jpeg",
+    "top100_rank": 4,
+    "top100_year": 2025
   },
   {
     "producer": "Château Beau-Séjour Bécot",
@@ -75,7 +87,10 @@
     "issue_date": "2025-03-31",
     "drink_window_start": 2026,
     "drink_window_end": 2040,
-    "release_price": 85
+    "release_price": 85,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20Beau-S%C3%A9jour%20B%C3%A9cot/St.-Emilion/2022/75477a3a4548acf6168ec308f60d67a8.jpeg",
+    "top100_rank": 5,
+    "top100_year": 2025
   },
   {
     "producer": "Clos Apalta",
@@ -90,7 +105,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2040,
-    "release_price": 170
+    "release_price": 170,
+    "label_url": "https://wineapi.s3.amazonaws.com/Clos%20Apalta/Apalta/2021/d1e41246f57262d40bc3dfc8c7fa5cb0.gif",
+    "top100_rank": 6,
+    "top100_year": 2025
   },
   {
     "producer": "Produttori del Barbaresco",
@@ -106,7 +124,10 @@
     "issue_date": "2025-10-31",
     "drink_window_start": 2027,
     "drink_window_end": 2040,
-    "release_price": 57
+    "release_price": 57,
+    "label_url": "https://wineapi.s3.amazonaws.com/Produttori%20del%20Barbaresco/Barbaresco/2021/0d392891dc5814a77a6c4229216ae933.jpeg",
+    "top100_rank": 7,
+    "top100_year": 2025
   },
   {
     "producer": "Wayfarer",
@@ -122,7 +143,10 @@
     "issue_date": "2025-09-30",
     "drink_window_start": 2026,
     "drink_window_end": 2036,
-    "release_price": 100
+    "release_price": 100,
+    "label_url": "https://wineapi.s3.amazonaws.com/Wayfarer/Pinot%20Noir%20Fort%20Ross-Seaview%20Wayfarer%20Vineyard%20The%20Estate/2023/96b100973f0a236e463c890e190c003f.jpeg",
+    "top100_rank": 8,
+    "top100_year": 2025
   },
   {
     "producer": "Castello di Ama",
@@ -138,7 +162,10 @@
     "issue_date": "2025-08-31",
     "drink_window_start": 2028,
     "drink_window_end": 2050,
-    "release_price": 90
+    "release_price": 90,
+    "label_url": "https://wineapi.s3.amazonaws.com/Castello%20di%20Ama/Chianti%20Classico%20San%20Lorenzo%20Gran%20Selezione/2021/2c1149ffe85151f840b864b4e23fe989.jpeg",
+    "top100_rank": 9,
+    "top100_year": 2025
   },
   {
     "producer": "Famille Isabel Ferrando",
@@ -153,7 +180,10 @@
     "review_date": "2025-03-31",
     "issue_date": "2025-03-31",
     "drink_window_end": 2040,
-    "release_price": 108
+    "release_price": 108,
+    "label_url": "https://wineapi.s3.amazonaws.com/Famille%20Isabel%20Ferrando/Ch%C3%A2teauneuf-du-Pape%20St.-Prefert/2022/e6745023e8c3a317bb555d246c96a19a.jpeg",
+    "top100_rank": 10,
+    "top100_year": 2025
   },
   {
     "producer": "Cristom",
@@ -168,7 +198,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2035,
-    "release_price": 50
+    "release_price": 50,
+    "label_url": "https://wineapi.s3.amazonaws.com/Cristom/Pinot%20Noir%20Eola-Amity%20Hills%20Mt.%20Jefferson%20Cuv%C3%A9e/2023/8c5763dbd8eea147fd245030ab412715.jpeg",
+    "top100_rank": 11,
+    "top100_year": 2025
   },
   {
     "producer": "Bedrock",
@@ -183,7 +216,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2035,
-    "release_price": 60
+    "release_price": 60,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bedrock/Bedrock%20Vineyard%20Heritage%20Sonoma%20Valley/2023/5172135934bdb3e7cfd4b7fa6cf5ba97.jpeg",
+    "top100_rank": 12,
+    "top100_year": 2025
   },
   {
     "producer": "Château Talbot",
@@ -199,7 +235,10 @@
     "issue_date": "2025-05-31",
     "drink_window_start": 2027,
     "drink_window_end": 2045,
-    "release_price": 68
+    "release_price": 68,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20Talbot/St.-Julien/2022/14370ae8516905e4e0c812f292678bc3.jpeg",
+    "top100_rank": 13,
+    "top100_year": 2025
   },
   {
     "producer": "Viticcio",
@@ -214,7 +253,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2045,
-    "release_price": 40
+    "release_price": 40,
+    "label_url": "https://wineapi.s3.amazonaws.com/Viticcio/Chianti%20Classico%20Riserva/2019/e5b829183cb932799d45ed2d2bc89acc.jpeg",
+    "top100_rank": 14,
+    "top100_year": 2025
   },
   {
     "producer": "Le Vieux Donjon",
@@ -230,7 +272,10 @@
     "issue_date": "2025-03-31",
     "drink_window_start": 2026,
     "drink_window_end": 2038,
-    "release_price": 65
+    "release_price": 65,
+    "label_url": "https://wineapi.s3.amazonaws.com/Le%20Vieux%20Donjon/Ch%C3%A2teauneuf-du-Pape/2022/fd91d139045bdfea95515403f25752cc.jpeg",
+    "top100_rank": 15,
+    "top100_year": 2025
   },
   {
     "producer": "Lingua Franca",
@@ -245,7 +290,10 @@
     "review_date": "2025-02-28",
     "issue_date": "2025-02-28",
     "drink_window_end": 2033,
-    "release_price": 40
+    "release_price": 40,
+    "label_url": "https://wineapi.s3.amazonaws.com/Lingua%20Franca/Pinot%20Noir%20Willamette%20Valley%20Avni/2022/d5e2a1364ac36a0b215885704aa6721d.jpeg",
+    "top100_rank": 16,
+    "top100_year": 2025
   },
   {
     "producer": "Ruffino",
@@ -260,7 +308,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2040,
-    "release_price": 25
+    "release_price": 25,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ruffino/Chianti%20Classico%20Ducale%20Riserva/2021/00b8607b0cd1884d361f2fb7403bc7ed.jpeg",
+    "top100_rank": 17,
+    "top100_year": 2025
   },
   {
     "producer": "Diatom",
@@ -274,7 +325,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
-    "release_price": 25
+    "release_price": 25,
+    "label_url": "https://wineapi.s3.amazonaws.com/Diatom/Chardonnay%20Santa%20Barbara%20County/2024/98217fae89e3ec0badac1ce7ead61141.jpeg",
+    "top100_rank": 18,
+    "top100_year": 2025
   },
   {
     "producer": "Penner-Ash",
@@ -289,7 +343,10 @@
     "review_date": "2025-03-31",
     "issue_date": "2025-03-31",
     "drink_window_end": 2032,
-    "release_price": 60
+    "release_price": 60,
+    "label_url": "https://wineapi.s3.amazonaws.com/Penner-Ash/Pinot%20Noir%20Willamette%20Valley/2022/b3ed52e19cf6701adadd6318366acd50.jpeg",
+    "top100_rank": 19,
+    "top100_year": 2025
   },
   {
     "producer": "Rimapere",
@@ -303,7 +360,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
-    "release_price": 30
+    "release_price": 30,
+    "label_url": "https://wineapi.s3.amazonaws.com/Rimapere/Sauvignon%20Blanc%20Marlborough%20Single%20Vineyard/2024/12870501746c478489ba9c8ea062cee3.jpeg",
+    "top100_rank": 20,
+    "top100_year": 2025
   },
   {
     "producer": "Camigliano",
@@ -319,7 +379,10 @@
     "issue_date": "2025-06-30",
     "drink_window_start": 2027,
     "drink_window_end": 2043,
-    "release_price": 60
+    "release_price": 60,
+    "label_url": "https://wineapi.s3.amazonaws.com/Camigliano/Brunello%20di%20Montalcino/2020/70f85023d904c7aa8469ad66f20b2f69.jpeg",
+    "top100_rank": 21,
+    "top100_year": 2025
   },
   {
     "producer": "Patz & Hall",
@@ -333,7 +396,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-07-31",
     "issue_date": "2025-07-31",
-    "release_price": 35
+    "release_price": 35,
+    "label_url": "https://wineapi.s3.amazonaws.com/Patz%20%26%20Hall/Chardonnay%20Sonoma%20Coast/2022/dd2e0ffb45e4504a767f94ebfedc39ce.jpeg",
+    "top100_rank": 22,
+    "top100_year": 2025
   },
   {
     "producer": "Rocca di Frassinello",
@@ -349,7 +415,10 @@
     "issue_date": "2025-10-31",
     "drink_window_start": 2026,
     "drink_window_end": 2038,
-    "release_price": 30
+    "release_price": 30,
+    "label_url": "https://wineapi.s3.amazonaws.com/Rocca%20di%20Frassinello/Maremma%20Toscana%20Ornello/2023/d13215e94fb61c2841f79f9409c31dba.jpeg",
+    "top100_rank": 23,
+    "top100_year": 2025
   },
   {
     "producer": "Dry Creek",
@@ -363,7 +432,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
-    "release_price": 18
+    "release_price": 18,
+    "label_url": "https://wineapi.s3.amazonaws.com/Dry%20Creek/Chenin%20Blanc%20Clarksburg%20Dry/2023/3392cdb26c59e8921035da47d7898efe.jpeg",
+    "top100_rank": 24,
+    "top100_year": 2025
   },
   {
     "producer": "Carpineto",
@@ -379,7 +451,10 @@
     "issue_date": "2025-08-31",
     "drink_window_start": 2027,
     "drink_window_end": 2043,
-    "release_price": 29
+    "release_price": 29,
+    "label_url": "https://wineapi.s3.amazonaws.com/Carpineto/Chianti%20Classico%20Riserva/2020/4c76089568ba713134e14072f3c1bcf0.jpeg",
+    "top100_rank": 25,
+    "top100_year": 2025
   },
   {
     "producer": "Viña Tarapacá",
@@ -394,7 +469,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2038,
-    "release_price": 34
+    "release_price": 34,
+    "label_url": "https://wineapi.s3.amazonaws.com/Vi%C3%B1a%20Tarapac%C3%A1/Cabernet%20Sauvignon%20Maipo%20Valley%20Etiqueta%20Negra%20Gran%20Reserva/2022/e3150f49e31c75fd98535680ba3c4e92.jpeg",
+    "top100_rank": 26,
+    "top100_year": 2025
   },
   {
     "producer": "Pine Ridge",
@@ -408,7 +486,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
-    "release_price": 16
+    "release_price": 16,
+    "label_url": "https://wineapi.s3.amazonaws.com/Pine%20Ridge/Chenin%20Blanc-Viognier%20American/2024/4b950a2370e9c1d9e599ba7ed2dbe014.jpeg",
+    "top100_rank": 27,
+    "top100_year": 2025
   },
   {
     "producer": "Castello Banfi",
@@ -423,7 +504,10 @@
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
     "drink_window_end": 2030,
-    "release_price": 15
+    "release_price": 15,
+    "label_url": "https://wineapi.s3.amazonaws.com/Castello%20Banfi/Toscana%20Centine/2022/0b9dd885257cbd8b86cdcf5ed196ff0c.jpeg",
+    "top100_rank": 28,
+    "top100_year": 2025
   },
   {
     "producer": "Château d'Estoublon",
@@ -437,7 +521,10 @@
     "reviewer_initials": "KB",
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
-    "release_price": 27
+    "release_price": 27,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20d%27Estoublon/Coteaux%20Varois%20en%20Provence%20Roseblood%20Ros%C3%A9/2024/e7b4111f1e83e2bbfadaf5fbac4d5b3c.jpeg",
+    "top100_rank": 29,
+    "top100_year": 2025
   },
   {
     "producer": "Château Marquis de Terme",
@@ -453,7 +540,10 @@
     "issue_date": "2025-03-31",
     "drink_window_start": 2026,
     "drink_window_end": 2040,
-    "release_price": 51
+    "release_price": 51,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20Marquis%20de%20Terme/Margaux/2022/f55ce766e7a8db72ea37a9849e7ff652.png",
+    "top100_rank": 30,
+    "top100_year": 2025
   },
   {
     "producer": "Marchesi de' Frescobaldi",
@@ -468,7 +558,10 @@
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
     "drink_window_end": 2030,
-    "release_price": 20
+    "release_price": 20,
+    "label_url": "https://wineapi.s3.amazonaws.com/Marchesi%20de%27%20Frescobaldi/Chianti%20Rufina%20Nipozzano%20Riserva/2022/a21b849d19403e762c36eecc2e30a4f8.jpeg",
+    "top100_rank": 31,
+    "top100_year": 2025
   },
   {
     "producer": "Massican",
@@ -482,7 +575,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
-    "release_price": 32
+    "release_price": 32,
+    "label_url": "https://wineapi.s3.amazonaws.com/Massican/Annia%20California/2024/9df61fd3680a4e8bc06c38254d04ee2b.png",
+    "top100_rank": 32,
+    "top100_year": 2025
   },
   {
     "producer": "Loveblock",
@@ -496,7 +592,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-02-28",
     "issue_date": "2025-02-28",
-    "release_price": 34
+    "release_price": 34,
+    "label_url": "https://wineapi.s3.amazonaws.com/Loveblock/Sauvignon%20Blanc%20Marlborough%20tee/2023/56760f74c4f1eb8ddd1d7c4fffb63186.jpeg",
+    "top100_rank": 33,
+    "top100_year": 2025
   },
   {
     "producer": "Frequency",
@@ -511,7 +610,10 @@
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
     "drink_window_end": 2035,
-    "release_price": 36
+    "release_price": 36,
+    "label_url": "https://wineapi.s3.amazonaws.com/Frequency/GSM%20Santa%20Barbara%20County/2023/b7b75db07f27d2c2b7b41230e5ed0625.jpeg",
+    "top100_rank": 34,
+    "top100_year": 2025
   },
   {
     "producer": "Primus",
@@ -525,7 +627,10 @@
     "reviewer_initials": "AR",
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
-    "release_price": 21
+    "release_price": 21,
+    "label_url": "https://wineapi.s3.amazonaws.com/Primus/The%20Blend%20Apalta/2022/55d567a6433ce3838a81a13ac76509e2.jpeg",
+    "top100_rank": 35,
+    "top100_year": 2025
   },
   {
     "producer": "Ravines",
@@ -540,7 +645,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2028,
-    "release_price": 21
+    "release_price": 21,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ravines/Riesling%20Finger%20Lakes%20Dry/2022/51ca0bff5614d4b97283e5c72300e33b.jpeg",
+    "top100_rank": 36,
+    "top100_year": 2025
   },
   {
     "producer": "Ken Wright",
@@ -555,7 +663,10 @@
     "review_date": "2025-09-30",
     "issue_date": "2025-09-30",
     "drink_window_end": 2035,
-    "release_price": 65
+    "release_price": 65,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ken%20Wright/Pinot%20Noir%20Yamhill-Carlton%20Shea%20Vineyard/2023/4693d9d0a001e49d26b9a9df501e0892.jpeg",
+    "top100_rank": 37,
+    "top100_year": 2025
   },
   {
     "producer": "Ployez-Jacquemart",
@@ -570,7 +681,10 @@
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
     "drink_window_end": 2035,
-    "release_price": 56
+    "release_price": 56,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ployez-Jacquemart/Brut%20Champagne%20Extra%20Quality/2025/b7ea40b907013b2330cdaf9f65ea4e5d.jpeg",
+    "top100_rank": 38,
+    "top100_year": 2025
   },
   {
     "producer": "Hartford Family",
@@ -585,7 +699,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2033,
-    "release_price": 50
+    "release_price": 50,
+    "label_url": "https://wineapi.s3.amazonaws.com/Hartford%20Family/Zinfandel%20Russian%20River%20Valley%20Old%20Vine/2022/76124e2f8385b17553f5a698b3d26985.jpeg",
+    "top100_rank": 39,
+    "top100_year": 2025
   },
   {
     "producer": "La Granja Nuestra Señora de Remelluri",
@@ -600,7 +717,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2040,
-    "release_price": 56
+    "release_price": 56,
+    "label_url": "https://wineapi.s3.amazonaws.com/La%20Granja%20Nuestra%20Se%C3%B1ora%20de%20Remelluri/Rioja%20Reserva/2016/b40eb24abb8900b5c72f63f0a1677401.jpeg",
+    "top100_rank": 40,
+    "top100_year": 2025
   },
   {
     "producer": "Stoller",
@@ -615,7 +735,10 @@
     "review_date": "2025-06-30",
     "issue_date": "2025-06-30",
     "drink_window_end": 2033,
-    "release_price": 40
+    "release_price": 40,
+    "label_url": "https://wineapi.s3.amazonaws.com/Stoller/Pinot%20Noir%20Dundee%20Hills%20Estate/2023/2f635b96b3a878db63014489b603bd29.png",
+    "top100_rank": 41,
+    "top100_year": 2025
   },
   {
     "producer": "Ravenswood",
@@ -630,7 +753,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2035,
-    "release_price": 27
+    "release_price": 27,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ravenswood/Zinfandel%20Dry%20Creek%20Valley/2023/9de5272ee72a47f636713b5aae1385f7.png",
+    "top100_rank": 42,
+    "top100_year": 2025
   },
   {
     "producer": "Lamadrid",
@@ -645,7 +771,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2030,
-    "release_price": 20
+    "release_price": 20,
+    "label_url": "https://wineapi.s3.amazonaws.com/Lamadrid/Malbec%20Agrelo%20Single%20Vineyard%20Reserva/2023/16f7a11df8291eec16f18f7233dba3eb.jpeg",
+    "top100_rank": 43,
+    "top100_year": 2025
   },
   {
     "producer": "Burn Cottage",
@@ -660,7 +789,10 @@
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
     "drink_window_end": 2038,
-    "release_price": 50
+    "release_price": 50,
+    "label_url": "https://wineapi.s3.amazonaws.com/Burn%20Cottage/Pinot%20Noir%20Central%20Otago%20Moonlight%20Race/2023/c4852d0c04281e092c1a163f969fd480.jpeg",
+    "top100_rank": 44,
+    "top100_year": 2025
   },
   {
     "producer": "Castello di Monsanto",
@@ -676,7 +808,10 @@
     "issue_date": "2025-10-31",
     "drink_window_start": 2028,
     "drink_window_end": 2050,
-    "release_price": 85
+    "release_price": 85,
+    "label_url": "https://wineapi.s3.amazonaws.com/Castello%20di%20Monsanto/Chianti%20Classico%20San%20Donato%20in%20Poggio%20Il%20Poggio%20Gran%20Selezione/2020/64a90117558bfcea7f04e0004774d0f5.jpeg",
+    "top100_rank": 45,
+    "top100_year": 2025
   },
   {
     "producer": "Dehlinger",
@@ -692,7 +827,10 @@
     "issue_date": "2025-09-30",
     "drink_window_start": 2026,
     "drink_window_end": 2036,
-    "release_price": 50
+    "release_price": 50,
+    "label_url": "https://wineapi.s3.amazonaws.com/Dehlinger/Pinot%20Noir%20Russian%20River%20Valley%20Estate/2023/b8f72e22375764b016825a7c7c65245b.jpeg",
+    "top100_rank": 46,
+    "top100_year": 2025
   },
   {
     "producer": "Château de St.-Cosme",
@@ -708,7 +846,10 @@
     "issue_date": "2025-02-28",
     "drink_window_start": 2026,
     "drink_window_end": 2037,
-    "release_price": 65
+    "release_price": 65,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20de%20St.-Cosme/Gigondas/2022/da6fce819e6615c75f3fd496bf622040.jpeg",
+    "top100_rank": 47,
+    "top100_year": 2025
   },
   {
     "producer": "Symington Family",
@@ -723,7 +864,10 @@
     "review_date": "2025-12-15",
     "issue_date": "2025-12-15",
     "drink_window_end": 2030,
-    "release_price": 13
+    "release_price": 13,
+    "label_url": "https://wineapi.s3.amazonaws.com/Symington%20Family/Douro%20Altano/2022/dd51e8f4565c1bc9889c7c0a1fdce7b4.jpeg",
+    "top100_rank": 48,
+    "top100_year": 2025
   },
   {
     "producer": "Ken Forrester",
@@ -738,7 +882,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2030,
-    "release_price": 21
+    "release_price": 21,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ken%20Forrester/Chenin%20Blanc%20Stellenbosch%20Old%20Vine%20Reserve/2024/3286bd0f807fe7b8ce8213c7fd51e656.png",
+    "top100_rank": 49,
+    "top100_year": 2025
   },
   {
     "producer": "Cheval des Andes",
@@ -754,7 +901,10 @@
     "issue_date": "2025-11-30",
     "drink_window_start": 2036,
     "drink_window_end": 2040,
-    "release_price": 100
+    "release_price": 100,
+    "label_url": "https://wineapi.s3.amazonaws.com/Cheval%20des%20Andes/Mendoza/2022/f0317256336a0d23ec839a662cd4d201.jpeg",
+    "top100_rank": 50,
+    "top100_year": 2025
   },
   {
     "producer": "Caterwaul",
@@ -770,7 +920,10 @@
     "issue_date": "2025-12-15",
     "drink_window_start": 2026,
     "drink_window_end": 2036,
-    "release_price": 55
+    "release_price": 55,
+    "label_url": "https://wineapi.s3.amazonaws.com/Caterwaul/Cabernet%20Sauvignon%20Napa%20Valley/2023/f5eaa745dc5aa8607d0ea351b080dfce.jpeg",
+    "top100_rank": 51,
+    "top100_year": 2025
   },
   {
     "producer": "Il Poggione",
@@ -786,7 +939,10 @@
     "issue_date": "2025-06-30",
     "drink_window_start": 2028,
     "drink_window_end": 2046,
-    "release_price": 145
+    "release_price": 145,
+    "label_url": "https://wineapi.s3.amazonaws.com/Il%20Poggione/Brunello%20di%20Montalcino%20Vigna%20Paganelli%20Riserva/2019/e37d7511346d5f3f16858a27c9374f1c.jpeg",
+    "top100_rank": 52,
+    "top100_year": 2025
   },
   {
     "producer": "Epoch",
@@ -801,7 +957,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2035,
-    "release_price": 75
+    "release_price": 75,
+    "label_url": "https://wineapi.s3.amazonaws.com/Epoch/Veracity%20Paso%20Robles%20Willow%20Creek%20District/2021/f48e2887a82a75e2b6918059c215bfd2.jpeg",
+    "top100_rank": 53,
+    "top100_year": 2025
   },
   {
     "producer": "Claude Riffault",
@@ -816,7 +975,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2030,
-    "release_price": 40
+    "release_price": 40,
+    "label_url": "https://wineapi.s3.amazonaws.com/Claude%20Riffault/Sancerre%20Les%20Boucauds/2023/1e579b14a72c380340c4d06c3517443d.png",
+    "top100_rank": 54,
+    "top100_year": 2025
   },
   {
     "producer": "Damilano",
@@ -832,7 +994,10 @@
     "issue_date": "2025-11-15",
     "drink_window_start": 2029,
     "drink_window_end": 2047,
-    "release_price": 97
+    "release_price": 97,
+    "label_url": "https://wineapi.s3.amazonaws.com/Damilano/Barolo%20Cannubi/2021/a71e2af94903d779f2be7ae926e1fe73.jpeg",
+    "top100_rank": 55,
+    "top100_year": 2025
   },
   {
     "producer": "Venus La Universal",
@@ -847,7 +1012,10 @@
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
     "drink_window_end": 2031,
-    "release_price": 25
+    "release_price": 25,
+    "label_url": "https://wineapi.s3.amazonaws.com/Venus%20La%20Universal/Montsant%20Dido%20La%20Universal/2021/c5888bd50bf722cc9da6278d14ef4c24.jpeg",
+    "top100_rank": 56,
+    "top100_year": 2025
   },
   {
     "producer": "Graham",
@@ -861,7 +1029,10 @@
     "reviewer_initials": "JM",
     "review_date": "2025-02-28",
     "issue_date": "2025-02-28",
-    "release_price": 80
+    "release_price": 80,
+    "label_url": "https://wineapi.s3.amazonaws.com/Graham/Tawny%20Port%2020%20Year%20Old/2025/db27d22a4227b47ff7fcf629802eb813.jpeg",
+    "top100_rank": 57,
+    "top100_year": 2025
   },
   {
     "producer": "Masút",
@@ -877,7 +1048,10 @@
     "issue_date": "2025-08-31",
     "drink_window_start": 2026,
     "drink_window_end": 2029,
-    "release_price": 47
+    "release_price": 47,
+    "label_url": "https://wineapi.s3.amazonaws.com/Mas%C3%BAt/Pinot%20Noir%20Eagle%20Peak%20Estate%20Vineyard/2023/bf352074232b530849a43cd3be23e736.jpeg",
+    "top100_rank": 58,
+    "top100_year": 2025
   },
   {
     "producer": "Bodegas y Viñedos Artuke",
@@ -892,7 +1066,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2030,
-    "release_price": 23
+    "release_price": 23,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bodegas%20y%20Vi%C3%B1edos%20Artuke/Rioja%20Pies%20Rotos/2022/5f89f60c5d14d59b8a8b09602546c9cb.png",
+    "top100_rank": 59,
+    "top100_year": 2025
   },
   {
     "producer": "Newfound",
@@ -907,7 +1084,10 @@
     "review_date": "2025-09-30",
     "issue_date": "2025-09-30",
     "drink_window_end": 2034,
-    "release_price": 30
+    "release_price": 30,
+    "label_url": "https://wineapi.s3.amazonaws.com/Newfound/New%20Wine/2022/974301cb00faead802667de67b2ad209.jpeg",
+    "top100_rank": 60,
+    "top100_year": 2025
   },
   {
     "producer": "BiancaVigna",
@@ -921,7 +1101,10 @@
     "reviewer_initials": "AN",
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
-    "release_price": 23
+    "release_price": 23,
+    "label_url": "https://wineapi.s3.amazonaws.com/BiancaVigna/Brut%20Conegliano%20Valdobbiadene%20Prosecco%20Superiore/2023/8e025e4d20d6e828b1f350f059cbfccd.png",
+    "top100_rank": 61,
+    "top100_year": 2025
   },
   {
     "producer": "Te Pa",
@@ -935,7 +1118,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-09-30",
     "issue_date": "2025-09-30",
-    "release_price": 21
+    "release_price": 21,
+    "label_url": "https://wineapi.s3.amazonaws.com/Te%20Pa/Sauvignon%20Blanc%20Marlborough/2024/65435b300546f9cf15b0aeef6f686282.jpeg",
+    "top100_rank": 62,
+    "top100_year": 2025
   },
   {
     "producer": "Bodegas Alto Moncayo",
@@ -951,7 +1137,10 @@
     "issue_date": "2025-10-31",
     "drink_window_start": 2027,
     "drink_window_end": 2032,
-    "release_price": 27
+    "release_price": 27,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bodegas%20Alto%20Moncayo/Garnacha-Tempranillo%20Campo%20de%20Borja%20Baramb%C3%A1n%20Edici%C3%B3n%20Limitada/2022/b0b4b0bf385df54431552e36340505bb.jpeg",
+    "top100_rank": 63,
+    "top100_year": 2025
   },
   {
     "producer": "Famiglia Cotarella",
@@ -966,7 +1155,10 @@
     "review_date": "2025-04-30",
     "issue_date": "2025-04-30",
     "drink_window_end": 2035,
-    "release_price": 80
+    "release_price": 80,
+    "label_url": "https://wineapi.s3.amazonaws.com/Famiglia%20Cotarella/Lazio%20Montiano/2021/55bf36845a07066c6c575462cefa07ad.jpeg",
+    "top100_rank": 64,
+    "top100_year": 2025
   },
   {
     "producer": "Raíces Ibéricas",
@@ -981,7 +1173,10 @@
     "review_date": "2025-04-30",
     "issue_date": "2025-04-30",
     "drink_window_end": 2030,
-    "release_price": 18
+    "release_price": 18,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ra%C3%ADces%20Ib%C3%A9ricas/Garnacha-Syrah%20Calatayud%20Las%20Pizarrras%20Fabla%20%23506/2023/baf7152c7aac89b498d96a3cc88f6d67.jpeg",
+    "top100_rank": 65,
+    "top100_year": 2025
   },
   {
     "producer": "Melville",
@@ -997,7 +1192,10 @@
     "issue_date": "2025-09-30",
     "drink_window_start": 2026,
     "drink_window_end": 2036,
-    "release_price": 74
+    "release_price": 74,
+    "label_url": "https://wineapi.s3.amazonaws.com/Melville/Pinot%20Noir%20Sta.%20Rita%20Hills%20Sandy%27s%20Block/2023/7a221448bcc7e5d0079063eb2edc4278.jpeg",
+    "top100_rank": 66,
+    "top100_year": 2025
   },
   {
     "producer": "Matteo Ascheri",
@@ -1013,7 +1211,10 @@
     "issue_date": "2025-11-30",
     "drink_window_start": 2028,
     "drink_window_end": 2042,
-    "release_price": 50
+    "release_price": 50,
+    "label_url": "https://wineapi.s3.amazonaws.com/Matteo%20Ascheri/Barolo/2021/2b90b336d7d9da96921f50fd3e75a125.jpeg",
+    "top100_rank": 67,
+    "top100_year": 2025
   },
   {
     "producer": "Albert Bichot",
@@ -1025,10 +1226,12 @@
     "score": 90,
     "tasting_note": "Ripe with cherry, this is juicy and pure, showing accents of earth and leafy underbrush. Winds down leisurely, with balance, a firm edge and fine length. Drink now through 2028. 17,000 cases made, 11,000 cases imported.",
     "reviewer_initials": "BS",
-    "review_date": "2025-12-05",
-    "issue_date": null,
+    "review_date": "2025-12-13",
     "drink_window_end": 2028,
-    "release_price": 26
+    "release_price": 26,
+    "label_url": "https://wineapi.s3.amazonaws.com/Albert%20Bichot/Bourgogne%20Origines/2023/b607e270da30cdd1765cbd8a5436218e.jpeg",
+    "top100_rank": 68,
+    "top100_year": 2025
   },
   {
     "producer": "Paula Kornell",
@@ -1042,7 +1245,10 @@
     "reviewer_initials": "TF",
     "review_date": "2025-11-15",
     "issue_date": "2025-11-15",
-    "release_price": 22
+    "release_price": 22,
+    "label_url": "https://wineapi.s3.amazonaws.com/Paula%20Kornell/Brut%20California/2025/705e1c608703af9640e27b584a0dfd69.jpeg",
+    "top100_rank": 69,
+    "top100_year": 2025
   },
   {
     "producer": "Cantine Lunae Bosoni",
@@ -1056,7 +1262,10 @@
     "reviewer_initials": "BS",
     "review_date": "2025-03-31",
     "issue_date": "2025-03-31",
-    "release_price": 28
+    "release_price": 28,
+    "label_url": "https://wineapi.s3.amazonaws.com/Cantine%20Lunae%20Bosoni/Vermentino%20Colli%20di%20Luni-Liguria%20Grey%20Label/2023/16031c2760fda70d31700b18bfd1629f.jpeg",
+    "top100_rank": 70,
+    "top100_year": 2025
   },
   {
     "producer": "Familia Zuccardi",
@@ -1071,7 +1280,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2034,
-    "release_price": 78
+    "release_price": 78,
+    "label_url": "https://wineapi.s3.amazonaws.com/Familia%20Zuccardi/Bot%C3%A1nico%20Gualtallary/2024/75b0b8280d4d363e0f647576d9f1b568.jpeg",
+    "top100_rank": 71,
+    "top100_year": 2025
   },
   {
     "producer": "Clos Ste.-Magdeleine",
@@ -1086,7 +1298,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2028,
-    "release_price": 45
+    "release_price": 45,
+    "label_url": "https://wineapi.s3.amazonaws.com/Clos%20Ste.-Magdeleine/Cassis/2023/b526a49438e36adba7c90f9bd49ba971.jpeg",
+    "top100_rank": 72,
+    "top100_year": 2025
   },
   {
     "producer": "Sleight of Hand",
@@ -1101,7 +1316,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2031,
-    "release_price": 25
+    "release_price": 25,
+    "label_url": "https://wineapi.s3.amazonaws.com/Sleight%20of%20Hand/The%20Spellbinder%20Columbia%20Valley/2022/f39c020b465cf0303a0f9b6f67e1e5e9.jpeg",
+    "top100_rank": 73,
+    "top100_year": 2025
   },
   {
     "producer": "Marisco",
@@ -1115,7 +1333,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
-    "release_price": 17
+    "release_price": 17,
+    "label_url": "https://wineapi.s3.amazonaws.com/Marisco/Pinot%20Gris%20Marlborough%20The%20Ned/2024/47eb4597a83aeefa040c6b6b2aa353f2.png",
+    "top100_rank": 74,
+    "top100_year": 2025
   },
   {
     "producer": "Graci",
@@ -1129,7 +1350,9 @@
     "reviewer_initials": "AN",
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
-    "release_price": 30
+    "release_price": 30,
+    "top100_rank": 75,
+    "top100_year": 2025
   },
   {
     "producer": "Bodega Catena Zapata",
@@ -1145,7 +1368,10 @@
     "issue_date": "2025-11-30",
     "drink_window_start": 2027,
     "drink_window_end": 2040,
-    "release_price": 120
+    "release_price": 120,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bodega%20Catena%20Zapata/Malbec%20Paraje%20Altamira%20Nicasia%20Vineyard/2023/29148c44150f0cbdfc75800c328f501b.jpeg",
+    "top100_rank": 76,
+    "top100_year": 2025
   },
   {
     "producer": "Barnett",
@@ -1160,7 +1386,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2035,
-    "release_price": 80
+    "release_price": 80,
+    "label_url": "https://wineapi.s3.amazonaws.com/Barnett/Merlot%20Spring%20Mountain%20District/2022/01ad5e394baf2fa7c3cc0f58691a098a.jpeg",
+    "top100_rank": 77,
+    "top100_year": 2025
   },
   {
     "producer": "Conte Vistarino",
@@ -1175,7 +1404,10 @@
     "review_date": "2025-04-30",
     "issue_date": "2025-04-30",
     "drink_window_end": 2030,
-    "release_price": 29
+    "release_price": 29,
+    "label_url": "https://wineapi.s3.amazonaws.com/Conte%20Vistarino/Pinot%20Nero%20dell%27Otrep%C3%B2%20Pavese%20Costa%20del%20Nero/2022/be1bdb9333f564f2e417dcd36cb622d6.jpeg",
+    "top100_rank": 78,
+    "top100_year": 2025
   },
   {
     "producer": "Domaine Michel Magnien",
@@ -1190,7 +1422,10 @@
     "review_date": "2025-07-31",
     "issue_date": "2025-07-31",
     "drink_window_end": 2032,
-    "release_price": 45
+    "release_price": 45,
+    "label_url": "https://wineapi.s3.amazonaws.com/Domaine%20Michel%20Magnien/Bourgogne%20C%C3%B4te%20d%27Or/2022/29cb985c29cee44b12213bdd9270da2b.jpeg",
+    "top100_rank": 79,
+    "top100_year": 2025
   },
   {
     "producer": "Foradori",
@@ -1205,7 +1440,10 @@
     "review_date": "2025-08-31",
     "issue_date": "2025-08-31",
     "drink_window_end": 2035,
-    "release_price": 38
+    "release_price": 38,
+    "label_url": "https://wineapi.s3.amazonaws.com/Foradori/Manzoni%20Bianco%20Vigneti%20delle%20Dolomiti%20Fontanasanta/2023/1f0fefae8cb1e780c4815b59054e887f.jpeg",
+    "top100_rank": 80,
+    "top100_year": 2025
   },
   {
     "producer": "Bodegas Protos",
@@ -1220,7 +1458,10 @@
     "review_date": "2025-10-31",
     "issue_date": "2025-10-31",
     "drink_window_end": 2040,
-    "release_price": 70
+    "release_price": 70,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bodegas%20Protos/Ribera%20del%20Duero%20Carroa/2021/b30d848cad7eb00b23504519b60f6301.jpeg",
+    "top100_rank": 81,
+    "top100_year": 2025
   },
   {
     "producer": "Duckhorn",
@@ -1236,7 +1477,10 @@
     "issue_date": "2025-11-30",
     "drink_window_start": 2026,
     "drink_window_end": 2033,
-    "release_price": 140
+    "release_price": 140,
+    "label_url": "https://wineapi.s3.amazonaws.com/Duckhorn/Merlot%20Napa%20Valley%20Three%20Palms%20Vineyard/2022/5c85ee9b933d30b05ec2e8e62dba5876.jpeg",
+    "top100_rank": 82,
+    "top100_year": 2025
   },
   {
     "producer": "Domaine de la Vieille Julienne",
@@ -1252,7 +1496,10 @@
     "issue_date": "2025-06-30",
     "drink_window_start": 2027,
     "drink_window_end": 2040,
-    "release_price": 89
+    "release_price": 89,
+    "label_url": "https://wineapi.s3.amazonaws.com/Domaine%20de%20la%20Vieille%20Julienne/Ch%C3%A2teauneuf-du-Pape%20Les%20Trois%20Sources/2022/88a70e666ffa35480da7c25ba7eba8dd.jpeg",
+    "top100_rank": 83,
+    "top100_year": 2025
   },
   {
     "producer": "Etude",
@@ -1268,7 +1515,10 @@
     "issue_date": "2025-10-31",
     "drink_window_start": 2027,
     "drink_window_end": 2040,
-    "release_price": 155
+    "release_price": 155,
+    "label_url": "https://wineapi.s3.amazonaws.com/Etude/Cabernet%20Sauvignon%20Rutherford/2021/c948fa1dfcdde222fe6838006dbdd1c3.jpeg",
+    "top100_rank": 84,
+    "top100_year": 2025
   },
   {
     "producer": "Château Smith-Haut-Lafitte",
@@ -1283,7 +1533,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2035,
-    "release_price": 169
+    "release_price": 169,
+    "label_url": "https://wineapi.s3.amazonaws.com/Ch%C3%A2teau%20Smith-Haut-Lafitte/Pessac-L%C3%A9ognan%20White/2022/eeacbda7fda8ea0fe6c8faa33d297142.jpeg",
+    "top100_rank": 85,
+    "top100_year": 2025
   },
   {
     "producer": "Dr. Loosen",
@@ -1297,7 +1550,10 @@
     "reviewer_initials": "KB",
     "review_date": "2025-07-31",
     "issue_date": "2025-07-31",
-    "release_price": 28
+    "release_price": 28,
+    "label_url": "https://wineapi.s3.amazonaws.com/Dr.%20Loosen/Riesling%20Kabinett%20Mosel%20Erdener%20Treppchen/2023/e3c80c7cbeee790e26468b23335b927e.png",
+    "top100_rank": 86,
+    "top100_year": 2025
   },
   {
     "producer": "Bosquet des Papes",
@@ -1312,7 +1568,10 @@
     "review_date": "2025-03-31",
     "issue_date": "2025-03-31",
     "drink_window_end": 2040,
-    "release_price": 65
+    "release_price": 65,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bosquet%20des%20Papes/Ch%C3%A2teauneuf-du-Pape/2022/89f45a33a41ae910029193f290c80427.jpeg",
+    "top100_rank": 87,
+    "top100_year": 2025
   },
   {
     "producer": "Comando G",
@@ -1324,10 +1583,12 @@
     "score": 93,
     "tasting_note": "This graceful red is fresh and aromatic, not weighty but nicely structured, with a plush texture to its supple tannins. Offers flavors of plumped raspberry and strawberry fruit, blood orange peel, dried lavender, rosemary and thyme, plus a lovely skein of ground anise, pink peppercorn and paprika. Minerally stone and smoke notes linger on the creamy finish. Garnacha Tinta. Drink now through 2035. 941 cases made, 344 cases imported.",
     "reviewer_initials": "AN",
-    "review_date": "2025-12-05",
-    "issue_date": null,
+    "review_date": "2025-12-13",
     "drink_window_end": 2035,
-    "release_price": 69
+    "release_price": 69,
+    "label_url": "https://wineapi.s3.amazonaws.com/Comando%20G/Vinos%20de%20Madrid%20Sierra%20de%20Gredos%20Rozas%20de%20Puerto%20Real%20Valle%20del%20Ti%C3%A9tar/2023/a6066a4455a6c3383fa292f2b3f95863.jpeg",
+    "top100_rank": 88,
+    "top100_year": 2025
   },
   {
     "producer": "Reynvaan",
@@ -1342,7 +1603,10 @@
     "review_date": "2025-09-30",
     "issue_date": "2025-09-30",
     "drink_window_end": 2033,
-    "release_price": 100
+    "release_price": 100,
+    "label_url": "https://wineapi.s3.amazonaws.com/Reynvaan/Syrah%20Walla%20Walla%20Valley%20In%20The%20Rocks/2022/49e34d8fa836bba29a4b449966da48f1.jpeg",
+    "top100_rank": 89,
+    "top100_year": 2025
   },
   {
     "producer": "Jean-Louis Chave Sélection",
@@ -1357,7 +1621,9 @@
     "review_date": "2025-02-28",
     "issue_date": "2025-02-28",
     "drink_window_end": 2028,
-    "release_price": 41
+    "release_price": 41,
+    "top100_rank": 90,
+    "top100_year": 2025
   },
   {
     "producer": "Hugh Hamilton",
@@ -1372,7 +1638,10 @@
     "review_date": "2025-11-15",
     "issue_date": "2025-11-15",
     "drink_window_end": 2038,
-    "release_price": 30
+    "release_price": 30,
+    "label_url": "https://wineapi.s3.amazonaws.com/Hugh%20Hamilton/Shiraz-Saperavi%20South%20Australia%20Black%20Ops/2021/0c8a81108b4942701ca0d3a9a0fd3208.jpeg",
+    "top100_rank": 91,
+    "top100_year": 2025
   },
   {
     "producer": "Tenute Capaldo",
@@ -1388,7 +1657,10 @@
     "issue_date": "2025-11-15",
     "drink_window_start": 2028,
     "drink_window_end": 2040,
-    "release_price": 90
+    "release_price": 90,
+    "label_url": "https://wineapi.s3.amazonaws.com/Tenute%20Capaldo/Taurasi%20Gulielmus%20Riserva/2018/e6b3c7508ba2b213d3ab16d654d1ae2b.jpeg",
+    "top100_rank": 92,
+    "top100_year": 2025
   },
   {
     "producer": "Famille Lieubeau",
@@ -1403,7 +1675,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2028,
-    "release_price": 28
+    "release_price": 28,
+    "label_url": "https://wineapi.s3.amazonaws.com/Famille%20Lieubeau/Muscadet%20de%20S%C3%A8vre%20et%20Maine%20Clisson/2022/c6cfb7af541ab422452c8cd4b91b1ca0.jpeg",
+    "top100_rank": 93,
+    "top100_year": 2025
   },
   {
     "producer": "Bernhard Ott",
@@ -1418,7 +1693,10 @@
     "review_date": "2025-09-30",
     "issue_date": "2025-09-30",
     "drink_window_end": 2028,
-    "release_price": 33
+    "release_price": 33,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bernhard%20Ott/Gr%C3%BCner%20Veltliner%20Nieder%C3%B6sterreich%20Fass%204/2023/d0d8ab06c71eada22d07c9a60ce057a0.jpeg",
+    "top100_rank": 94,
+    "top100_year": 2025
   },
   {
     "producer": "Louis Jadot",
@@ -1434,7 +1712,10 @@
     "issue_date": "2025-07-31",
     "drink_window_start": 2029,
     "drink_window_end": 2047,
-    "release_price": 115
+    "release_price": 115,
+    "label_url": "https://wineapi.s3.amazonaws.com/Louis%20Jadot/Beaune%20Clos%20des%20Ursules%20H%C3%A9ritiers/2022/91862194e4eff1b2b638ea663676f87f.jpeg",
+    "top100_rank": 95,
+    "top100_year": 2025
   },
   {
     "producer": "Bodegas Bhilar",
@@ -1449,7 +1730,10 @@
     "review_date": "2025-05-31",
     "issue_date": "2025-05-31",
     "drink_window_end": 2032,
-    "release_price": 21
+    "release_price": 21,
+    "label_url": "https://wineapi.s3.amazonaws.com/Bodegas%20Bhilar/Rioja%20White/2022/4562aec80ed03f2243c2c3a3283e662a.jpeg",
+    "top100_rank": 96,
+    "top100_year": 2025
   },
   {
     "producer": "Elderton",
@@ -1463,7 +1747,10 @@
     "reviewer_initials": "MW",
     "review_date": "2025-04-30",
     "issue_date": "2025-04-30",
-    "release_price": 33
+    "release_price": 33,
+    "label_url": "https://wineapi.s3.amazonaws.com/Elderton/Cabernet%20Sauvignon%20Barossa/2022/97281e2d27e570a4913b3a66f10bcb59.jpeg",
+    "top100_rank": 97,
+    "top100_year": 2025
   },
   {
     "producer": "Platt Vineyard",
@@ -1479,7 +1766,10 @@
     "issue_date": "2025-09-30",
     "drink_window_start": 2026,
     "drink_window_end": 2038,
-    "release_price": 165
+    "release_price": 165,
+    "label_url": "https://wineapi.s3.amazonaws.com/Platt%20Vineyard/Pinot%20Noir%20West%20Sonoma%20Coast%20Estate%20Reserve/2023/00093f9724769add332cb524e4d63557.png",
+    "top100_rank": 98,
+    "top100_year": 2025
   },
   {
     "producer": "Domaine du Closel",
@@ -1494,7 +1784,10 @@
     "review_date": "2025-11-30",
     "issue_date": "2025-11-30",
     "drink_window_end": 2040,
-    "release_price": 62
+    "release_price": 62,
+    "label_url": "https://wineapi.s3.amazonaws.com/Domaine%20du%20Closel/Savenni%C3%A8res%20La%20Jalousie%20Ch%C3%A2teau%20des%20Vaults/2022/b99b7dee3913e19399a4ee6f05e99d54.jpeg",
+    "top100_rank": 99,
+    "top100_year": 2025
   },
   {
     "producer": "Freemark Abbey",
@@ -1509,6 +1802,9 @@
     "review_date": "2025-11-15",
     "issue_date": "2025-11-15",
     "drink_window_end": 2035,
-    "release_price": 225
+    "release_price": 225,
+    "label_url": "https://wineapi.s3.amazonaws.com/Freemark%20Abbey/Cabernet%20Sauvignon%20Rutherford%20Cabernet%20Bosch%C3%A9/2022/1a3a4bc6b0e23f367ef488d71795da02.jpeg",
+    "top100_rank": 100,
+    "top100_year": 2025
   }
 ]

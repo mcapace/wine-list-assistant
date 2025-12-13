@@ -33,6 +33,9 @@ interface WineInput {
   drink_window_start?: number;
   drink_window_end?: number;
   release_price?: number;
+  label_url?: string;
+  top100_rank?: number;
+  top100_year?: number;
 }
 
 // Initialize clients
@@ -123,6 +126,9 @@ async function seed() {
           color: wine.color,
           grape_varieties: wine.grape_varieties || [],
           alcohol: wine.alcohol || null,
+          label_url: wine.label_url || null,
+          top100_rank: wine.top100_rank || null,
+          top100_year: wine.top100_year || null,
         })
         .select()
         .single();
@@ -177,6 +183,9 @@ async function seed() {
         drink_window_start: wine.drink_window_start,
         drink_window_end: wine.drink_window_end,
         release_price: wine.release_price,
+        label_url: wine.label_url || null,
+        top100_rank: wine.top100_rank || null,
+        top100_year: wine.top100_year || null,
         producer_normalized: normalizeText(wine.producer),
         name_normalized: normalizeText(wine.name),
         searchable_text: normalizeText(fullName),

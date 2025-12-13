@@ -11,6 +11,9 @@ export interface Wine {
   color: WineColor;
   grape_varieties: GrapeVariety[];
   alcohol: number | null;
+  label_url: string | null;
+  top100_rank: number | null;
+  top100_year: number | null;
 }
 
 export interface Review {
