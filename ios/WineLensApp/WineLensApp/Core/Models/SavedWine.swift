@@ -13,6 +13,13 @@ struct SavedWine: Identifiable, Codable {
         var date: Date?
         var rating: Int?  // User's personal rating 1-5
 
+        enum CodingKeys: String, CodingKey {
+            case restaurant
+            case pricePaid = "price_paid"
+            case date
+            case rating
+        }
+
         var pricePaidDisplay: String? {
             guard let price = pricePaid else { return nil }
             let formatter = NumberFormatter()
