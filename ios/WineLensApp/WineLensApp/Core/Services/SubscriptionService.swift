@@ -233,15 +233,13 @@ final class SubscriptionService: ObservableObject {
         return max(0, AppConfiguration.freeScansPerMonth - getScansThisMonth())
     }
     
-    // MARK: - Development Helpers
-    
-    #if DEBUG
+    // MARK: - Development/Testing Helpers
+
     /// Reset scan count for development/testing
     func resetScanCount() {
         UserDefaults.standard.set(0, forKey: Constants.StorageKeys.scansThisMonth)
         UserDefaults.standard.set(Date(), forKey: Constants.StorageKeys.scansMonthStart)
     }
-    #endif
 
     // MARK: - Private Methods
 
