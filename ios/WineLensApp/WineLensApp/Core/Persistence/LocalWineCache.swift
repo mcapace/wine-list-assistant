@@ -17,14 +17,17 @@ actor LocalWineCache {
     private var wineCache: [String: Wine] = [:]  // id -> Wine
     private var searchIndex: [String: Set<String>] = [:]  // normalized term -> wine ids
     private let cacheURL: URL
+    private let cacheVersionURL: URL
+    private let currentCacheVersion = 2 // Increment when schema changes (added label_url, tasting_note, etc.)
 
     // MARK: - Initialization
 
     private init() {
         let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
         cacheURL = cacheDir.appendingPathComponent("wine_cache.json")
+        cacheVersionURL = cacheDir.appendingPathComponent("wine_cache_version.txt")
 
-        // Load cached wines from disk
+        // Load cached wines from disk (only if version matches)
         Task {
             await loadFromDisk()
         }
@@ -73,16 +76,16 @@ actor LocalWineCache {
         wineCache.removeAll()
         searchIndex.removeAll()
         
-        // Remove cache file from disk
+        // Remove cache file and version file from disk
         if FileManager.default.fileExists(atPath: cacheURL.path) {
             try? FileManager.default.removeItem(at: cacheURL)
-            #if DEBUG
-            print("🗑️ LocalWineCache: Cleared cache file at \(cacheURL.path)")
-            #endif
+        }
+        if FileManager.default.fileExists(atPath: cacheVersionURL.path) {
+            try? FileManager.default.removeItem(at: cacheVersionURL)
         }
         
         #if DEBUG
-        print("🗑️ LocalWineCache: Cleared \(wineCache.count) wines from memory")
+        print("🗑️ LocalWineCache: Cleared cache files and memory")
         #endif
     }
 
@@ -180,6 +183,13 @@ actor LocalWineCache {
             let wines = Array(wineCache.values)
             let data = try JSONEncoder().encode(wines)
             try data.write(to: cacheURL)
+            
+            // Save cache version
+            try String(currentCacheVersion).write(to: cacheVersionURL, atomically: true, encoding: .utf8)
+            
+            #if DEBUG
+            print("💾 LocalWineCache: Saved \(wines.count) wines to disk (version \(currentCacheVersion))")
+            #endif
         } catch {
             print("Failed to save wine cache: \(error)")
         }
@@ -190,12 +200,42 @@ actor LocalWineCache {
             return
         }
 
+        // Check cache version - if it doesn't match, clear old cache
+        let savedVersion: Int
+        if FileManager.default.fileExists(atPath: cacheVersionURL.path),
+           let versionData = try? String(contentsOf: cacheVersionURL),
+           let version = Int(versionData.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            savedVersion = version
+        } else {
+            savedVersion = 0
+        }
+
+        if savedVersion != currentCacheVersion {
+            #if DEBUG
+            print("🔄 LocalWineCache: Cache version mismatch (saved: \(savedVersion), current: \(currentCacheVersion)). Clearing old cache.")
+            #endif
+            clear()
+            return
+        }
+
         do {
             let data = try Data(contentsOf: cacheURL)
             let wines = try JSONDecoder().decode([Wine].self, from: data)
+            
+            #if DEBUG
+            print("📂 LocalWineCache: Loaded \(wines.count) wines from disk")
+            if let first = wines.first {
+                print("   Sample: \(first.producer) \(first.name)")
+                print("   - Has labelUrl: \(first.labelUrl != nil)")
+                print("   - Has tastingNote: \(first.tastingNote != nil)")
+            }
+            #endif
+            
             cache(wines: wines)
         } catch {
             print("Failed to load wine cache: \(error)")
+            // If decoding fails, clear the cache
+            clear()
         }
     }
 }
