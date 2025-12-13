@@ -35,6 +35,13 @@ actor LocalWineCache {
     func cache(wine: Wine) {
         wineCache[wine.id] = wine
         indexWine(wine)
+        
+        #if DEBUG
+        print("💾 LocalWineCache: Cached wine \(wine.producer) \(wine.name)")
+        print("   - Has labelUrl: \(wine.labelUrl != nil)")
+        print("   - Has tastingNote: \(wine.tastingNote != nil)")
+        print("   - Has top100Rank: \(wine.top100Rank != nil)")
+        #endif
     }
 
     func cache(wines: [Wine]) {
@@ -42,6 +49,15 @@ actor LocalWineCache {
             wineCache[wine.id] = wine
             indexWine(wine)
         }
+
+        #if DEBUG
+        print("💾 LocalWineCache: Cached \(wines.count) wines")
+        if let first = wines.first {
+            print("   Sample: \(first.producer) \(first.name)")
+            print("   - Has labelUrl: \(first.labelUrl != nil)")
+            print("   - Has tastingNote: \(first.tastingNote != nil)")
+        }
+        #endif
 
         // Save periodically
         Task {
@@ -56,7 +72,18 @@ actor LocalWineCache {
     func clear() {
         wineCache.removeAll()
         searchIndex.removeAll()
-        try? FileManager.default.removeItem(at: cacheURL)
+        
+        // Remove cache file from disk
+        if FileManager.default.fileExists(atPath: cacheURL.path) {
+            try? FileManager.default.removeItem(at: cacheURL)
+            #if DEBUG
+            print("🗑️ LocalWineCache: Cleared cache file at \(cacheURL.path)")
+            #endif
+        }
+        
+        #if DEBUG
+        print("🗑️ LocalWineCache: Cleared \(wineCache.count) wines from memory")
+        #endif
     }
 
     // MARK: - Search

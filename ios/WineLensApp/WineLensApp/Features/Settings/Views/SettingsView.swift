@@ -95,6 +95,10 @@ struct SettingsView: View {
                     Button(action: {
                         Task {
                             await LocalWineCache.shared.clear()
+                            // Show confirmation
+                            #if DEBUG
+                            print("🗑️ Wine cache cleared - next scan will fetch fresh data from API")
+                            #endif
                         }
                     }) {
                         HStack {

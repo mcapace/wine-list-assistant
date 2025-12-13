@@ -88,6 +88,13 @@ final class WineAPIClient {
         
         #if DEBUG
         print("🌐 WineAPIClient.searchWines - Decoded \(apiResponse.data.results.count) results")
+        if let first = apiResponse.data.results.first {
+            let w = first.wine
+            print("   Sample wine: \(w.producer) \(w.name)")
+            print("   - Has labelUrl: \(w.labelUrl != nil), value: \(w.labelUrl?.prefix(50) ?? "nil")")
+            print("   - Has tastingNote: \(w.tastingNote != nil), length: \(w.tastingNote?.count ?? 0)")
+            print("   - Has top100Rank: \(w.top100Rank != nil), value: \(w.top100Rank ?? -1)")
+        }
         #endif
         
         return apiResponse.data.results.map {
