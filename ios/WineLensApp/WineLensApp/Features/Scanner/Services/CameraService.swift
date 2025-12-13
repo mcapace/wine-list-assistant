@@ -22,8 +22,8 @@ final class CameraService: NSObject, ObservableObject {
     /// The capture session - exposed for preview layer connection
     let captureSession = AVCaptureSession()
     private let videoOutput = AVCaptureVideoDataOutput()
-    private let sessionQueue = DispatchQueue(label: "com.mcapace.winelens.camera.session")
-    private let videoOutputQueue = DispatchQueue(label: "com.mcapace.winelens.camera.output")
+    private let sessionQueue = DispatchQueue(label: "com.winespec.winelens.camera.session")
+    private let videoOutputQueue = DispatchQueue(label: "com.winespec.winelens.camera.output")
     private var currentDevice: AVCaptureDevice?
     private var isConfigured = false
 
