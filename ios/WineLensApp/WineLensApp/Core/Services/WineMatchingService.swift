@@ -415,6 +415,13 @@ final class WineMatchingService {
                 return nil
             }
 
+            #if DEBUG
+            print("🍷 tryAPIMatch - API returned wine: \(best.wine.producer) \(best.wine.name)")
+            print("   - Has labelUrl: \(best.wine.labelUrl != nil), value: \(best.wine.labelUrl?.prefix(50) ?? "nil")")
+            print("   - Has tastingNote: \(best.wine.tastingNote != nil), length: \(best.wine.tastingNote?.count ?? 0)")
+            print("   - Has top100Rank: \(best.wine.top100Rank != nil), value: \(best.wine.top100Rank ?? -1)")
+            #endif
+
             // Cache the result for future searches
             await localCache.cache(wine: best.wine)
 

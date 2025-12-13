@@ -17,7 +17,22 @@ struct WineDetailSheet: View {
     }
 
     private var wine: Wine? {
-        recognizedWine.matchedWine
+        let wine = recognizedWine.matchedWine
+        #if DEBUG
+        if let w = wine {
+            print("🍷 WineDetailSheet - Wine data:")
+            print("   - Producer: \(w.producer)")
+            print("   - Name: \(w.name)")
+            print("   - Has labelUrl: \(w.labelUrl != nil)")
+            print("   - labelUrl value: \(w.labelUrl ?? "nil")")
+            print("   - Has tastingNote: \(w.tastingNote != nil)")
+            print("   - tastingNote length: \(w.tastingNote?.count ?? 0)")
+            print("   - Has top100Rank: \(w.top100Rank != nil), value: \(w.top100Rank ?? -1)")
+        } else {
+            print("🍷 WineDetailSheet - No wine data!")
+        }
+        #endif
+        return wine
     }
 
     var body: some View {
