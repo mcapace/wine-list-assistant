@@ -23,7 +23,7 @@ struct SavedWine: Identifiable, Codable {
 
         enum CodingKeys: String, CodingKey {
             case restaurant
-            case pricePaid = "price_paid"
+            case pricePaid
             case date
             case rating
         }
@@ -32,7 +32,7 @@ struct SavedWine: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case wine
-        case addedAt = "added_at"
+        case addedAt
         case notes
         case context
     }

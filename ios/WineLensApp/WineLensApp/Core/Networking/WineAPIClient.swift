@@ -25,7 +25,7 @@ final class WineAPIClient {
 
         self.decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        // Note: Don't use .convertFromSnakeCase - Wine model has explicit CodingKeys
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self.encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -293,11 +293,6 @@ private struct SearchResponse: Codable {
     struct SearchResultItem: Codable {
         let wine: Wine
         let matchConfidence: Double
-
-        enum CodingKeys: String, CodingKey {
-            case wine
-            case matchConfidence = "match_confidence"
-        }
     }
 }
 
@@ -343,12 +338,6 @@ private struct SaveWineRequest: Codable {
     let wineId: String
     let notes: String?
     let context: SavedWine.SaveContext?
-
-    enum CodingKeys: String, CodingKey {
-        case wineId = "wine_id"
-        case notes
-        case context
-    }
 }
 
 private struct SaveWineResponse: Codable {
@@ -357,10 +346,6 @@ private struct SaveWineResponse: Codable {
 
     struct SaveWineData: Codable {
         let savedWine: SavedWine
-
-        enum CodingKeys: String, CodingKey {
-            case savedWine = "saved_wine"
-        }
     }
 }
 
@@ -368,12 +353,6 @@ private struct VerifySubscriptionRequest: Codable {
     let store: String
     let receiptData: String
     let transactionId: String
-
-    enum CodingKeys: String, CodingKey {
-        case store
-        case receiptData = "receipt_data"
-        case transactionId = "transaction_id"
-    }
 }
 
 private struct VerifySubscriptionResponse: Codable {
