@@ -18,8 +18,8 @@ final class SubscriptionService: ObservableObject {
     // MARK: - Product IDs
 
     enum ProductID: String, CaseIterable {
-        case monthlyPremium = "com.winespec.winelens.premium.monthly"
-        case yearlyPremium = "com.winespec.winelens.premium.yearly"
+        case monthlyPremium = "com.winespec.winelensapp.premium.monthly"
+        case yearlyPremium = "com.winespec.winelensapp.premium.yearly"
 
         var displayName: String {
             switch self {
