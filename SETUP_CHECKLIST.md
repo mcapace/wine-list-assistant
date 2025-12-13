@@ -74,3 +74,6 @@ ALGOLIA_SEARCH_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 JWT_SECRET=[64-character random string]
 ```
 
+
+
+

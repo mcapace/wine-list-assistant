@@ -1,0 +1,640 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CEB4BACC2EE37BB800014979 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = CEB4BACB2EE37BB800014979 /* Lottie */; };
+		CEB4BAD02EE37BC100014979 /* Card_Slide_Up.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */; };
+		CEB4BAD12EE37BC100014979 /* Expert_Scores_Not_Crowd.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */; };
+		CEB4BAD22EE37BC100014979 /* Find_The_Best_Value.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */; };
+		CEB4BAD42EE37BC100014979 /* Save_Your_Favorites.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */; };
+		CEB4BAD62EE37BC100014979 /* Scan_Any_Wine_List.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */; };
+		CEB4BAD82EE37BC100014979 /* Scan_Pulse.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */; };
+		CEB4BADA2EE37BC100014979 /* Score_Reveal.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADB2EE37BC100014979 /* Score_Reveal.json */; };
+		CEB4BADC2EE37BC100014979 /* Wine_Glass_Fill.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */; };
+		CEB4BADE2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json in Resources */ = {isa = PBXBuildFile; fileRef = CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CEB4BAAE2EE37BA100014979 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEB4BA982EE37B9F00014979 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEB4BA9F2EE37B9F00014979;
+			remoteInfo = WineLensApp;
+		};
+		CEB4BAB82EE37BA100014979 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEB4BA982EE37B9F00014979 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEB4BA9F2EE37B9F00014979;
+			remoteInfo = WineLensApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CEB4BAA02EE37B9F00014979 /* WineLensApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineLensApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEB4BAAD2EE37BA100014979 /* WineLensAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WineLensAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Card_Slide_Up.json; sourceTree = "<group>"; };
+		CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Expert_Scores_Not_Crowd.json; sourceTree = "<group>"; };
+		CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Find_The_Best_Value.json; sourceTree = "<group>"; };
+		CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Save_Your_Favorites.json; sourceTree = "<group>"; };
+		CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Any_Wine_List.json; sourceTree = "<group>"; };
+		CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Scan_Pulse.json; sourceTree = "<group>"; };
+		CEB4BADB2EE37BC100014979 /* Score_Reveal.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Score_Reveal.json; sourceTree = "<group>"; };
+		CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Glass_Fill.json; sourceTree = "<group>"; };
+		CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Wine_Spectator_Wine_Lens.json; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CEB4BAA22EE37B9F00014979 /* WineLensApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WineLensApp;
+			sourceTree = "<group>";
+		};
+		CEB4BAB02EE37BA100014979 /* WineLensAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WineLensAppTests;
+			sourceTree = "<group>";
+		};
+		CEB4BABA2EE37BA100014979 /* WineLensAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WineLensAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CEB4BA9D2EE37B9F00014979 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEB4BACC2EE37BB800014979 /* Lottie in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAAA2EE37BA100014979 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAB42EE37BA100014979 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CEB4BA972EE37B9F00014979 = {
+			isa = PBXGroup;
+			children = (
+				CEB4BAA22EE37B9F00014979 /* WineLensApp */,
+				CEB4BAE02EE37BC100014979 /* Animations */,
+				CEB4BAB02EE37BA100014979 /* WineLensAppTests */,
+				CEB4BABA2EE37BA100014979 /* WineLensAppUITests */,
+				CEB4BAA12EE37B9F00014979 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CEB4BAA12EE37B9F00014979 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CEB4BAA02EE37B9F00014979 /* WineLensApp.app */,
+				CEB4BAAD2EE37BA100014979 /* WineLensAppTests.xctest */,
+				CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CEB4BAE02EE37BC100014979 /* Animations */ = {
+			isa = PBXGroup;
+			children = (
+				CEB4BACE2EE37BC100014979 /* Card_Slide_Up.json */,
+				CEB4BACF2EE37BC100014979 /* Expert_Scores_Not_Crowd.json */,
+				CEB4BAD32EE37BC100014979 /* Find_The_Best_Value.json */,
+				CEB4BAD52EE37BC100014979 /* Save_Your_Favorites.json */,
+				CEB4BAD72EE37BC100014979 /* Scan_Any_Wine_List.json */,
+				CEB4BAD92EE37BC100014979 /* Scan_Pulse.json */,
+				CEB4BADB2EE37BC100014979 /* Score_Reveal.json */,
+				CEB4BADD2EE37BC100014979 /* Wine_Glass_Fill.json */,
+				CEB4BADF2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json */,
+			);
+			name = Animations;
+			path = WineLensApp/Resources/Animations;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CEB4BA9F2EE37B9F00014979 /* WineLensApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEB4BAC12EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensApp" */;
+			buildPhases = (
+				CEB4BA9C2EE37B9F00014979 /* Sources */,
+				CEB4BA9D2EE37B9F00014979 /* Frameworks */,
+				CEB4BA9E2EE37B9F00014979 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CEB4BAA22EE37B9F00014979 /* WineLensApp */,
+			);
+			name = WineLensApp;
+			packageProductDependencies = (
+				CEB4BACB2EE37BB800014979 /* Lottie */,
+			);
+			productName = WineLensApp;
+			productReference = CEB4BAA02EE37B9F00014979 /* WineLensApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CEB4BAAC2EE37BA100014979 /* WineLensAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEB4BAC42EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensAppTests" */;
+			buildPhases = (
+				CEB4BAA92EE37BA100014979 /* Sources */,
+				CEB4BAAA2EE37BA100014979 /* Frameworks */,
+				CEB4BAAB2EE37BA100014979 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEB4BAAF2EE37BA100014979 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CEB4BAB02EE37BA100014979 /* WineLensAppTests */,
+			);
+			name = WineLensAppTests;
+			packageProductDependencies = (
+			);
+			productName = WineLensAppTests;
+			productReference = CEB4BAAD2EE37BA100014979 /* WineLensAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CEB4BAB62EE37BA100014979 /* WineLensAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEB4BAC72EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensAppUITests" */;
+			buildPhases = (
+				CEB4BAB32EE37BA100014979 /* Sources */,
+				CEB4BAB42EE37BA100014979 /* Frameworks */,
+				CEB4BAB52EE37BA100014979 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEB4BAB92EE37BA100014979 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CEB4BABA2EE37BA100014979 /* WineLensAppUITests */,
+			);
+			name = WineLensAppUITests;
+			packageProductDependencies = (
+			);
+			productName = WineLensAppUITests;
+			productReference = CEB4BAB72EE37BA100014979 /* WineLensAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CEB4BA982EE37B9F00014979 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2610;
+				LastUpgradeCheck = 2610;
+				TargetAttributes = {
+					CEB4BA9F2EE37B9F00014979 = {
+						CreatedOnToolsVersion = 26.1;
+					};
+					CEB4BAAC2EE37BA100014979 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEB4BA9F2EE37B9F00014979;
+					};
+					CEB4BAB62EE37BA100014979 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEB4BA9F2EE37B9F00014979;
+					};
+				};
+			};
+			buildConfigurationList = CEB4BA9B2EE37B9F00014979 /* Build configuration list for PBXProject "WineLensApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CEB4BA972EE37B9F00014979;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CEB4BACA2EE37BB800014979 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CEB4BAA12EE37B9F00014979 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CEB4BA9F2EE37B9F00014979 /* WineLensApp */,
+				CEB4BAAC2EE37BA100014979 /* WineLensAppTests */,
+				CEB4BAB62EE37BA100014979 /* WineLensAppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CEB4BA9E2EE37B9F00014979 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEB4BAD02EE37BC100014979 /* Card_Slide_Up.json in Resources */,
+				CEB4BAD12EE37BC100014979 /* Expert_Scores_Not_Crowd.json in Resources */,
+				CEB4BAD22EE37BC100014979 /* Find_The_Best_Value.json in Resources */,
+				CEB4BAD42EE37BC100014979 /* Save_Your_Favorites.json in Resources */,
+				CEB4BAD62EE37BC100014979 /* Scan_Any_Wine_List.json in Resources */,
+				CEB4BAD82EE37BC100014979 /* Scan_Pulse.json in Resources */,
+				CEB4BADA2EE37BC100014979 /* Score_Reveal.json in Resources */,
+				CEB4BADC2EE37BC100014979 /* Wine_Glass_Fill.json in Resources */,
+				CEB4BADE2EE37BC100014979 /* Wine_Spectator_Wine_Lens.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAAB2EE37BA100014979 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAB52EE37BA100014979 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CEB4BA9C2EE37B9F00014979 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAA92EE37BA100014979 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB4BAB32EE37BA100014979 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CEB4BAAF2EE37BA100014979 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEB4BA9F2EE37B9F00014979 /* WineLensApp */;
+			targetProxy = CEB4BAAE2EE37BA100014979 /* PBXContainerItemProxy */;
+		};
+		CEB4BAB92EE37BA100014979 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEB4BA9F2EE37B9F00014979 /* WineLensApp */;
+			targetProxy = CEB4BAB82EE37BA100014979 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CEB4BABF2EE37BA100014979 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CEB4BAC02EE37BA100014979 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CEB4BAC22EE37BA100014979 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists and show you Wine Spectator ratings.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Wine Lens needs photo library access to upload wine list images.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelens;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CEB4BAC32EE37BA100014979 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Wine Lens needs camera access to scan wine lists and show you Wine Spectator ratings.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Wine Lens needs photo library access to upload wine list images.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelens;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CEB4BAC52EE37BA100014979 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelensTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WineLensApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WineLensApp";
+			};
+			name = Debug;
+		};
+		CEB4BAC62EE37BA100014979 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelensTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WineLensApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WineLensApp";
+			};
+			name = Release;
+		};
+		CEB4BAC82EE37BA100014979 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelensUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = WineLensApp;
+			};
+			name = Debug;
+		};
+		CEB4BAC92EE37BA100014979 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346J27QJCB;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcapace.winelensUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = WineLensApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CEB4BA9B2EE37B9F00014979 /* Build configuration list for PBXProject "WineLensApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEB4BABF2EE37BA100014979 /* Debug */,
+				CEB4BAC02EE37BA100014979 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEB4BAC12EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEB4BAC22EE37BA100014979 /* Debug */,
+				CEB4BAC32EE37BA100014979 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEB4BAC42EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEB4BAC52EE37BA100014979 /* Debug */,
+				CEB4BAC62EE37BA100014979 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEB4BAC72EE37BA100014979 /* Build configuration list for PBXNativeTarget "WineLensAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEB4BAC82EE37BA100014979 /* Debug */,
+				CEB4BAC92EE37BA100014979 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CEB4BACA2EE37BB800014979 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CEB4BACB2EE37BB800014979 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEB4BACA2EE37BB800014979 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = CEB4BA982EE37B9F00014979 /* Project object */;
+}

@@ -43,3 +43,6 @@ Once you have the API keys:
 2. Deploy to Vercel (Step 1.4)
 3. Seed the database (Step 1.5)
 
+
+
+

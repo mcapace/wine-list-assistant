@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Reusable Wine Lens branding badge with styled text logo
+/// Reusable Wine Lens branding badge using actual logo image assets
 struct WineLensBadge: View {
     enum Style {
         case light      // For dark backgrounds (scanner view)
@@ -30,20 +30,12 @@ struct WineLensBadge: View {
     // MARK: - Light Style (for dark backgrounds like scanner)
 
     private var lightStyleBadge: some View {
-        HStack(spacing: 6) {
-            // Wine glass icon
-            Image(systemName: "wineglass.fill")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Theme.secondaryColor)
-
-            // Styled text logo
-            Text("WINE")
-                .font(.system(size: 13, weight: .bold, design: .default))
-                .foregroundColor(.white)
-            +
-            Text("LENS")
-                .font(.system(size: 13, weight: .bold, design: .default))
-                .foregroundColor(Theme.secondaryColor)
+        HStack(spacing: 8) {
+            // WineLens logo image
+            Image("WineLensText")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 24)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
@@ -61,17 +53,11 @@ struct WineLensBadge: View {
 
     private var darkStyleBadge: some View {
         HStack(spacing: 4) {
-            Image(systemName: "wineglass.fill")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(Theme.secondaryColor)
-
-            Text("WINE")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(Theme.primaryColor)
-            +
-            Text("LENS")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(Theme.secondaryColor)
+            // WineLens logo image
+            Image("WineLensText")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 18)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
@@ -84,31 +70,20 @@ struct WineLensBadge: View {
     // MARK: - Onboarding Style (larger)
 
     private var onboardingStyleBadge: some View {
-        VStack(spacing: 8) {
-            // Wine Spectator branding
-            Text("Wine Spectator")
-                .font(.system(size: 28, weight: .bold, design: .serif))
-                .foregroundColor(.primary)
+        VStack(spacing: 16) {
+            // Wine Spectator logo
+            WineSpectatorLogo(variant: .black, height: 36)
 
-            // Wine Lens with icon
-            HStack(spacing: 8) {
-                Image(systemName: "wineglass.fill")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Theme.secondaryColor)
-
-                Text("WINE")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.primary)
-                +
-                Text("LENS")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(Theme.secondaryColor)
-            }
+            // WineLens logo image
+            Image("WineLensText")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 40)
         }
     }
 }
 
-/// Wine Spectator logo component - styled text version
+/// Wine Spectator logo component using actual image assets
 struct WineSpectatorLogo: View {
     enum Variant {
         case black
@@ -124,16 +99,10 @@ struct WineSpectatorLogo: View {
     }
 
     var body: some View {
-        HStack(spacing: 4) {
-            // Decorative wine glass icon
-            Image(systemName: "wineglass")
-                .font(.system(size: height * 0.6, weight: .light))
-                .foregroundColor(variant == .black ? Theme.primaryColor : .white)
-
-            Text("Wine Spectator")
-                .font(.system(size: height * 0.7, weight: .bold, design: .serif))
-                .foregroundColor(variant == .black ? Theme.primaryColor : .white)
-        }
+        Image(variant == .black ? "WSLogoBlack" : "WSLogoWhite")
+            .resizable()
+            .scaledToFit()
+            .frame(height: height)
     }
 }
 

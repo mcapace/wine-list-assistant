@@ -63,5 +63,5 @@ enum AppConfiguration {
 
     static let apiTimeoutSeconds: TimeInterval = 10
     static let ocrProcessingIntervalSeconds: TimeInterval = 0.5
-    static let matchConfidenceThreshold: Double = 0.7
+    static let matchConfidenceThreshold: Double = 0.6  // Minimum confidence for wine matches
 }
