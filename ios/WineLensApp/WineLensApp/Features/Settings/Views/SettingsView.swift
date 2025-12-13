@@ -91,6 +91,19 @@ struct SettingsView: View {
                         .foregroundColor(.orange)
                     }
 
+                    // Clear wine cache (removes old cached data)
+                    Button(action: {
+                        Task {
+                            await LocalWineCache.shared.clear()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise.circle")
+                            Text("Clear Wine Cache")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                    
                     // Development/Testing: Reset entire app
                     Button(action: {
                         showResetConfirmation = true

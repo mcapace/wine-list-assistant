@@ -72,6 +72,11 @@ final class AppState: ObservableObject {
         // Clear other preferences
         UserDefaults.standard.removeObject(forKey: Constants.StorageKeys.userPreferences)
 
+        // Clear wine cache (important: removes old cached wines without new fields like label_url, tasting_note)
+        Task {
+            await LocalWineCache.shared.clear()
+        }
+
         // Sync UserDefaults
         UserDefaults.standard.synchronize()
 
