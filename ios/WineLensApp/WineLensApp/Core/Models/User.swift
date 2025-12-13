@@ -23,12 +23,12 @@ struct User: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case email
-        case firstName = "first_name"
-        case lastName = "last_name"
+        case firstName
+        case lastName
         case subscription
         case stats
         case preferences
-        case createdAt = "created_at"
+        case createdAt
     }
 }
 
@@ -51,10 +51,10 @@ struct Subscription: Codable {
     enum CodingKeys: String, CodingKey {
         case tier
         case status
-        case expiresAt = "expires_at"
-        case autoRenew = "auto_renew"
+        case expiresAt
+        case autoRenew
         case store
-        case productId = "product_id"
+        case productId
     }
 }
 
@@ -109,10 +109,10 @@ struct UserStats: Codable {
     let memberSince: Date
 
     enum CodingKeys: String, CodingKey {
-        case winesSaved = "wines_saved"
-        case scansThisMonth = "scans_this_month"
-        case totalScans = "total_scans"
-        case memberSince = "member_since"
+        case winesSaved
+        case scansThisMonth
+        case totalScans
+        case memberSince
     }
 }
 
@@ -124,11 +124,11 @@ struct UserPreferences: Codable {
     var autoFilterEnabled: Bool
 
     enum CodingKeys: String, CodingKey {
-        case preferredRegions = "preferred_regions"
-        case minScoreFilter = "min_score_filter"
-        case notificationsEnabled = "notifications_enabled"
-        case hapticFeedbackEnabled = "haptic_feedback_enabled"
-        case autoFilterEnabled = "auto_filter_enabled"
+        case preferredRegions
+        case minScoreFilter
+        case notificationsEnabled
+        case hapticFeedbackEnabled
+        case autoFilterEnabled
     }
 
     static let `default` = UserPreferences(

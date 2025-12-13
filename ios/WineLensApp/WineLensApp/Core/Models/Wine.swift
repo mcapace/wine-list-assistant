@@ -105,6 +105,8 @@ struct Wine: Identifiable, Codable, Hashable {
     }
 
     // MARK: - Coding Keys
+    // Note: With decoder.keyDecodingStrategy = .convertFromSnakeCase,
+    // we don't need explicit snake_case mappings - the conversion is automatic
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -112,24 +114,24 @@ struct Wine: Identifiable, Codable, Hashable {
         case name
         case vintage
         case region
-        case subRegion = "sub_region"
+        case subRegion
         case appellation
         case country
         case color
-        case grapeVarieties = "grape_varieties"
+        case grapeVarieties
         case alcohol
         case score
-        case tastingNote = "tasting_note"
+        case tastingNote
         case reviewer
-        case reviewDate = "review_date"
-        case issueDate = "issue_date"
-        case drinkWindowStart = "drink_window_start"
-        case drinkWindowEnd = "drink_window_end"
-        case releasePrice = "release_price"
-        case releasePriceCurrency = "release_price_currency"
-        case labelUrl = "label_url"
-        case top100Rank = "top100_rank"
-        case top100Year = "top100_year"
+        case reviewDate
+        case issueDate
+        case drinkWindowStart
+        case drinkWindowEnd
+        case releasePrice
+        case releasePriceCurrency
+        case labelUrl
+        case top100Rank
+        case top100Year
     }
 
     // MARK: - Memberwise Initializer (for preview code and manual creation)
