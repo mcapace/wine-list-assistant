@@ -8,6 +8,7 @@ struct SettingsView: View {
     @State private var showSignIn = false
     @State private var showSignOut = false
     @State private var showResetConfirmation = false
+    @State private var showCacheClearedAlert = false
 
     var body: some View {
         NavigationView {
@@ -95,7 +96,9 @@ struct SettingsView: View {
                     Button(action: {
                         Task {
                             await LocalWineCache.shared.clear()
-                            // Show confirmation
+                            await MainActor.run {
+                                showCacheClearedAlert = true
+                            }
                             #if DEBUG
                             print("🗑️ Wine cache cleared - next scan will fetch fresh data from API")
                             #endif
@@ -106,6 +109,11 @@ struct SettingsView: View {
                             Text("Clear Wine Cache")
                         }
                         .foregroundColor(.blue)
+                    }
+                    .alert("Cache Cleared", isPresented: $showCacheClearedAlert) {
+                        Button("OK", role: .cancel) { }
+                    } message: {
+                        Text("Wine cache has been cleared. The next scan will fetch fresh data from the server with all fields including images and tasting notes.")
                     }
                     
                     // Development/Testing: Reset entire app
