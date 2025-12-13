@@ -393,19 +393,11 @@ struct ScannerView: View {
                     return
                 }
                 hasStartedCamera = true
-                
+
                 #if DEBUG
-                print("📷 ScannerView.task: Starting camera initialization")
-                print("📷 ScannerView.task: About to call startScanning() in 0.2s")
+                print("📷 ScannerView.task: Starting camera initialization immediately")
                 #endif
-                
-                // Small delay to ensure view is fully rendered
-                try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-                
-                #if DEBUG
-                print("📷 ScannerView.task: Delay complete, checking camera status")
-                #endif
-                
+
                 // Check if camera is already running to avoid duplicate starts
                 guard !viewModel.cameraService.isRunning else {
                     #if DEBUG
@@ -413,15 +405,14 @@ struct ScannerView: View {
                     #endif
                     return
                 }
-                
+
                 #if DEBUG
                 print("📷 ScannerView.task: Calling viewModel.startScanning() NOW")
                 #endif
-                
-                // Always request authorization and start camera
-                // This will show permission dialog if needed
+
+                // Start camera immediately for seamless experience
                 await viewModel.startScanning()
-                
+
                 #if DEBUG
                 print("📷 ScannerView.task: startScanning() completed")
                 #endif
@@ -792,6 +783,8 @@ struct ScanFrameCorners: Shape {
 struct ScannerInstructionsOverlay: View {
     let onDismiss: () -> Void
     @State private var currentStep = 0
+    @State private var showContent = false
+    @State private var iconScale: CGFloat = 0.8
 
     let steps = [
         InstructionStep(
@@ -818,90 +811,140 @@ struct ScannerInstructionsOverlay: View {
 
     var body: some View {
         ZStack {
-            // Dimmed background
-            Color.black.opacity(0.85)
-                .ignoresSafeArea()
+            // Gradient background matching onboarding
+            LinearGradient(
+                colors: [
+                    Theme.primaryColor.opacity(0.95),
+                    Color.black.opacity(0.95)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
             VStack(spacing: 32) {
                 // Close button
                 HStack {
                     Spacer()
                     Button(action: onDismiss) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title)
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.8))
+                            .frame(width: 36, height: 36)
+                            .background(Color.white.opacity(0.15))
+                            .clipShape(Circle())
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
 
                 Spacer()
 
                 // Current instruction
-                VStack(spacing: 24) {
+                VStack(spacing: 28) {
                     ZStack {
                         Circle()
-                            .fill(Theme.primaryColor.opacity(0.2))
-                            .frame(width: 100, height: 100)
+                            .fill(Theme.secondaryColor.opacity(0.15))
+                            .frame(width: 120, height: 120)
+
+                        Circle()
+                            .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 2)
+                            .frame(width: 120, height: 120)
 
                         Image(systemName: steps[currentStep].icon)
-                            .font(.system(size: 44))
+                            .font(.system(size: 48, weight: .medium))
                             .foregroundColor(Theme.secondaryColor)
                     }
+                    .scaleEffect(iconScale)
 
                     Text(steps[currentStep].title)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.white)
 
                     Text(steps[currentStep].description)
-                        .font(.body)
+                        .font(.system(size: 17, weight: .regular))
                         .foregroundColor(.white.opacity(0.8))
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 40)
                 }
+                .opacity(showContent ? 1.0 : 0.0)
+                .offset(y: showContent ? 0 : 20)
 
                 Spacer()
 
                 // Page indicator
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     ForEach(0..<steps.count, id: \.self) { index in
-                        Circle()
+                        Capsule()
                             .fill(index == currentStep ? Theme.secondaryColor : Color.white.opacity(0.3))
-                            .frame(width: 8, height: 8)
+                            .frame(width: index == currentStep ? 24 : 8, height: 8)
+                            .animation(.easeInOut(duration: 0.2), value: currentStep)
                     }
                 }
 
                 // Buttons
-                HStack(spacing: 16) {
-                    if currentStep > 0 {
-                        Button(action: { withAnimation { currentStep -= 1 } }) {
-                            Text("Back")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.white.opacity(0.2))
-                                .cornerRadius(12)
-                        }
-                    }
-
+                VStack(spacing: 12) {
                     Button(action: {
                         if currentStep < steps.count - 1 {
-                            withAnimation { currentStep += 1 }
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                iconScale = 0.8
+                                showContent = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                currentStep += 1
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                                    iconScale = 1.0
+                                    showContent = true
+                                }
+                            }
                         } else {
                             onDismiss()
                         }
                     }) {
                         Text(currentStep < steps.count - 1 ? "Next" : "Start Scanning")
-                            .font(.headline)
-                            .foregroundColor(.black)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(Theme.primaryColor)
                             .frame(maxWidth: .infinity)
-                            .padding()
+                            .padding(.vertical, 16)
                             .background(Theme.secondaryColor)
                             .cornerRadius(12)
                     }
+
+                    if currentStep > 0 {
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                iconScale = 0.8
+                                showContent = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                currentStep -= 1
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                                    iconScale = 1.0
+                                    showContent = true
+                                }
+                            }
+                        }) {
+                            Text("Back")
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundColor(.white.opacity(0.8))
+                        }
+                    } else {
+                        Button(action: onDismiss) {
+                            Text("Skip")
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 40)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 50)
+            }
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                iconScale = 1.0
+                showContent = true
             }
         }
     }
@@ -1389,36 +1432,90 @@ struct FirstMatchCelebrationToast: View {
 // MARK: - Permission & Paywall Views
 
 struct CameraPermissionView: View {
+    @State private var iconScale: CGFloat = 0.8
+    @State private var showContent = false
+
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "camera.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.white)
+        ZStack {
+            // Gradient background matching onboarding
+            LinearGradient(
+                colors: [
+                    Theme.primaryColor.opacity(0.95),
+                    Color.black.opacity(0.95)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            Text("Camera Access Required")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+            VStack(spacing: 32) {
+                Spacer()
 
-            Text("To scan wine lists, please allow camera access in Settings.")
-                .font(.body)
-                .foregroundColor(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
+                // Elegant icon container (matching onboarding style)
+                ZStack {
+                    Circle()
+                        .fill(Theme.secondaryColor.opacity(0.15))
+                        .frame(width: 140, height: 140)
 
-            Button(action: openSettings) {
-                Text("Open Settings")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .padding()
+                    Circle()
+                        .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 2)
+                        .frame(width: 140, height: 140)
+
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 56, weight: .medium))
+                        .foregroundColor(Theme.secondaryColor)
+                }
+                .scaleEffect(iconScale)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                VStack(spacing: 16) {
+                    Text("Camera Access Required")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("To scan wine lists and show you Wine Spectator ratings, we need access to your camera.")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 24)
+                }
+                .opacity(showContent ? 1.0 : 0.0)
+                .offset(y: showContent ? 0 : 20)
+
+                Spacer()
+
+                // Action button (matching onboarding style)
+                Button(action: openSettings) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("Open Settings")
+                            .font(.system(size: 17, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .background(Color.white)
-                    .cornerRadius(Theme.CornerRadius.medium)
+                    .padding(.vertical, 16)
+                    .background(Theme.primaryColor)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Theme.secondaryColor.opacity(0.5), lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal, 32)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                Spacer()
+                    .frame(height: 60)
             }
-            .padding(.horizontal, 40)
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.opacity(0.9))
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                iconScale = 1.0
+                showContent = true
+            }
+        }
     }
 
     private func openSettings() {
@@ -1430,37 +1527,115 @@ struct CameraPermissionView: View {
 
 struct ScanLimitReachedView: View {
     let onSubscribe: () -> Void
+    @State private var iconScale: CGFloat = 0.8
+    @State private var showContent = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.yellow)
+        ZStack {
+            // Gradient background matching onboarding
+            LinearGradient(
+                colors: [
+                    Theme.primaryColor.opacity(0.95),
+                    Color.black.opacity(0.95)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            Text("Free Scans Used")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+            VStack(spacing: 32) {
+                Spacer()
 
-            Text("You've used all \(AppConfiguration.freeScansPerMonth) free scans this month. Upgrade to Premium for unlimited scanning.")
-                .font(.body)
-                .foregroundColor(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
+                // Elegant icon container (matching onboarding style)
+                ZStack {
+                    Circle()
+                        .fill(Theme.secondaryColor.opacity(0.15))
+                        .frame(width: 140, height: 140)
 
-            Button(action: onSubscribe) {
-                Text("Upgrade to Premium")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .padding()
+                    Circle()
+                        .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 2)
+                        .frame(width: 140, height: 140)
+
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 56, weight: .medium))
+                        .foregroundColor(Theme.secondaryColor)
+                }
+                .scaleEffect(iconScale)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                VStack(spacing: 16) {
+                    Text("Unlock Unlimited Scans")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("You've used your \(AppConfiguration.freeScansPerMonth) free scans this month. Upgrade to Premium for unlimited access to Wine Spectator ratings.")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 24)
+                }
+                .opacity(showContent ? 1.0 : 0.0)
+                .offset(y: showContent ? 0 : 20)
+
+                Spacer()
+
+                // Premium features preview
+                VStack(alignment: .leading, spacing: 12) {
+                    PremiumFeatureRow(icon: "infinity", text: "Unlimited wine scans")
+                    PremiumFeatureRow(icon: "clock.arrow.circlepath", text: "Full scan history")
+                    PremiumFeatureRow(icon: "heart.fill", text: "Save favorite wines")
+                }
+                .padding(.horizontal, 40)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                Spacer()
+
+                // Action button (matching onboarding style)
+                Button(action: onSubscribe) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("Upgrade to Premium")
+                            .font(.system(size: 17, weight: .semibold))
+                    }
+                    .foregroundColor(Theme.primaryColor)
                     .frame(maxWidth: .infinity)
-                    .background(Color.white)
-                    .cornerRadius(Theme.CornerRadius.medium)
+                    .padding(.vertical, 16)
+                    .background(Theme.secondaryColor)
+                    .cornerRadius(12)
+                }
+                .padding(.horizontal, 32)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                Spacer()
+                    .frame(height: 60)
             }
-            .padding(.horizontal, 40)
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.opacity(0.9))
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                iconScale = 1.0
+                showContent = true
+            }
+        }
+    }
+}
+
+struct PremiumFeatureRow: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(Theme.secondaryColor)
+                .frame(width: 24)
+
+            Text(text)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+        }
     }
 }
 

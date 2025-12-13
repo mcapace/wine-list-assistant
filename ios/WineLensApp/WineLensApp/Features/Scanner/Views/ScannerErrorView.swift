@@ -5,56 +5,106 @@ struct ScannerErrorView: View {
     let onRetry: () -> Void
     let onOpenSettings: () -> Void
 
+    @State private var iconScale: CGFloat = 0.8
+    @State private var showContent = false
+
     var body: some View {
         ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.85)
+            // Gradient background matching onboarding style
+            LinearGradient(
+                colors: [
+                    Theme.primaryColor.opacity(0.95),
+                    Color.black.opacity(0.95)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
 
-            VStack(spacing: 24) {
-                // Error icon
-                Image(systemName: error.iconName)
-                    .font(.system(size: 60))
-                    .foregroundColor(error.iconColor)
+            VStack(spacing: 28) {
+                Spacer()
 
-                // Title
-                Text(error.errorTitle)
-                    .font(.title2.bold())
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
+                // Elegant icon container
+                ZStack {
+                    Circle()
+                        .fill(Theme.secondaryColor.opacity(0.15))
+                        .frame(width: 120, height: 120)
 
-                // Description
-                Text(error.errorMessage)
-                    .font(.body)
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                    Circle()
+                        .stroke(Theme.secondaryColor.opacity(0.3), lineWidth: 2)
+                        .frame(width: 120, height: 120)
+
+                    Image(systemName: error.iconName)
+                        .font(.system(size: 48, weight: .medium))
+                        .foregroundColor(Theme.secondaryColor)
+                }
+                .scaleEffect(iconScale)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                VStack(spacing: 16) {
+                    Text(error.errorTitle)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+
+                    Text(error.errorMessage)
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 32)
+                }
+                .opacity(showContent ? 1.0 : 0.0)
+                .offset(y: showContent ? 0 : 20)
+
+                Spacer()
 
                 // Action buttons
                 VStack(spacing: 12) {
                     if error == .cameraNotAuthorized {
                         Button(action: onOpenSettings) {
-                            Text("Open Settings")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Theme.primaryColor)
-                                .cornerRadius(12)
+                            HStack(spacing: 8) {
+                                Image(systemName: "gear")
+                                    .font(.system(size: 18, weight: .semibold))
+                                Text("Open Settings")
+                                    .font(.system(size: 17, weight: .semibold))
+                            }
+                            .foregroundColor(Theme.primaryColor)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Theme.secondaryColor)
+                            .cornerRadius(12)
                         }
                     }
 
                     Button(action: onRetry) {
-                        Text(error == .cameraNotAuthorized ? "Try Again" : "Retry")
-                            .font(.headline)
-                            .foregroundColor(error == .cameraNotAuthorized ? .white : .white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(error == .cameraNotAuthorized ? Color.white.opacity(0.2) : Theme.primaryColor)
-                            .cornerRadius(12)
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text(error == .cameraNotAuthorized ? "Try Again" : "Retry")
+                                .font(.system(size: 17, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(error == .cameraNotAuthorized ? Color.white.opacity(0.2) : Theme.primaryColor)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Theme.secondaryColor.opacity(0.5), lineWidth: error == .cameraNotAuthorized ? 0 : 1)
+                        )
                     }
                 }
                 .padding(.horizontal, 32)
-                .padding(.top, 8)
+                .opacity(showContent ? 1.0 : 0.0)
+
+                Spacer()
+                    .frame(height: 60)
+            }
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                iconScale = 1.0
+                showContent = true
             }
         }
     }
