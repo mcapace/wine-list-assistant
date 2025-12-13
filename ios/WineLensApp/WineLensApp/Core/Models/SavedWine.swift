@@ -20,6 +20,13 @@ struct SavedWine: Identifiable, Codable {
             formatter.currencyCode = "USD"
             return formatter.string(from: price as NSDecimalNumber)
         }
+
+        enum CodingKeys: String, CodingKey {
+            case restaurant
+            case pricePaid = "price_paid"
+            case date
+            case rating
+        }
     }
 
     enum CodingKeys: String, CodingKey {
