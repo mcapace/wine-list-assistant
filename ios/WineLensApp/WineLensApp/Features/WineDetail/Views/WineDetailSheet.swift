@@ -6,6 +6,12 @@ struct WineDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isSaved = false
     @State private var showShareSheet = false
+    @State private var selectedTab: DetailTab = .details
+
+    enum DetailTab: String, CaseIterable {
+        case details = "Details"
+        case tastingNote = "Tasting Note"
+    }
 
     private var wine: Wine? {
         recognizedWine.matchedWine
@@ -15,55 +21,72 @@ struct WineDetailSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Hero Score Header - Premium design
                     if let wine = wine {
-                        PremiumScoreHeader(
+                        // Hero Section with wine-type colored header
+                        WineHeroHeader(
                             wine: wine,
                             confidence: recognizedWine.matchConfidence
                         )
-                        .padding(.bottom, Theme.Spacing.xl)
-                    }
 
-                    VStack(spacing: Theme.Spacing.lg) {
-                        // Wine Info - Elegant grid layout
-                        if let wine = wine {
-                            PremiumWineInfoSection(wine: wine)
-                        }
+                        // Quick Info Bar (Score | Price | Region)
+                        QuickInfoBar(wine: wine, listPrice: recognizedWine.listPrice)
+                            .padding(.horizontal)
+                            .padding(.top, -20)
+                            .zIndex(1)
 
-                        // Tasting Note - Enhanced typography
-                        if let wine = wine, let note = wine.tastingNote, !note.isEmpty {
-                            PremiumTastingNoteSection(note: note)
-                        }
+                        // Tabbed Content
+                        VStack(spacing: 0) {
+                            // Tab Picker
+                            TabPicker(selectedTab: $selectedTab)
+                                .padding(.top, Theme.Spacing.lg)
+                                .padding(.horizontal)
 
-                        // Price & Value - Premium card
-                        if let wine = wine {
-                            PremiumPriceValueSection(
+                            // Tab Content
+                            TabContent(
+                                selectedTab: selectedTab,
                                 wine: wine,
                                 listPrice: recognizedWine.listPrice,
                                 valueRatio: recognizedWine.valueRatio
                             )
+                            .padding(.horizontal)
+                            .padding(.top, Theme.Spacing.md)
                         }
 
-                        // Actions - Elegant buttons
-                        PremiumActionButtonsSection(
+                        // Action Buttons
+                        ActionButtons(
                             isSaved: $isSaved,
                             onSave: saveWine,
                             onShare: { showShareSheet = true }
                         )
+                        .padding(.horizontal)
+                        .padding(.top, Theme.Spacing.lg)
+
+                        // Brand Footer
+                        BrandFooter()
+                            .padding(.top, Theme.Spacing.lg)
+                            .padding(.bottom, Theme.Spacing.xl + 20)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, Theme.Spacing.xl + 20) // Extra padding for safe area
                 }
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle(wine?.producer ?? "Wine Details")
-            .navigationBarTitleDisplayMode(.large)
+            .background(Color(.systemGray6).opacity(0.5))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(.secondary)
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color(.systemGray5)))
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showShareSheet = true }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color(.systemGray5)))
                     }
                 }
             }
@@ -77,11 +100,10 @@ struct WineDetailSheet: View {
 
     private func saveWine() {
         guard let wine = wine else { return }
-
         Task {
             do {
                 _ = try await WineAPIClient.shared.saveWine(wineId: wine.id)
-                isSaved = true
+                withAnimation { isSaved = true }
             } catch {
                 print("Failed to save wine: \(error)")
             }
@@ -93,400 +115,268 @@ struct WineDetailSheet: View {
         \(wine.fullName)
         Wine Spectator Score: \(wine.score?.description ?? "N/A")
 
-        \(wine.tastingNote ?? "No tasting note available")
+        \(wine.tastingNote ?? "")
 
         Drink: \(wine.drinkWindowDisplay)
         """
     }
 }
 
-// MARK: - Premium Score Header
+// MARK: - Wine Hero Header
 
-struct PremiumScoreHeader: View {
+struct WineHeroHeader: View {
     let wine: Wine
     let confidence: Double
     @State private var appear = false
 
+    private var headerColor: Color {
+        switch wine.color {
+        case .red: return Theme.primaryColor
+        case .white: return Color(red: 0.85, green: 0.75, blue: 0.45)
+        case .rose: return Color(red: 0.9, green: 0.5, blue: 0.55)
+        case .sparkling: return Color(red: 0.75, green: 0.7, blue: 0.55)
+        case .dessert: return Color(red: 0.8, green: 0.6, blue: 0.3)
+        case .fortified: return Color(red: 0.6, green: 0.3, blue: 0.25)
+        }
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Gradient background
-            ZStack(alignment: .top) {
-                LinearGradient(
-                    colors: [
-                        Theme.scoreBackgroundColor(for: wine.score ?? 0),
-                        Theme.scoreBackgroundColor(for: wine.score ?? 0).opacity(0.5),
-                        Color(.systemGroupedBackground)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 280)
-                .ignoresSafeArea(edges: .top)
+        ZStack(alignment: .bottom) {
+            // Gradient background based on wine type
+            LinearGradient(
+                colors: [
+                    headerColor.opacity(0.95),
+                    headerColor.opacity(0.8),
+                    headerColor.opacity(0.4)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 380)
 
-                VStack(spacing: Theme.Spacing.lg) {
-                    Spacer()
-                        .frame(height: 20)
+            VStack(spacing: Theme.Spacing.md) {
+                // Top 100 Badge
+                if let rank = wine.top100Rank, let year = wine.top100Year {
+                    Top100RankBadge(rank: rank, year: year)
+                        .opacity(appear ? 1 : 0)
+                        .offset(y: appear ? 0 : -10)
+                }
 
-                    // Large score display
-                    VStack(spacing: Theme.Spacing.sm) {
-                        Text(wine.score != nil ? "\(wine.score!)" : "N/A")
-                            .font(.system(size: 72, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.scoreColor(for: wine.score ?? 0))
-                            .opacity(appear ? 1.0 : 0.0)
-                            .scaleEffect(appear ? 1.0 : 0.8)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.7), value: appear)
+                // Wine Label Image
+                WineLabelDisplay(wine: wine)
+                    .frame(height: 200)
+                    .opacity(appear ? 1 : 0)
+                    .scaleEffect(appear ? 1 : 0.9)
 
-                        if let score = wine.score {
-                            ScoreCategoryBadge(score: score)
-                                .opacity(appear ? 1.0 : 0.0)
-                                .offset(y: appear ? 0 : 10)
-                                .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: appear)
-                        }
-                    }
+                // Wine Name
+                VStack(spacing: 4) {
+                    Text(wine.producer)
+                        .font(.system(size: 22, weight: .bold, design: .serif))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
 
-                    // Wine name section
-                    VStack(spacing: Theme.Spacing.xs) {
-                        Text(wine.producer)
-                            .font(.system(size: 22, weight: .semibold, design: .default))
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.center)
-
+                    if wine.name.lowercased() != wine.producer.lowercased() {
                         Text(wine.name)
-                            .font(.system(size: 18, weight: .medium, design: .default))
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 17, weight: .medium, design: .serif))
+                            .foregroundColor(.white.opacity(0.9))
                             .multilineTextAlignment(.center)
-
-                        if let vintage = wine.vintage {
-                            Text(String(vintage))
-                                .font(.system(size: 16, weight: .regular))
-                                .foregroundColor(.secondary.opacity(0.8))
-                                .padding(.top, 4)
-                        }
                     }
-                    .opacity(appear ? 1.0 : 0.0)
-                    .offset(y: appear ? 0 : 15)
-                    .animation(.easeOut(duration: 0.5).delay(0.2), value: appear)
 
-                    // Confidence indicator
-                    if confidence < 0.85 {
-                        HStack(spacing: 6) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                            Text("Possible match")
-                        }
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.orange)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.orange.opacity(0.15))
-                        )
-                        .opacity(appear ? 1.0 : 0.0)
-                        .animation(.easeOut(duration: 0.5).delay(0.3), value: appear)
+                    if let vintage = wine.vintage {
+                        Text(String(vintage))
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.8))
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, Theme.Spacing.xl)
+                .opacity(appear ? 1 : 0)
+                .offset(y: appear ? 0 : 10)
+
+                // Confidence warning
+                if confidence < 0.85 {
+                    ConfidenceWarning()
+                        .opacity(appear ? 1 : 0)
+                }
             }
+            .padding(.horizontal)
+            .padding(.bottom, 40)
         }
         .onAppear {
-            appear = true
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                appear = true
+            }
         }
     }
 }
 
-struct ScoreCategoryBadge: View {
-    let score: Int
-    
-    var body: some View {
-        let category = ScoreCategory(score: score)
-        Text(category.displayName.uppercased())
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
-            .foregroundColor(Theme.scoreColor(for: score))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Theme.scoreColor(for: score).opacity(0.15))
-            )
-    }
-}
+// MARK: - Wine Label Display
 
-// MARK: - Premium Wine Info Section
-
-struct PremiumWineInfoSection: View {
+struct WineLabelDisplay: View {
     let wine: Wine
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-            // Section header
-            HStack {
-                Image(systemName: "info.circle.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(Theme.primaryColor)
-                Text("Details")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.primary)
-                Spacer()
-            }
-            .padding(.bottom, Theme.Spacing.xs)
-
-            // Grid layout - elegant spacing
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: Theme.Spacing.md),
-                GridItem(.flexible(), spacing: Theme.Spacing.md)
-            ], spacing: Theme.Spacing.lg) {
-                PremiumInfoItem(
-                    icon: "mappin.circle.fill",
-                    label: "Region",
-                    value: wine.region ?? "Unknown",
-                    iconColor: .blue
-                )
-                PremiumInfoItem(
-                    icon: "globe",
-                    label: "Country",
-                    value: wine.country ?? "Unknown",
-                    iconColor: .green
-                )
-                PremiumInfoItem(
-                    icon: "drop.fill",
-                    label: "Type",
-                    value: wine.color.displayName,
-                    iconColor: Theme.primaryColor
-                )
-                PremiumInfoItem(
-                    icon: "calendar",
-                    label: "Drink Window",
-                    value: wine.drinkWindowDisplay,
-                    iconColor: .purple
-                )
-            }
-
-            // Divider
-            Divider()
-                .padding(.vertical, Theme.Spacing.xs)
-
-            // Grapes - elegant display
-            if !wine.grapeVarieties.isEmpty {
-                VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-                    HStack {
-                        Image(systemName: "leaf.fill")
-                            .font(.system(size: 14))
-                            .foregroundColor(.green)
-                        Text("Grape Varieties")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.primary)
-                    }
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Theme.Spacing.sm) {
-                            ForEach(wine.grapeVarieties, id: \.name) { grape in
-                                Text(grape.name)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.primary)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color(.systemGray6))
-                                    )
-                            }
-                        }
+        Group {
+            if let urlString = wine.labelUrl, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        WineBottlePlaceholder(wineColor: wine.color)
+                            .overlay(ProgressView().tint(.white))
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .shadow(color: .black.opacity(0.4), radius: 20, x: 0, y: 10)
+                    case .failure:
+                        WineBottlePlaceholder(wineColor: wine.color)
+                    @unknown default:
+                        WineBottlePlaceholder(wineColor: wine.color)
                     }
                 }
+            } else {
+                WineBottlePlaceholder(wineColor: wine.color)
             }
+        }
+    }
+}
 
-            // Drink Window Status - premium badge
-            if wine.drinkWindowStatus != .ready {
-                HStack {
-                    DrinkWindowBadge(status: wine.drinkWindowStatus)
-                    Spacer()
+// MARK: - Wine Bottle Placeholder
+
+struct WineBottlePlaceholder: View {
+    let wineColor: WineColor
+
+    private var iconName: String {
+        switch wineColor {
+        case .sparkling: return "bubbles.and.sparkles"
+        default: return "wineglass.fill"
+        }
+    }
+
+    private var iconColor: Color {
+        switch wineColor {
+        case .red: return Color(red: 0.4, green: 0.1, blue: 0.15)
+        case .white: return Color(red: 0.9, green: 0.85, blue: 0.6)
+        case .rose: return Color(red: 0.95, green: 0.6, blue: 0.65)
+        case .sparkling: return Color(red: 0.9, green: 0.85, blue: 0.6)
+        case .dessert: return Color(red: 0.85, green: 0.65, blue: 0.3)
+        case .fortified: return Color(red: 0.5, green: 0.2, blue: 0.15)
+        }
+    }
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color.black.opacity(0.2))
+            .frame(width: 120, height: 180)
+            .overlay(
+                VStack(spacing: 12) {
+                    Image(systemName: iconName)
+                        .font(.system(size: 50))
+                        .foregroundColor(iconColor)
+                    Text(wineColor.displayName)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
                 }
-                .padding(.top, Theme.Spacing.xs)
-            }
-        }
-        .padding(Theme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-        )
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+            )
+            .shadow(color: .black.opacity(0.3), radius: 15, x: 0, y: 8)
     }
 }
 
-struct PremiumInfoItem: View {
-    let icon: String
-    let label: String
-    let value: String
-    let iconColor: Color
+// MARK: - Top 100 Rank Badge
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(iconColor)
-                Text(label)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.secondary)
-            }
-            Text(value)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Theme.Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6).opacity(0.5))
-        )
-    }
-}
-
-struct InfoItem: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text(value)
-                .font(.body)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-struct DrinkWindowBadge: View {
-    let status: DrinkWindowStatus
+struct Top100RankBadge: View {
+    let rank: Int
+    let year: Int
 
     var body: some View {
         HStack(spacing: 6) {
-            Image(systemName: status.iconName)
-            Text(status.displayText)
+            Image(systemName: "trophy.fill")
+                .font(.system(size: 12))
+            Text("#\(rank) • Top 100 of \(year)")
+                .font(.system(size: 12, weight: .bold))
         }
-        .font(.subheadline)
-        .foregroundColor(.white)
+        .foregroundColor(Theme.secondaryColor)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(
             Capsule()
-                .fill(Theme.drinkWindowColor(for: status))
+                .fill(Color.black.opacity(0.3))
+                .overlay(Capsule().strokeBorder(Theme.secondaryColor.opacity(0.5), lineWidth: 1))
         )
     }
 }
 
-// MARK: - Premium Tasting Note Section
+// MARK: - Confidence Warning
 
-struct PremiumTastingNoteSection: View {
-    let note: String
-    @State private var isExpanded = false
-
+struct ConfidenceWarning: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            // Section header
-            HStack {
-                Image(systemName: "quote.bubble.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(Theme.secondaryColor)
-                Text("Tasting Note")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.primary)
-                Spacer()
-            }
-
-            // Note text with elegant typography
-            Text(note)
-                .font(.system(size: 17, weight: .regular, design: .default))
-                .lineSpacing(6)
-                .lineLimit(isExpanded ? nil : 5)
-                .foregroundColor(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            // Read more/less button
-            if note.count > 250 {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        isExpanded.toggle()
-                    }
-                }) {
-                    HStack(spacing: 4) {
-                        Text(isExpanded ? "Show Less" : "Read More")
-                            .font(.system(size: 15, weight: .semibold))
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 12, weight: .semibold))
-                    }
-                    .foregroundColor(Theme.primaryColor)
-                }
-                .padding(.top, Theme.Spacing.xs)
-            }
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill")
+            Text("Possible match")
         }
-        .padding(Theme.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-        )
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+        .font(.system(size: 12, weight: .medium))
+        .foregroundColor(.orange)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Capsule().fill(Color.orange.opacity(0.2)))
     }
 }
 
-// MARK: - Premium Price & Value Section
+// MARK: - Quick Info Bar
 
-struct PremiumPriceValueSection: View {
+struct QuickInfoBar: View {
     let wine: Wine
     let listPrice: Decimal?
-    let valueRatio: Double?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-            // Section header
-            HStack {
-                Image(systemName: "dollarsign.circle.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(.green)
-                Text("Price & Value")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.primary)
-                Spacer()
-            }
+        HStack(spacing: 0) {
+            // Score with Arc
+            ScoreArcView(score: wine.score)
+                .frame(maxWidth: .infinity)
 
-            // Price grid - elegant layout
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: Theme.Spacing.md),
-                GridItem(.flexible(), spacing: Theme.Spacing.md)
-            ], spacing: Theme.Spacing.md) {
-                if let releasePrice = wine.releasePriceDisplay {
-                    PremiumPriceItem(
-                        icon: "tag.fill",
-                        label: "Release Price",
-                        value: releasePrice,
-                        iconColor: .blue
-                    )
-                }
+            Divider()
+                .frame(height: 50)
 
-                if let listPrice = listPrice {
-                    PremiumPriceItem(
-                        icon: "list.bullet",
-                        label: "List Price",
-                        value: formatPrice(listPrice),
-                        iconColor: .purple
-                    )
-                }
-
-                if let ratio = valueRatio {
-                    ValueRatioItem(ratio: ratio)
+            // Price
+            VStack(spacing: 2) {
+                Text("Price")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+                if let price = wine.releasePriceDisplay {
+                    Text(price)
+                        .font(.system(size: 18, weight: .bold))
+                } else if let listPrice = listPrice {
+                    Text(formatPrice(listPrice))
+                        .font(.system(size: 18, weight: .bold))
+                } else {
+                    Text("N/A")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.secondary)
                 }
             }
+            .frame(maxWidth: .infinity)
+
+            Divider()
+                .frame(height: 50)
+
+            // Region
+            VStack(spacing: 2) {
+                Text("Region")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+                Text(wine.region ?? wine.country ?? "Unknown")
+                    .font(.system(size: 16, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .padding(Theme.Spacing.lg)
+        .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 15, x: 0, y: 5)
         )
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
 
     private func formatPrice(_ price: Decimal) -> String {
@@ -497,125 +387,577 @@ struct PremiumPriceValueSection: View {
     }
 }
 
-struct PremiumPriceItem: View {
+// MARK: - Score Arc View
+
+struct ScoreArcView: View {
+    let score: Int?
+
+    private var scoreColor: Color {
+        guard let score = score else { return .gray }
+        switch score {
+        case 95...100: return Color(red: 0.2, green: 0.7, blue: 0.3)
+        case 90...94: return Color(red: 0.4, green: 0.75, blue: 0.3)
+        case 85...89: return Color(red: 0.9, green: 0.7, blue: 0.2)
+        case 80...84: return Color(red: 0.95, green: 0.5, blue: 0.2)
+        default: return Color(red: 0.9, green: 0.3, blue: 0.25)
+        }
+    }
+
+    private var progress: Double {
+        guard let score = score else { return 0 }
+        return Double(score - 50) / 50.0 // 50-100 range
+    }
+
+    var body: some View {
+        VStack(spacing: 2) {
+            ZStack {
+                // Background arc
+                Circle()
+                    .trim(from: 0.0, to: 0.75)
+                    .stroke(Color(.systemGray5), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 60, height: 60)
+
+                // Progress arc
+                Circle()
+                    .trim(from: 0.0, to: progress * 0.75)
+                    .stroke(scoreColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 60, height: 60)
+
+                // Score text
+                VStack(spacing: -2) {
+                    Text(score.map { "\($0)" } ?? "N/A")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                    if score != nil {
+                        Text("pts")
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Tab Picker
+
+struct TabPicker: View {
+    @Binding var selectedTab: WineDetailSheet.DetailTab
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(WineDetailSheet.DetailTab.allCases, id: \.self) { tab in
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedTab = tab
+                    }
+                }) {
+                    VStack(spacing: 8) {
+                        Text(tab.rawValue)
+                            .font(.system(size: 15, weight: selectedTab == tab ? .semibold : .medium))
+                            .foregroundColor(selectedTab == tab ? Theme.primaryColor : .secondary)
+
+                        Rectangle()
+                            .fill(selectedTab == tab ? Theme.primaryColor : Color.clear)
+                            .frame(height: 2)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .background(
+            VStack {
+                Spacer()
+                Rectangle()
+                    .fill(Color(.systemGray5))
+                    .frame(height: 1)
+            }
+        )
+    }
+}
+
+// MARK: - Tab Content
+
+struct TabContent: View {
+    let selectedTab: WineDetailSheet.DetailTab
+    let wine: Wine
+    let listPrice: Decimal?
+    let valueRatio: Double?
+
+    var body: some View {
+        switch selectedTab {
+        case .details:
+            DetailsTabContent(wine: wine, listPrice: listPrice, valueRatio: valueRatio)
+        case .tastingNote:
+            TastingNoteTabContent(wine: wine)
+        }
+    }
+}
+
+// MARK: - Details Tab Content
+
+struct DetailsTabContent: View {
+    let wine: Wine
+    let listPrice: Decimal?
+    let valueRatio: Double?
+
+    var body: some View {
+        VStack(spacing: Theme.Spacing.md) {
+            // Wine Info Card
+            InfoCard(wine: wine)
+
+            // Value Card (if applicable)
+            if let ratio = valueRatio {
+                ValueCard(ratio: ratio, listPrice: listPrice, releasePrice: wine.releasePrice)
+            }
+
+            // Grape Varieties
+            if !wine.grapeVarieties.isEmpty {
+                GrapeVarietiesCard(grapes: wine.grapeVarieties)
+            }
+        }
+    }
+}
+
+// MARK: - Info Card
+
+struct InfoCard: View {
+    let wine: Wine
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            // Type & Country Row
+            HStack {
+                InfoPill(icon: "drop.fill", text: wine.color.displayName, color: Theme.primaryColor)
+                InfoPill(icon: "globe", text: wine.country ?? "Unknown", color: .blue)
+                Spacer()
+            }
+
+            // Drink Window
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 14))
+                    .foregroundColor(.purple)
+                Text("Drink")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
+                Text(wine.drinkWindowDisplay)
+                    .font(.system(size: 14, weight: .semibold))
+
+                if wine.drinkWindowStatus != .ready {
+                    DrinkWindowStatusBadge(status: wine.drinkWindowStatus)
+                }
+            }
+
+            // Alcohol if available
+            if let alcohol = wine.alcohol {
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: "percent")
+                        .font(.system(size: 14))
+                        .foregroundColor(.orange)
+                    Text("Alcohol")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                    Text(String(format: "%.1f%%", alcohol))
+                        .font(.system(size: 14, weight: .semibold))
+                }
+            }
+        }
+        .padding(Theme.Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+        )
+    }
+}
+
+// MARK: - Info Pill
+
+struct InfoPill: View {
     let icon: String
-    let label: String
-    let value: String
-    let iconColor: Color
+    let text: String
+    let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(iconColor)
-                Text(label)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.secondary)
-            }
-            Text(value)
-                .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.primary)
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundColor(color)
+            Text(text)
+                .font(.system(size: 13, weight: .medium))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Theme.Spacing.md)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6).opacity(0.5))
+            Capsule()
+                .fill(color.opacity(0.1))
         )
     }
 }
 
-struct ValueRatioItem: View {
+// MARK: - Drink Window Status Badge
+
+struct DrinkWindowStatusBadge: View {
+    let status: DrinkWindowStatus
+
+    private var color: Color {
+        switch status {
+        case .tooYoung: return .orange
+        case .ready: return .green
+        case .peaking: return .green
+        case .pastPrime: return .red
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: status.iconName)
+                .font(.system(size: 10))
+            Text(status.displayText)
+                .font(.system(size: 11, weight: .semibold))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Capsule().fill(color))
+    }
+}
+
+// MARK: - Value Card
+
+struct ValueCard: View {
     let ratio: Double
-    
-    private var ratioColor: Color {
-        ratio < 2.5 ? .green : (ratio < 3.5 ? .orange : .red)
+    let listPrice: Decimal?
+    let releasePrice: Decimal?
+
+    private var valueColor: Color {
+        ratio < 2.0 ? .green : (ratio < 3.0 ? .orange : .red)
     }
-    
+
     private var valueText: String {
-        ratio < 2.5 ? "Great Value" : (ratio < 3.5 ? "Fair Value" : "High Markup")
+        ratio < 2.0 ? "Great Value" : (ratio < 3.0 ? "Fair Value" : "High Markup")
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-            HStack(spacing: 6) {
-                Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.system(size: 14))
-                    .foregroundColor(ratioColor)
-                Text("Value")
-                    .font(.system(size: 12, weight: .medium))
+        HStack {
+            // Value Gauge
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 14))
+                        .foregroundColor(valueColor)
+                    Text(valueText)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(valueColor)
+                }
+                Text(String(format: "%.1fx markup from release", ratio))
+                    .font(.system(size: 12))
                     .foregroundColor(.secondary)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(format: "%.1fx", ratio))
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(ratioColor)
-                Text(valueText)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(ratioColor.opacity(0.8))
-            }
+
+            Spacer()
+
+            // Mini gauge
+            ValueGauge(ratio: ratio)
+                .frame(width: 60, height: 30)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Theme.Spacing.md)
+        .padding(Theme.Spacing.lg)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(ratioColor.opacity(0.1))
+            RoundedRectangle(cornerRadius: 16)
+                .fill(valueColor.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(valueColor.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 }
 
-// MARK: - Premium Action Buttons
+// MARK: - Value Gauge
 
-struct PremiumActionButtonsSection: View {
+struct ValueGauge: View {
+    let ratio: Double
+
+    private var color: Color {
+        ratio < 2.0 ? .green : (ratio < 3.0 ? .orange : .red)
+    }
+
+    private var needlePosition: Double {
+        min(1.0, max(0.0, (ratio - 1.0) / 4.0)) // 1x to 5x range
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                // Background arc
+                Path { path in
+                    path.addArc(center: CGPoint(x: geo.size.width / 2, y: geo.size.height),
+                               radius: geo.size.width / 2 - 4,
+                               startAngle: .degrees(180),
+                               endAngle: .degrees(0),
+                               clockwise: false)
+                }
+                .stroke(
+                    LinearGradient(colors: [.green, .yellow, .orange, .red],
+                                  startPoint: .leading, endPoint: .trailing),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                )
+
+                // Needle
+                let angle = 180 - (needlePosition * 180)
+                let needleLength = geo.size.width / 2 - 8
+                let center = CGPoint(x: geo.size.width / 2, y: geo.size.height)
+                let needleEnd = CGPoint(
+                    x: center.x + needleLength * cos(angle * .pi / 180),
+                    y: center.y - needleLength * sin(angle * .pi / 180)
+                )
+
+                Path { path in
+                    path.move(to: center)
+                    path.addLine(to: needleEnd)
+                }
+                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+
+                Circle()
+                    .fill(Color.primary)
+                    .frame(width: 6, height: 6)
+                    .position(center)
+            }
+        }
+    }
+}
+
+// MARK: - Grape Varieties Card
+
+struct GrapeVarietiesCard: View {
+    let grapes: [GrapeVariety]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            HStack(spacing: 6) {
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.green)
+                Text("Grape Varieties")
+                    .font(.system(size: 15, weight: .semibold))
+            }
+
+            FlowLayout(spacing: 8) {
+                ForEach(grapes, id: \.name) { grape in
+                    GrapeChip(grape: grape)
+                }
+            }
+        }
+        .padding(Theme.Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+        )
+    }
+}
+
+// MARK: - Grape Chip
+
+struct GrapeChip: View {
+    let grape: GrapeVariety
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(grape.name)
+                .font(.system(size: 13, weight: .medium))
+            if let pct = grape.percentage {
+                Text("\(pct)%")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(Color(.systemGray6)))
+    }
+}
+
+// MARK: - Tasting Note Tab Content
+
+struct TastingNoteTabContent: View {
+    let wine: Wine
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+            if let note = wine.tastingNote, !note.isEmpty {
+                // Tasting Note Card
+                VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+                    // Quote icon
+                    Image(systemName: "quote.opening")
+                        .font(.system(size: 24))
+                        .foregroundColor(Theme.secondaryColor.opacity(0.5))
+
+                    // Note text
+                    Text(note)
+                        .font(.system(size: 17, weight: .regular, design: .serif))
+                        .lineSpacing(8)
+                        .lineLimit(isExpanded ? nil : 6)
+                        .foregroundColor(.primary)
+
+                    // Read more
+                    if note.count > 250 {
+                        Button(action: { withAnimation { isExpanded.toggle() } }) {
+                            HStack(spacing: 4) {
+                                Text(isExpanded ? "Show Less" : "Read More")
+                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            }
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Theme.primaryColor)
+                        }
+                    }
+
+                    // Reviewer attribution
+                    if let reviewer = wine.reviewer {
+                        HStack(spacing: Theme.Spacing.sm) {
+                            // Reviewer initials avatar
+                            Text(reviewer.initials)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 36, height: 36)
+                                .background(Circle().fill(Theme.primaryColor))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                if let name = reviewer.name {
+                                    Text(name)
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                if let date = wine.issueDate {
+                                    Text(formatDate(date))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .padding(.top, Theme.Spacing.sm)
+                    }
+                }
+                .padding(Theme.Spacing.lg)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color(.systemBackground))
+                )
+            } else {
+                // No tasting note
+                VStack(spacing: Theme.Spacing.md) {
+                    Image(systemName: "text.quote")
+                        .font(.system(size: 40))
+                        .foregroundColor(.secondary.opacity(0.5))
+                    Text("No tasting note available")
+                        .font(.system(size: 15))
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Theme.Spacing.xxl)
+            }
+        }
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
+    }
+}
+
+// MARK: - Action Buttons
+
+struct ActionButtons: View {
     @Binding var isSaved: Bool
     let onSave: () -> Void
     let onShare: () -> Void
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            // Save button
-            Button(action: {
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
-                onSave()
-            }) {
-                HStack {
-                    Image(systemName: isSaved ? "heart.fill" : "heart")
-                        .font(.system(size: 18, weight: .semibold))
-                    Text(isSaved ? "Saved" : "Save")
-                        .font(.system(size: 17, weight: .semibold))
-                }
-                .foregroundColor(isSaved ? .white : Theme.primaryColor)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSaved ? Color.red : Color(.systemGray6))
-                )
+        Button(action: {
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            onSave()
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: isSaved ? "heart.fill" : "heart")
+                    .font(.system(size: 18, weight: .semibold))
+                Text(isSaved ? "Saved to My Wines" : "Save to My Wines")
+                    .font(.system(size: 16, weight: .semibold))
             }
-            .disabled(isSaved)
+            .foregroundColor(isSaved ? .white : Theme.primaryColor)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSaved ? Theme.primaryColor : Color(.systemBackground))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Theme.primaryColor, lineWidth: isSaved ? 0 : 2)
+                    )
+            )
+        }
+        .disabled(isSaved)
+    }
+}
 
-            // Share button
-            Button(action: {
-                let generator = UIImpactFeedbackGenerator(style: .light)
-                generator.impactOccurred()
-                onShare()
-            }) {
-                HStack {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 18, weight: .semibold))
-                    Text("Share")
-                        .font(.system(size: 17, weight: .semibold))
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Theme.primaryColor)
-                )
+// MARK: - Brand Footer
+
+struct BrandFooter: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                WineSpectatorLogo(variant: .black, height: 18)
             }
+            Text("Expert ratings & reviews")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, Theme.Spacing.md)
+    }
+}
+
+// MARK: - Flow Layout
+
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = FlowResult(in: proposal.width ?? 0, subviews: subviews, spacing: spacing)
+        return result.size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = FlowResult(in: bounds.width, subviews: subviews, spacing: spacing)
+        for (index, subview) in subviews.enumerated() {
+            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x,
+                                      y: bounds.minY + result.positions[index].y),
+                         proposal: .unspecified)
+        }
+    }
+
+    struct FlowResult {
+        var size: CGSize = .zero
+        var positions: [CGPoint] = []
+
+        init(in width: CGFloat, subviews: Subviews, spacing: CGFloat) {
+            var x: CGFloat = 0
+            var y: CGFloat = 0
+            var rowHeight: CGFloat = 0
+
+            for subview in subviews {
+                let size = subview.sizeThatFits(.unspecified)
+                if x + size.width > width, x > 0 {
+                    x = 0
+                    y += rowHeight + spacing
+                    rowHeight = 0
+                }
+                positions.append(CGPoint(x: x, y: y))
+                rowHeight = max(rowHeight, size.height)
+                x += size.width + spacing
+                self.size.width = max(self.size.width, x)
+            }
+            self.size.height = y + rowHeight
         }
     }
 }

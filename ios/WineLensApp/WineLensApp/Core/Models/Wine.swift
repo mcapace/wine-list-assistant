@@ -21,6 +21,9 @@ struct Wine: Identifiable, Codable, Hashable {
     let drinkWindowEnd: Int?
     let releasePrice: Decimal?
     let releasePriceCurrency: String?
+    let labelUrl: String? // Wine label image URL
+    let top100Rank: Int? // Top 100 ranking if applicable
+    let top100Year: Int? // Year of Top 100 list
 
     // MARK: - Computed Properties
 
@@ -124,6 +127,9 @@ struct Wine: Identifiable, Codable, Hashable {
         case drinkWindowEnd = "drink_window_end"
         case releasePrice = "release_price"
         case releasePriceCurrency = "release_price_currency"
+        case labelUrl = "label_url"
+        case top100Rank = "top100_rank"
+        case top100Year = "top100_year"
     }
 
     // MARK: - Memberwise Initializer (for preview code and manual creation)
@@ -148,7 +154,10 @@ struct Wine: Identifiable, Codable, Hashable {
         drinkWindowStart: Int?,
         drinkWindowEnd: Int?,
         releasePrice: Decimal?,
-        releasePriceCurrency: String?
+        releasePriceCurrency: String?,
+        labelUrl: String? = nil,
+        top100Rank: Int? = nil,
+        top100Year: Int? = nil
     ) {
         self.id = id
         self.producer = producer
@@ -170,6 +179,9 @@ struct Wine: Identifiable, Codable, Hashable {
         self.drinkWindowEnd = drinkWindowEnd
         self.releasePrice = releasePrice
         self.releasePriceCurrency = releasePriceCurrency
+        self.labelUrl = labelUrl
+        self.top100Rank = top100Rank
+        self.top100Year = top100Year
     }
 
     // MARK: - Custom Decoding
@@ -197,6 +209,9 @@ struct Wine: Identifiable, Codable, Hashable {
         drinkWindowEnd = try container.decodeIfPresent(Int.self, forKey: .drinkWindowEnd)
         releasePrice = try container.decodeIfPresent(Decimal.self, forKey: .releasePrice)
         releasePriceCurrency = try container.decodeIfPresent(String.self, forKey: .releasePriceCurrency)
+        labelUrl = try container.decodeIfPresent(String.self, forKey: .labelUrl)
+        top100Rank = try container.decodeIfPresent(Int.self, forKey: .top100Rank)
+        top100Year = try container.decodeIfPresent(Int.self, forKey: .top100Year)
     }
 
     // MARK: - Encoding
@@ -224,6 +239,9 @@ struct Wine: Identifiable, Codable, Hashable {
         try container.encodeIfPresent(drinkWindowEnd, forKey: .drinkWindowEnd)
         try container.encodeIfPresent(releasePrice, forKey: .releasePrice)
         try container.encodeIfPresent(releasePriceCurrency, forKey: .releasePriceCurrency)
+        try container.encodeIfPresent(labelUrl, forKey: .labelUrl)
+        try container.encodeIfPresent(top100Rank, forKey: .top100Rank)
+        try container.encodeIfPresent(top100Year, forKey: .top100Year)
     }
 }
 
