@@ -1,9 +1,37 @@
 .vercel
-# Xcode user-specific files (should not be committed)
-*.xcuserstate
-*.xcuserdatad/
+
+# macOS
 .DS_Store
 
-# Xcode user-specific files
+# Xcode — build products & local caches
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode — user-specific (do not share per-developer state)
 *.xcuserstate
+*.xcuserdatad/
 xcuserdata/
+
+# Xcode — legacy / merge noise
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+!default.pbxuser
+*.moved-aside
+
+# Carthage (if added later)
+Carthage/Build/
+
+# SwiftPM — local resolver cache only; keep shared Package.resolved committed
+.swiftpm/configuration/
+
+# Backend
+backend/node_modules/
+backend/.env
+backend/.env.*
+!backend/.env.example

@@ -1,98 +1,63 @@
-# Wine Spectator Wine List Assistant
+# Wine List Assistant
 
-> *Like Google Translate for fine wine*
+Monorepo for **Wine Lens** (iOS) and its **backend API** (Node/TypeScript on Vercel).
 
-A mobile application that uses smartphone camera technology to scan restaurant wine lists and instantly overlay Wine Spectator's trusted critic scores. Transform wine list anxiety into confident ordering.
+## Repository layout
 
-## The Problem
+| Path | What it is |
+|------|------------|
+| `ios/WineLensApp/` | Xcode project, SwiftUI app, unit/UI tests |
+| `backend/` | Vercel serverless API (`api/`), Algolia search, Supabase-related tooling |
 
-Every wine lover has faced it: wine list anxiety. You're handed a 60-page menu, names and vintages blur together, and the prices seem random. Is that $525 Montrachet worth it? Is the $175 bottle a steal?
-
-## The Solution
-
-Using your smartphone camera, the app scans any wine list and instantly overlays Wine Spectator's trusted, unbiased critic scores right on your screen. Filter by score (only wines over 90 points), drink window, or best values.
-
-**Key differentiator:** Unlike crowd-sourced alternatives (Vivino, Delectable), this app is powered by editorially-driven reviews from credible blind tastings conducted by highly experienced tasters.
-
-## Features
-
-### Consumer (B2C)
-- **Real-time scanning** - Point camera at wine list, see scores instantly
-- **AR overlay** - Score badges appear next to recognized wines
-- **Smart filters** - Filter by score (90+), drink window, best value
-- **Wine details** - Tap for full tasting notes, drink windows, prices
-- **Save & share** - Build personal wine lists
-
-### Business (B2B)
-- **List analysis** - Upload wine list for comprehensive analysis
-- **Markup alerts** - Flag wines outside acceptable markup ranges
-- **Drink window alerts** - Identify wines past their prime
-- **Replacement suggestions** - Find alternatives for out-of-stock wines
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Project Plan](docs/PROJECT_PLAN.md) | Full project overview, phases, monetization, risks |
-| [iOS Technical Spec](docs/IOS_TECHNICAL_SPEC.md) | iOS architecture, code structure, Swift implementation |
-| [API Specification](docs/API_SPECIFICATION.md) | Backend API design, endpoints, authentication |
-
-## Technology Stack
-
-### iOS (Primary Platform)
-- Swift 5.9+ / SwiftUI
-- Apple Vision (OCR)
-- ARKit (AR overlay)
-- AVFoundation (camera)
-- StoreKit 2 (subscriptions)
-
-### Android (Phase 2)
-- Kotlin / Jetpack Compose
-- ML Kit (OCR)
-- ARCore (AR overlay)
-
-### Backend
-- REST API
-- PostgreSQL (wine database)
-- Elasticsearch (fuzzy matching)
-- Redis (caching)
-
-## Development Phases
-
-1. **Foundation** (Weeks 1-4) - Architecture, design, API contracts
-2. **Core Scanner MVP** (Weeks 5-12) - Camera, OCR, matching, overlay
-3. **Polish & Filters** (Weeks 13-18) - Filters, accounts, subscriptions
-4. **Launch Prep** (Weeks 19-22) - QA, optimization, App Store prep
-5. **Launch & Iterate** (Weeks 23-28) - Launch, feedback, improvements
-6. **B2B Features** (Weeks 29-36) - Business tools
-7. **Android** (Weeks 37-50) - Android app development
-
-## Key Technical Challenges
-
-1. **OCR in low light** - Restaurant lighting optimization
-2. **Fuzzy wine matching** - Handling abbreviations, misspellings, formatting variations
-3. **Real-time AR performance** - Smooth overlay with moving camera
-4. **Vintage handling** - Same wine, different vintages, different scores
-
-## Monetization
-
-### Consumer
-- **Free tier:** 5 scans/month, basic scores
-- **Premium:** $9.99/month or $79.99/year - unlimited scans, full notes, filters
-
-### Business
-- **Pro:** $999/year - 1 user, list analysis
-- **Enterprise:** $2,499/year - 5 users, markup analysis, API access
-
-## Project Status
-
-**Current Phase:** Planning & Architecture
-
-## Team
-
-- Product concept: Jeffrey Lindenmuth
-- Technical planning: In progress
+Architecture, data flow, and diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
-*Wine Spectator - The World's Most Authoritative Wine Publication*
+## Sharing Xcode projects in Git (for the team)
+
+Xcode works well in Git if you commit the **project** and **shared** SPM state, and ignore **machine-local** noise.
+
+### Do commit
+
+- **`*.xcodeproj/`** — project file, `project.pbxproj`, and the **shared** workspace data under `project.xcworkspace/xcshareddata/` (includes **`swiftpm/Package.resolved`** so everyone gets the same Lottie version).
+- **Source folders** synced by the project (`WineLensApp/`, tests, assets).
+- **Team-scheme** files if you add shared schemes under `xcshareddata/xcschemes/` (optional; schemes in personal `xcuserdata` are not shared by default).
+
+### Do not commit
+
+- **`xcuserdata/`** — per-developer UI state, breakpoints, personal scheme tweaks.
+- **`DerivedData/`**, local **`build/`** output, **`.DS_Store`**.
+- **Secrets** — API keys, Google Cloud Vision keys, provisioning details. Use `Info.plist` / `.xcconfig` gitignored locally, or CI secrets.
+
+This repo’s [`.gitignore`](.gitignore) is set up for the above. After clone, each developer opens the same `.xcodeproj`; Xcode resolves Swift packages from `Package.resolved` on first build.
+
+### Clone and run the iOS app
+
+1. Clone the repository.
+2. Open `ios/WineLensApp/WineLensApp.xcodeproj` in Xcode.
+3. Select the **WineLensApp** scheme and a simulator or device.
+4. **⌘B** to build. SPM will fetch **Lottie** automatically.
+
+Configure optional keys locally (not committed): `GOOGLE_CLOUD_VISION_API_KEY`, `WLA_API_KEY` as referenced in `AppConfiguration.swift`.
+
+### Clone and run the backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Fill in `.env` from `backend/.env.example` (Algolia, Supabase, JWT as needed). `vercel dev` requires the [Vercel CLI](https://vercel.com/docs/cli). See `backend/package.json` for `build`, `lint`, and DB scripts.
+
+---
+
+## Quick reference: builds
+
+| Component | Tooling |
+|-----------|---------|
+| iOS app | Xcode 16+ (project targets **iOS 18**); Swift **5**; SPM (**Lottie**) |
+| Backend | Node **≥ 18**; **TypeScript** → `tsc`; deploy **Vercel** (`api/` routes) |
+
+For detailed stack and request flows, use **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
